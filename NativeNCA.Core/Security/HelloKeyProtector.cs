@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
@@ -27,11 +28,12 @@ public interface IVaultKeyProtector
 /// <summary>
 /// Windows Hello key in the Microsoft Passport key storage provider (TPM-backed where available).
 /// The private key never leaves the device and every decryption requires face, fingerprint or PIN.
-/// Same approach as KeePassWinHello: RSA-2048 with PKCS#1 padding.
+/// Same approach as KeePassWinHello: RSA-2048 with PKCS#1 padding, driven through ncrypt.dll directly
+/// (the managed CngKey API mishandles this provider, e.g. CngKey.Exists throws instead of returning false).
 /// </summary>
 public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
 {
-    private static readonly CngProvider PassportProvider = new("Microsoft Passport Key Storage Provider");
+    private const string ProviderName = "Microsoft Passport Key Storage Provider";
 
     // Passport KSP key names have the form "<user SID>//<domain>/<sub-domain>/<key name>".
     private static string KeyName => $"{WindowsIdentity.GetCurrent().User!.Value}//NativeNCA/Vault/MasterKey";
@@ -40,94 +42,174 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
     {
         get
         {
-            try
-            {
-                // Throws if the provider is unavailable (Windows Hello not set up).
-                CngKey.Exists(KeyName, PassportProvider);
-                return true;
-            }
-            catch (CryptographicException)
-            {
-                return false;
-            }
+            // The provider opens only when Windows Hello (at least a PIN) is set up for this user.
+            if (NCryptOpenStorageProvider(out var provider, ProviderName, 0) != 0) return false;
+            NCryptFreeObject(provider);
+            return true;
         }
     }
 
     public void CreateKey(IntPtr ownerWindow)
     {
-        if (CngKey.Exists(KeyName, PassportProvider))
-            DeleteKey();
+        DeleteKey();
 
-        var parameters = new CngKeyCreationParameters
-        {
-            Provider = PassportProvider,
-            KeyUsage = CngKeyUsages.Decryption | CngKeyUsages.Signing,
-            ExportPolicy = CngExportPolicies.None,
-            ParentWindowHandle = ownerWindow
-        };
-        parameters.Parameters.Add(new CngProperty("Length", BitConverter.GetBytes(2048), CngPropertyOptions.None));
-        parameters.Parameters.Add(UseContext("NativeNCA: создание ключа защиты хранилища"));
-
+        Check(NCryptOpenStorageProvider(out var provider, ProviderName, 0), "открыть хранилище ключей Windows Hello");
         try
         {
-            using var key = CngKey.Create(CngAlgorithm.Rsa, KeyName, parameters);
+            Check(NCryptCreatePersistedKey(provider, out var key, "RSA", KeyName, 0, 0), "создать ключ Windows Hello");
+            try
+            {
+                SetInt(key, "Length", 2048);
+                SetInt(key, "Key Usage", NcryptAllowAllUsages);
+                SetWindow(key, ownerWindow);
+                SetString(key, "Use Context", "NativeNCA: создание ключа защиты хранилища");
+
+                // Shows the Windows Hello prompt.
+                int status = NCryptFinalizeKey(key, 0);
+                if (IsCancellation(status))
+                    throw new OperationCanceledException("Создание ключа Windows Hello отменено");
+                Check(status, "создать ключ Windows Hello");
+            }
+            finally
+            {
+                NCryptFreeObject(key);
+            }
         }
-        catch (CryptographicException ex) when (IsCancellation(ex))
+        finally
         {
-            throw new OperationCanceledException("Создание ключа Windows Hello отменено", ex);
+            NCryptFreeObject(provider);
         }
     }
 
     public byte[] Wrap(byte[] secret)
     {
         // Encrypt with an imported copy of the public key so no Hello UI is involved.
-        using var key = CngKey.Open(KeyName, PassportProvider);
-        byte[] publicBlob = key.Export(CngKeyBlobFormat.GenericPublicBlob);
-        using var publicKey = CngKey.Import(publicBlob, CngKeyBlobFormat.GenericPublicBlob);
+        byte[] publicBlob = WithKey(key =>
+        {
+            Check(NCryptExportKey(key, IntPtr.Zero, "RSAPUBLICBLOB", IntPtr.Zero, null, 0, out int size, 0), "прочитать открытый ключ");
+            var blob = new byte[size];
+            Check(NCryptExportKey(key, IntPtr.Zero, "RSAPUBLICBLOB", IntPtr.Zero, blob, size, out size, 0), "прочитать открытый ключ");
+            return blob[..size];
+        });
+
+        using var publicKey = CngKey.Import(publicBlob, new CngKeyBlobFormat("RSAPUBLICBLOB"));
         using var rsa = new RSACng(publicKey);
         return rsa.Encrypt(secret, RSAEncryptionPadding.Pkcs1);
     }
 
-    public byte[] Unwrap(byte[] wrapped, IntPtr ownerWindow, string reason)
+    public byte[] Unwrap(byte[] wrapped, IntPtr ownerWindow, string reason) => WithKey(key =>
     {
-        if (!CngKey.Exists(KeyName, PassportProvider))
-            throw new VaultKeyLostException();
+        SetWindow(key, ownerWindow);
+        SetString(key, "Use Context", reason);
 
-        using var key = CngKey.Open(KeyName, PassportProvider);
-        if (ownerWindow != IntPtr.Zero)
-            key.SetProperty(new CngProperty("HWND Handle", BitConverter.GetBytes(ownerWindow.ToInt64()), CngPropertyOptions.None));
-        key.SetProperty(UseContext(reason));
-
-        try
-        {
-            using var rsa = new RSACng(key);
-            return rsa.Decrypt(wrapped, RSAEncryptionPadding.Pkcs1);
-        }
-        catch (CryptographicException ex) when (IsCancellation(ex))
-        {
-            throw new OperationCanceledException("Подтверждение Windows Hello отменено", ex);
-        }
-    }
+        // Shows the Windows Hello prompt (the first call already performs the private-key operation).
+        var output = new byte[wrapped.Length];
+        int status = NCryptDecrypt(key, wrapped, wrapped.Length, IntPtr.Zero, output, output.Length, out int written, NcryptPadPkcs1Flag);
+        if (IsCancellation(status))
+            throw new OperationCanceledException("Подтверждение Windows Hello отменено");
+        Check(status, "расшифровать ключ хранилища");
+        return output[..written];
+    });
 
     public void DeleteKey()
     {
+        if (NCryptOpenStorageProvider(out var provider, ProviderName, 0) != 0) return;
         try
         {
-            using var key = CngKey.Open(KeyName, PassportProvider);
-            key.Delete();
+            if (NCryptOpenKey(provider, out var key, KeyName, 0, 0) == 0)
+            {
+                // NCryptDeleteKey frees the handle on success.
+                if (NCryptDeleteKey(key, 0) != 0) NCryptFreeObject(key);
+            }
         }
-        catch (CryptographicException)
+        finally
         {
-            // Already gone.
+            NCryptFreeObject(provider);
         }
     }
 
-    private static CngProperty UseContext(string text) =>
-        new("Use Context", Encoding.Unicode.GetBytes(text + "\0"), CngPropertyOptions.None);
+    private static T WithKey<T>(Func<IntPtr, T> action)
+    {
+        Check(NCryptOpenStorageProvider(out var provider, ProviderName, 0), "открыть хранилище ключей Windows Hello");
+        try
+        {
+            int status = NCryptOpenKey(provider, out var key, KeyName, 0, 0);
+            if (status is NteNoKey or NteBadKeyset) throw new VaultKeyLostException();
+            Check(status, "открыть ключ Windows Hello");
+            try
+            {
+                return action(key);
+            }
+            finally
+            {
+                NCryptFreeObject(key);
+            }
+        }
+        finally
+        {
+            NCryptFreeObject(provider);
+        }
+    }
+
+    // ---------- ncrypt.dll ----------
+
+    private const int NteNoKey = unchecked((int)0x8009000D);
+    private const int NteBadKeyset = unchecked((int)0x80090016);
+    private const int NcryptAllowAllUsages = 0x00FFFFFF;
+    private const int NcryptPadPkcs1Flag = 0x2;
 
     // NTE_USER_CANCELLED (0x80090036) / ERROR_CANCELLED (0x800704C7)
-    private static bool IsCancellation(CryptographicException ex) =>
-        ex.HResult is unchecked((int)0x80090036) or unchecked((int)0x800704C7);
+    private static bool IsCancellation(int status) =>
+        status is unchecked((int)0x80090036) or unchecked((int)0x800704C7);
+
+    private static void Check(int status, string action)
+    {
+        if (status != 0)
+            throw new CryptographicException($"Не удалось {action} (0x{status:X8})") { HResult = status };
+    }
+
+    private static void SetInt(IntPtr handle, string property, int value) =>
+        Check(NCryptSetProperty(handle, property, BitConverter.GetBytes(value), 4, 0), $"задать свойство «{property}»");
+
+    private static void SetString(IntPtr handle, string property, string value)
+    {
+        byte[] bytes = Encoding.Unicode.GetBytes(value + "\0");
+        Check(NCryptSetProperty(handle, property, bytes, bytes.Length, 0), $"задать свойство «{property}»");
+    }
+
+    private static void SetWindow(IntPtr handle, IntPtr window)
+    {
+        if (window == IntPtr.Zero) return;
+        byte[] bytes = IntPtr.Size == 8 ? BitConverter.GetBytes(window.ToInt64()) : BitConverter.GetBytes(window.ToInt32());
+        Check(NCryptSetProperty(handle, "HWND Handle", bytes, bytes.Length, 0), "привязать окно Windows Hello");
+    }
+
+    [DllImport("ncrypt.dll", CharSet = CharSet.Unicode)]
+    private static extern int NCryptOpenStorageProvider(out IntPtr provider, string providerName, int flags);
+
+    [DllImport("ncrypt.dll", CharSet = CharSet.Unicode)]
+    private static extern int NCryptOpenKey(IntPtr provider, out IntPtr key, string keyName, int legacyKeySpec, int flags);
+
+    [DllImport("ncrypt.dll", CharSet = CharSet.Unicode)]
+    private static extern int NCryptCreatePersistedKey(IntPtr provider, out IntPtr key, string algorithm, string keyName, int legacyKeySpec, int flags);
+
+    [DllImport("ncrypt.dll", CharSet = CharSet.Unicode)]
+    private static extern int NCryptSetProperty(IntPtr handle, string property, byte[] input, int inputSize, int flags);
+
+    [DllImport("ncrypt.dll")]
+    private static extern int NCryptFinalizeKey(IntPtr key, int flags);
+
+    [DllImport("ncrypt.dll", CharSet = CharSet.Unicode)]
+    private static extern int NCryptExportKey(IntPtr key, IntPtr exportKey, string blobType, IntPtr parameterList, byte[]? output, int outputSize, out int result, int flags);
+
+    [DllImport("ncrypt.dll")]
+    private static extern int NCryptDecrypt(IntPtr key, byte[] input, int inputSize, IntPtr paddingInfo, byte[] output, int outputSize, out int result, int flags);
+
+    [DllImport("ncrypt.dll")]
+    private static extern int NCryptDeleteKey(IntPtr key, int flags);
+
+    [DllImport("ncrypt.dll")]
+    private static extern int NCryptFreeObject(IntPtr handle);
 }
 
 /// <summary>The Windows Hello key protecting the vault no longer exists (e.g. PIN was reset).</summary>
