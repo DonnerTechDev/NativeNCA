@@ -94,6 +94,35 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Banner at the top of the content layer (ui:InfoBar does not render buttons) -->
+        <Style x:Key="BannerBorder" TargetType="Border">
+            <Setter Property="Margin" Value="0,8,0,0" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+        </Style>
+
+        <Style x:Key="BannerIcon" TargetType="ui:SymbolIcon">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Margin" Value="0,1,12,0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Filled" Value="True" />
+        </Style>
+
+        <Style x:Key="BannerTitleText" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        </Style>
+
+        <Style x:Key="BannerBodyText" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,2,0,0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        </Style>
     </ui:FluentWindow.Resources>
 
     <Grid>
@@ -199,12 +228,14 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
+                <!-- Banners, most important first; the host collapses when none is shown -->
+                <StackPanel x:Name="BannerHost" Grid.Row="0" Margin="24,8,24,0">
+
                 <!-- Server problem banner (NCALayer holds the port, no TLS certificate, ...) with its fix -->
-                <Border x:Name="ServerBanner" Grid.Row="0" Margin="24,16,24,0" Padding="16,12" CornerRadius="8" BorderThickness="1"
-                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                <Border x:Name="ServerBanner"
                         Visibility="{Binding ServerError, Converter={StaticResource NullToVisibilityConverter}}">
                     <Border.Style>
-                        <Style TargetType="Border">
+                        <Style TargetType="Border" BasedOn="{StaticResource BannerBorder}">
                             <Setter Property="Background" Value="{DynamicResource SystemFillColorCriticalBackgroundBrush}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsNcaLayerConflict}" Value="True">
@@ -267,6 +298,101 @@
                         </StackPanel>
                     </Grid>
                 </Border>
+
+                <!-- The vault was written by a newer NativeNCA: read-only until updated -->
+                <Border x:Name="VaultReadOnlyBanner" Style="{StaticResource BannerBorder}"
+                        Background="{DynamicResource SystemFillColorCautionBackgroundBrush}"
+                        Visibility="{Binding VaultReadOnlyMessage, Converter={StaticResource NullToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="Warning24" Style="{StaticResource BannerIcon}"
+                                       Foreground="{DynamicResource SystemFillColorCautionBrush}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Хранилище ключей открыто только для чтения" Style="{StaticResource BannerTitleText}" />
+                            <TextBlock Text="{Binding VaultReadOnlyMessage}" Style="{StaticResource BannerBodyText}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- A newer version is available / downloading -->
+                <Border x:Name="UpdateBanner" Style="{StaticResource BannerBorder}"
+                        Background="{DynamicResource SystemFillColorAttentionBackgroundBrush}"
+                        Visibility="{Binding IsUpdateBannerVisible, Converter={StaticResource BoolToVisibility}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="ArrowCircleUp24" Style="{StaticResource BannerIcon}"
+                                       Foreground="{DynamicResource SystemFillColorAttentionBrush}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding UpdateBannerTitle}" Style="{StaticResource BannerTitleText}" />
+                            <TextBlock Text="{Binding UpdateBannerText}" Style="{StaticResource BannerBodyText}" />
+
+                            <Grid Margin="0,8,0,0"
+                                  Visibility="{Binding UpdateError, Converter={StaticResource NullToVisibilityConverter}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ui:SymbolIcon Symbol="ErrorCircle16" Filled="True" FontSize="14" Margin="0,2,6,0" VerticalAlignment="Top"
+                                               Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
+                                <TextBlock Grid.Column="1" Text="{Binding UpdateError}" FontSize="13" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                            </Grid>
+
+                            <WrapPanel Margin="0,12,0,0"
+                                       Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}">
+                                <ui:Button Margin="0,0,8,0" Appearance="Primary" Content="Обновить"
+                                           Icon="{ui:SymbolIcon ArrowDownload24}" Command="{Binding UpdateNowCommand}" />
+                                <ui:HyperlinkButton Content="Что нового" NavigateUri="{Binding ReleaseNotesUrl}" />
+                            </WrapPanel>
+
+                            <Grid Margin="0,12,0,0"
+                                  Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVisibility}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <ProgressBar Minimum="0" Maximum="1" Value="{Binding DownloadFraction, Mode=OneWay}"
+                                                 IsIndeterminate="{Binding IsDownloadIndeterminate}" />
+                                    <TextBlock Text="{Binding DownloadText}" Margin="0,6,0,0" Style="{StaticResource SecondaryText}" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1" Margin="16,0,0,0" Content="Отмена" VerticalAlignment="Center"
+                                           Command="{Binding CancelDownloadCommand}" />
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- After an update, a rollback or the installation: closable -->
+                <Border x:Name="RestartBanner" Style="{StaticResource BannerBorder}"
+                        Background="{DynamicResource SystemFillColorSuccessBackgroundBrush}"
+                        Visibility="{Binding RestartBannerText, Converter={StaticResource NullToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="CheckmarkCircle24" Style="{StaticResource BannerIcon}"
+                                       Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding RestartBannerText}" Style="{StaticResource BannerBodyText}" Margin="0" />
+                            <ui:HyperlinkButton Content="Открыть параметры" Margin="-8,4,0,-4" Padding="8,4" HorizontalAlignment="Left"
+                                                Click="OnOpenSettingsFromBannerClick"
+                                                Visibility="{Binding HasPreviousVersion, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+                        <ui:Button Grid.Column="2" Margin="12,-4,-8,-4" VerticalAlignment="Top" Style="{StaticResource IconButton}"
+                                   Icon="{ui:SymbolIcon Dismiss16}" ToolTip="Закрыть"
+                                   Command="{Binding DismissRestartBannerCommand}" />
+                    </Grid>
+                </Border>
+                </StackPanel>
 
                 <Grid x:Name="ContentHost" Grid.Row="1" RenderTransformOrigin="0.5,0.5">
                     <Grid.RenderTransform>
@@ -584,6 +710,64 @@
                                 </StackPanel>
                             </ui:CardControl>
 
+                            <StackPanel x:Name="UpdatesSection">
+                                <TextBlock Text="Обновления" Style="{StaticResource SectionHeaderText}" />
+
+                                <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon ArrowSync24}">
+                                    <ui:CardControl.Header>
+                                        <StackPanel>
+                                            <TextBlock Style="{StaticResource SettingsTitleText}">
+                                                <Run Text="NativeNCA" /> <Run Text="{Binding CurrentVersionText, Mode=OneWay}" />
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding CheckStatusText}" Style="{StaticResource SettingsDescriptionText}" />
+                                        </StackPanel>
+                                    </ui:CardControl.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:ProgressRing Width="16" Height="16" Margin="0,0,12,0" IsIndeterminate="True"
+                                                         Visibility="{Binding IsChecking, Converter={StaticResource BoolToVisibility}}" />
+                                        <ui:Button Content="Обновить" Appearance="Primary" Margin="0,0,8,0"
+                                                   Command="{Binding UpdateNowCommand}"
+                                                   Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibility}}" />
+                                        <ui:Button Content="Проверить обновления" Command="{Binding CheckNowCommand}" />
+                                    </StackPanel>
+                                </ui:CardControl>
+
+                                <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon ArrowSyncCheckmark24}">
+                                    <ui:CardControl.Header>
+                                        <StackPanel>
+                                            <TextBlock Text="Автоматически проверять обновления" Style="{StaticResource SettingsTitleText}" />
+                                            <TextBlock Text="Раз в несколько часов NativeNCA узнаёт на GitHub о новой версии и сообщает о ней. Устанавливаются только версии с подписью разработчика"
+                                                       Style="{StaticResource SettingsDescriptionText}" />
+                                        </StackPanel>
+                                    </ui:CardControl.Header>
+                                    <ui:ToggleSwitch IsChecked="{Binding AutoCheck}" />
+                                </ui:CardControl>
+
+                                <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon History24}"
+                                                Visibility="{Binding HasPreviousVersion, Converter={StaticResource BoolToVisibility}}">
+                                    <ui:CardControl.Header>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding RollbackTitle}" Style="{StaticResource SettingsTitleText}" />
+                                            <TextBlock Text="Если после обновления что-то стало работать не так. Ключи и параметры сохранятся"
+                                                       Style="{StaticResource SettingsDescriptionText}" />
+                                        </StackPanel>
+                                    </ui:CardControl.Header>
+                                    <ui:Button Content="Вернуть" MinWidth="110" Click="OnRollbackClick" />
+                                </ui:CardControl>
+
+                                <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon ArrowDownload24}"
+                                                Visibility="{Binding IsInstalledCopy, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}">
+                                    <ui:CardControl.Header>
+                                        <StackPanel>
+                                            <TextBlock Text="Установить NativeNCA" Style="{StaticResource SettingsTitleText}" />
+                                            <TextBlock Text="Эта копия запущена без установки и не обновляется сама. Установленная NativeNCA есть в меню «Пуск» и получает обновления"
+                                                       Style="{StaticResource SettingsDescriptionText}" />
+                                        </StackPanel>
+                                    </ui:CardControl.Header>
+                                    <ui:Button Content="Установить" MinWidth="110" Appearance="Primary" Click="OnInstallClick" />
+                                </ui:CardControl>
+                            </StackPanel>
+
                             <TextBlock Text="Система" Style="{StaticResource SectionHeaderText}" />
 
                             <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon Power24}">
@@ -673,6 +857,18 @@
                                     <ui:Button Content="Установить" MinWidth="110" Appearance="Primary" Click="OnInstallTlsCertificateClick"
                                                Visibility="{Binding IsOwnTlsCertificate, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}" />
                                 </StackPanel>
+                            </ui:CardControl>
+
+                            <ui:CardControl x:Name="UninstallCard" Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon Delete24}"
+                                            Visibility="{Binding IsInstalledCopy, Converter={StaticResource BoolToVisibility}}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Удалить NativeNCA" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Программа будет удалена с этого компьютера. Ключи и параметры можно сохранить или удалить вместе с ней"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:Button Content="Удалить" MinWidth="110" Click="OnUninstallClick" />
                             </ui:CardControl>
                         </StackPanel>
                     </ScrollViewer>

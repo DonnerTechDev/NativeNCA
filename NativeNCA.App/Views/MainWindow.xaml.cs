@@ -5,8 +5,10 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using NativeNCA.App.Services;
 using NativeNCA.App.Views.Dialogs;
 using NativeNCA.Core.Security;
+using NativeNCA.Core.Updates;
 using NativeNCA.Core.ViewModels;
 using Wpf.Ui;
 using Wpf.Ui.Appearance;
@@ -18,23 +20,36 @@ namespace NativeNCA.App.Views;
 public partial class MainWindow : FluentWindow
 {
     private readonly SettingsViewModel _viewModel;
+    private readonly UpdateViewModel _updates;
     private readonly SnackbarService _snackbar = new();
+    private readonly TrayNotification _trayNotification;
     private bool _isSettingsOpen;
     private FrameworkElement? _currentView;
 
-    public MainWindow(SettingsViewModel viewModel)
+    public MainWindow(SettingsViewModel viewModel, UpdateViewModel updates)
     {
         InitializeComponent();
         _viewModel = viewModel;
+        _updates = updates;
         DataContext = viewModel;
+        UpdateBanner.DataContext = updates;
+        RestartBanner.DataContext = updates;
+        UpdatesSection.DataContext = updates;
+        UninstallCard.DataContext = updates;
 
         SystemThemeWatcher.Watch(this);
         _snackbar.SetSnackbarPresenter(SnackbarPresenter);
         SourceInitialized += (_, _) => _viewModel.OwnerWindowHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
         TrayIcon.Icon = LoadTrayIcon();
+        _trayNotification = new TrayNotification(TrayIcon);
+        _trayNotification.Clicked += (_, _) => Dispatcher.BeginInvoke(BringToFront);
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        _updates.PropertyChanged += OnUpdatesPropertyChanged;
+        _updates.NotificationRequested += (_, release) => ShowUpdateNotification(release);
+        _updates.InstallRequired += async (_, _) => await OfferInstallAsync();
         Loaded += OnLoaded;
+        UpdateBannerHost();
     }
 
     // ===================== Lifetime & tray =====================
@@ -79,6 +94,12 @@ public partial class MainWindow : FluentWindow
 
     /// <summary>The user chose "Выход" in the tray menu.</summary>
     public event EventHandler? ExitRequested;
+
+    /// <summary>Install this (not installed) copy and hand over to the installed one.</summary>
+    public event EventHandler? InstallRequested;
+
+    /// <summary>Settings → "Удалить NativeNCA".</summary>
+    public event EventHandler? UninstallRequested;
 
     /// <summary>
     /// Starts in the tray only (autostart). The tray icon registers when the window is loaded,
@@ -166,6 +187,117 @@ public partial class MainWindow : FluentWindow
             // Reset so that the same message shows again next time.
             _viewModel.StatusMessage = null;
         }
+        if (e.PropertyName == nameof(SettingsViewModel.ServerError)) UpdateBannerHost();
+    }
+
+    private void OnUpdatesPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(UpdateViewModel.IsUpdateBannerVisible):
+            case nameof(UpdateViewModel.RestartBannerText):
+                UpdateBannerHost();
+                break;
+            case nameof(UpdateViewModel.RollbackError) when _updates.RollbackError != null:
+                ShowError(_updates.RollbackError);
+                break;
+        }
+    }
+
+    /// <summary>The banner stack takes no space when every banner is hidden.</summary>
+    private void UpdateBannerHost()
+    {
+        // Bindings update after the property change notification, so look once they have run.
+        Dispatcher.BeginInvoke(() =>
+        {
+            bool any = BannerHost.Children.OfType<UIElement>().Any(b => b.Visibility == Visibility.Visible);
+            BannerHost.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
+        }, System.Windows.Threading.DispatcherPriority.DataBind);
+    }
+
+    public void ShowError(string message) => ShowToast(message.StartsWith("Ошибка", StringComparison.Ordinal) ? message : "Ошибка: " + message, isError: true);
+
+    // ===================== Updates =====================
+
+    private void ShowUpdateNotification(ReleaseInfo release)
+    {
+        _trayNotification.Show($"Доступна NativeNCA {release.Version}",
+            $"У вас версия {_updates.CurrentVersion}. Нажмите, чтобы открыть NativeNCA и обновить");
+    }
+
+    private void OnOpenSettingsFromBannerClick(object sender, RoutedEventArgs e)
+    {
+        _isSettingsOpen = true;
+        UpdateView(animate: true);
+    }
+
+    private void OnInstallClick(object sender, RoutedEventArgs e) => InstallRequested?.Invoke(this, EventArgs.Empty);
+
+    private void OnUninstallClick(object sender, RoutedEventArgs e) => UninstallRequested?.Invoke(this, EventArgs.Empty);
+
+    /// <summary>"Обновить" in a copy that is not installed: only the installed copy updates itself.</summary>
+    private async Task OfferInstallAsync()
+    {
+        var dialog = new ContentDialog(DialogHost)
+        {
+            Title = "Установить NativeNCA?",
+            Content = new TextBlock
+            {
+                Text = "Эта копия запущена без установки, поэтому обновить её автоматически нельзя. Установите NativeNCA — " +
+                       "он появится в меню «Пуск», а обновление можно будет поставить сразу после запуска.\n\n" +
+                       "Или скачайте новую версию вручную со страницы релиза.",
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 440,
+                Style = (Style)FindResource("SecondaryText"),
+                FontSize = 13
+            },
+            PrimaryButtonText = "Установить",
+            SecondaryButtonText = "Страница релиза",
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        switch (await dialog.ShowAsync())
+        {
+            case ContentDialogResult.Primary:
+                InstallRequested?.Invoke(this, EventArgs.Empty);
+                break;
+            case ContentDialogResult.Secondary:
+                OpenUrl(_updates.ReleaseNotesUrl);
+                break;
+        }
+    }
+
+    private async void OnRollbackClick(object sender, RoutedEventArgs e)
+    {
+        if (_updates.PreviousVersion is not { } previous) return;
+
+        var dialog = new ContentDialog(DialogHost)
+        {
+            Title = $"Вернуть версию {previous}?",
+            Content = new TextBlock
+            {
+                Text = $"NativeNCA перезапустится в версии {previous}. Ключи и параметры сохранятся. " +
+                       $"Версия {_updates.CurrentVersion} больше не будет предлагаться автоматически — " +
+                       "её можно будет снова установить кнопкой «Проверить обновления».",
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 440,
+                Style = (Style)FindResource("SecondaryText"),
+                FontSize = 13
+            },
+            PrimaryButtonText = "Вернуть",
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            await _updates.RollBackAsync();
+    }
+
+    private static void OpenUrl(string url)
+    {
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true }); }
+        catch { /* no browser */ }
     }
 
     // ===================== Navigation between key details / settings =====================

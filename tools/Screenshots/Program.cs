@@ -11,6 +11,7 @@ using NativeNCA.App.Views;
 using NativeNCA.App.Views.Dialogs;
 using NativeNCA.Core.Models;
 using NativeNCA.Core.Security;
+using NativeNCA.Core.Updates;
 using NativeNCA.Core.ViewModels;
 using Wpf.Ui.Appearance;
 
@@ -20,10 +21,12 @@ using Wpf.Ui.Appearance;
 //
 //   dotnet run --project tools/Screenshots -- docs/screenshots
 //   dotnet run --project tools/Screenshots -- <dir> --extra    (also the certificate and NCALayer states, for review)
+//   dotnet run --project tools/Screenshots -- <dir> --updates  (only the install, update and rollback UI, for review)
 class Program
 {
     static string Out = "";
     static bool Extra;
+    static bool Updates;
 
     /// <summary>Stand-in for CurrentUser\Root: the renderer must never install anything into Windows.</summary>
     sealed class PreviewRootStore : IRootCertificateStore
@@ -50,6 +53,7 @@ class Program
     {
         Out = args[0];
         Extra = args.Contains("--extra");
+        Updates = args.Contains("--updates");
         Directory.CreateDirectory(Out);
 
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
@@ -97,6 +101,31 @@ class Program
         var enc = new PngBitmapEncoder(); enc.Frames.Add(BitmapFrame.Create(bmp));
         using var ms = new MemoryStream(); enc.Save(ms); return ms.ToArray();
     }
+
+    /// <summary>
+    /// Update state for an installed 0.2.0 in a temp folder (never the real install folder), optionally with
+    /// 0.1.0 kept for rollback. Nothing is checked online.
+    /// </summary>
+    static UpdateViewModel MakeUpdates(bool installed = true, bool withPrevious = false)
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "nnca_preview_install_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        if (withPrevious)
+        {
+            File.WriteAllText(Path.Combine(dir, AppInstallation.PreviousExeName), "");
+            File.WriteAllText(Path.Combine(dir, AppInstallation.PreviousInfoName), "{\"Version\":\"0.1.0\"}");
+        }
+        var store = new UpdateStateStore(Path.Combine(dir, "update.json"));
+        // A client is passed only so "Проверить обновления" looks enabled; nothing calls it.
+        var client = new GitHubReleaseClient(new System.Net.Http.HttpClient());
+        return new UpdateViewModel(AppVersion.Parse("0.2.0"), new AppInstallation(dir), installed, store, client, downloader: null)
+        {
+            CheckStatusText = "Установлена последняя версия · Проверено 14:32"
+        };
+    }
+
+    static ReleaseInfo FakeRelease(string version) =>
+        new(AppVersion.Parse(version), "v" + version, new Uri($"https://github.com/DonnerTechDev/NativeNCA/releases/tag/v{version}"), Array.Empty<ReleaseAsset>());
 
     static SecureVaultService MakeVault(int count = 3)
     {
@@ -204,6 +233,97 @@ class Program
         enc.Save(fs);
     }
 
+    static void ApplyTheme(ApplicationTheme theme)
+    {
+        ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false);
+        ApplicationThemeManager.Apply(theme, Wpf.Ui.Controls.WindowBackdropType.Mica, false);
+        ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false);
+    }
+
+    static async Task RunUpdates(ApplicationTheme theme, string t, bool dark)
+    {
+        // Update available, stacked under a server problem.
+        var vm = new SettingsViewModel(MakeVault(), MakeTls(installed: true)) { IsServerRunning = true };
+        var updates = MakeUpdates(withPrevious: true);
+        var main = new MainWindow(vm, updates) { Width = 1080, Height = 700 };
+        Place(main); main.Show(); await Idle(); ApplyTheme(theme); await Idle();
+
+        updates.AvailableRelease = FakeRelease("0.3.0");
+        await Idle(); Snap(main, $"u-banner-{t}", dark);
+
+        updates.UpdateError = "Подпись обновления недействительна. Обновление не установлено";
+        vm.ServerErrorKind = NativeNCA.Core.Server.ServerErrorKind.NcaLayerRunning;
+        vm.ServerErrorTitle = "Запущен NCALayer";
+        vm.ServerError = "Оригинальный NCALayer занимает порт 13579, который сайты используют для подписи. " +
+                         "Две программы не могут работать одновременно — закройте NCALayer, и NativeNCA запустится сам.";
+        await Idle(); Snap(main, $"u-stacked-{t}", dark);
+
+        vm.ServerError = null;
+        updates.UpdateError = null;
+        updates.IsDownloading = true;
+        updates.IsDownloadIndeterminate = false;
+        updates.DownloadFraction = 0.42;
+        updates.DownloadText = "Загрузка 28,4 из 67,7 МБ · 42 %";
+        await Idle(); Snap(main, $"u-downloading-{t}", dark);
+
+        updates.IsDownloading = false;
+        updates.AvailableRelease = null;
+        updates.ApplyStartupArguments(new[] { UpdateViewModel.UpdatedFromArgument, "0.1.0" });
+        await Idle(); Snap(main, $"u-updated-{t}", dark);
+
+        ((ToggleButton)main.FindName("SettingsNavButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        updates.DismissRestartBannerCommand.Execute(null);
+        await Idle();
+        var settingsScroll = (ScrollViewer)main.FindName("SettingsView");
+        var section = (FrameworkElement)main.FindName("UpdatesSection");
+        section.BringIntoView(); await Idle();
+        settingsScroll.ScrollToVerticalOffset(section.TranslatePoint(new Point(0, 0), (UIElement)settingsScroll.Content).Y - 16);
+        await Idle(); Snap(main, $"u-settings-{t}", dark);
+        settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"u-settings-end-{t}", dark);
+        main.CloseForExit();
+
+        // A copy that is not installed: install row instead of rollback and uninstall.
+        var portableVm = new SettingsViewModel(MakeVault(), MakeTls(installed: true)) { IsServerRunning = true };
+        var portable = MakeUpdates(installed: false);
+        portable.AvailableRelease = FakeRelease("0.3.0");
+        var main2 = new MainWindow(portableVm, portable) { Width = 1080, Height = 700 };
+        Place(main2); main2.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        ((ToggleButton)main2.FindName("SettingsNavButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        await Idle();
+        var scroll2 = (ScrollViewer)main2.FindName("SettingsView");
+        var section2 = (FrameworkElement)main2.FindName("UpdatesSection");
+        scroll2.ScrollToVerticalOffset(section2.TranslatePoint(new Point(0, 0), (UIElement)scroll2.Content).Y - 16);
+        await Idle(); Snap(main2, $"u-portable-{t}", dark);
+        main2.CloseForExit();
+
+        // Vault from a newer version.
+        var newerDir = Path.Combine(Path.GetTempPath(), "nnca_preview_newer_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(newerDir);
+        File.WriteAllText(Path.Combine(newerDir, "vault.json"), "{\"FormatVersion\":2,\"Keys\":[]}");
+        var roVm = new SettingsViewModel(new SecureVaultService(newerDir), MakeTls(installed: true)) { IsServerRunning = true };
+        var main3 = new MainWindow(roVm, MakeUpdates()) { Width = 1080, Height = 700 };
+        Place(main3); main3.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        Snap(main3, $"u-vault-readonly-{t}", dark);
+        main3.CloseForExit();
+
+        // Setup windows.
+        async Task SnapSetup(SetupWindow w, string name, Action<SetupWindow> before = null)
+        {
+            Place(w); w.Show(); await Idle(); ApplyTheme(theme); await Idle();
+            before?.Invoke(w); await Idle();
+            Snap(w, name, dark);
+            w.Close();
+        }
+
+        var v = AppVersion.Parse("0.2.0");
+        await SnapSetup(SetupWindow.ForInstall(v, null, () => Task.CompletedTask, () => { }), $"u-setup-install-{t}");
+        await SnapSetup(SetupWindow.ForInstall(v, AppVersion.Parse("0.1.0"), () => Task.CompletedTask, () => { }), $"u-setup-upgrade-{t}");
+        await SnapSetup(SetupWindow.ForInstall(v, v, () => Task.CompletedTask, () => { }), $"u-setup-installed-{t}");
+        await SnapSetup(SetupWindow.ForUninstall(v, _ => Task.FromResult<string>(null)), $"u-uninstall-{t}");
+        await SnapSetup(SetupWindow.ForUninstall(v, _ => Task.FromResult<string>(null)), $"u-uninstall-done-{t}", w =>
+            ((Wpf.Ui.Controls.Button)w.FindName("PrimaryButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)));
+    }
+
     static async Task Run()
     {
         foreach (var theme in new[] { ApplicationTheme.Dark, ApplicationTheme.Light })
@@ -212,8 +332,14 @@ class Program
             string t = dark ? "dark" : "light";
             ApplicationThemeManager.Apply(theme, Wpf.Ui.Controls.WindowBackdropType.Mica, true);
 
+            if (Updates)
+            {
+                await RunUpdates(theme, t, dark);
+                continue;
+            }
+
             var vm = new SettingsViewModel(MakeVault(), MakeTls(installed: true)) { IsServerRunning = true };
-            var main = new MainWindow(vm) { Width = 1080, Height = 700 };
+            var main = new MainWindow(vm, MakeUpdates()) { Width = 1080, Height = 700 };
             Place(main); main.Show(); await Idle();
             ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false); ApplicationThemeManager.Apply(theme, Wpf.Ui.Controls.WindowBackdropType.Mica, false); ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false); await Idle();
             Snap(main, $"main-{t}", dark);
