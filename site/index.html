@@ -156,12 +156,18 @@
       <div class="versus-col">
         <div class="versus-label"><strong>Типичный Java-апплет</strong><span class="timer" id="t-old">0,0 с</span></div>
         <div class="retro" role="group" aria-label="Пародия на NCALayer">
-          <div class="retro-title"><span>NCALayer (Java)</span><span class="retro-title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
-          <div class="retro-menu" aria-hidden="true"><span>Файл</span><span>Ключи</span><span>Справка</span></div>
+          <div class="retro-title">
+            <span class="retro-title-text">NCALayer</span>
+            <span class="retro-bumps" aria-hidden="true"></span>
+            <span class="retro-title-btns" aria-hidden="true"><span class="min"></span><span class="max"></span><span class="close"></span></span>
+          </div>
+          <div class="retro-menu" aria-hidden="true"><span>Файл</span><span>Ключи</span><span>Настройки</span><span>Справка</span></div>
           <div class="retro-body">
+            <div class="retro-row" aria-hidden="true"><span>Тип хранилища:</span><span class="retro-combo">PKCS12</span></div>
             <div class="retro-field" id="old-log" aria-live="polite">Готов к работе. Наверное.</div>
             <div class="retro-progress" aria-hidden="true"><i id="old-bar"></i></div>
             <div class="retro-actions">
+              <button class="retro-btn" type="button" tabindex="-1" aria-hidden="true">Отмена</button>
               <button class="retro-btn" type="button" id="old-run">Подписать</button>
             </div>
           </div>
