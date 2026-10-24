@@ -25,3 +25,6 @@ Desktop.ini
 # Local-only files (internal notes, design prototypes)
 CLAUDE_TASK.md
 design/
+
+# Generated for the translator, shared by hand (tools/LocalizationReview)
+docs/localization-review.md
