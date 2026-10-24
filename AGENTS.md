@@ -25,6 +25,8 @@ The UI is in Kazakh, Russian and English (see Localization below). Code, comment
 | `tools/LocalizationReview` | Writes `docs/localization-review.md` (key, Russian, Kazakh, notes) for the native-speaker review. The sheet is local-only (gitignored) |
 | `tools/ReleaseSigning` | Generates the release signing key, signs and verifies release zips |
 | `.github/workflows/build.yml` | CI, packaging and releases |
+| `site/` | Website for GitHub Pages (static HTML/CSS/JS, Russian). See the Website section |
+| `.github/workflows/pages.yml` | Builds `site/` and deploys it to GitHub Pages |
 
 `design/` and `CLAUDE_TASK.md` are local-only and ignored by git. Never add them to a commit.
 
@@ -129,6 +131,14 @@ Everything lives in the one `NativeNCA.exe`; there is no separate installer or u
 - List selection follows NavigationView: fill plus accent pill, no accent outline. Radio cards in the overlay keep the outline.
 - Settings apply immediately, with no Save button, as in Windows 11 Settings.
 - The app icon (`Assets/app.ico`) contains 15 frames from 16 to 256 px, with a simplified drawing below 40 px. The window title bar intentionally uses the monochrome `ShieldKeyhole24` glyph.
+
+## Website
+
+- `site/` is plain HTML, CSS and JS with no framework or bundler. `site/build.py` copies it to `_site/`, converts `docs/screenshots/*.png` to WebP, copies `docs/icon.png` and `app.ico`, replaces `__SITE_URL__` and `__BUILD_DATE__`, adds FAQPage JSON-LD built from the FAQ expanders and bakes the latest releases into `release.json`. Build locally with `pip install pillow` and `python site/build.py`, then serve `_site/` with any static server.
+- Screenshots on the site come from `docs/screenshots`, so refreshing them with `tools/Screenshots` updates the site too. The site expects the current file names (`main`, `overlay`, `add-key`, `avatar-crop`, `settings`, each `-light` and `-dark`).
+- The download button reads releases from the GitHub API, then `release.json`, then falls back to the Releases page. It picks the asset ending in `-win-x64.zip` or `-win-arm64.zip`, so keep that suffix in `build.yml`.
+- Icons are Fluent UI System Icons inlined as an SVG sprite at the top of `index.html`. Donation links live in `CONFIG.donate` in `site/assets/site.js`.
+- Copy is Russian, natural, no emoji. Claims about security must match the code and the README.
 
 ## Working style for this repo
 

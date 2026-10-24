@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NativeNCA — замена NCALayer для Windows: ЭЦП без Java и вечных паролей</title>
+<meta name="description" content="Бесплатная программа с открытым кодом для входа и подписи ЭЦП НУЦ РК на eGov и в банках вместо NCALayer. Без Java, с Windows Hello и зашифрованным хранилищем ключей.">
+<link rel="canonical" href="__SITE_URL__">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#f3f3f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121820" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="application-name" content="NativeNCA">
+<meta name="author" content="DonnerTechDev">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NativeNCA">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:url" content="__SITE_URL__">
+<meta property="og:title" content="NativeNCA — замена NCALayer для Windows">
+<meta property="og:description" content="Подпись ЭЦП на eGov и в банках касанием Windows Hello. Без Java, без пароля на каждую подпись, с открытым кодом.">
+<meta property="og:image" content="__SITE_URL__og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NativeNCA: хранилище ключей ЭЦП в стиле Windows 11">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="icon.png" type="image/png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://api.github.com" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+
+<script>
+  // Theme before first paint: saved choice, otherwise the system one.
+  (function () {
+    var d = document.documentElement, t = null;
+    try { t = localStorage.getItem("theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    d.setAttribute("data-theme", t);
+    d.classList.remove("no-js");
+  })();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "NativeNCA",
+  "alternateName": "Нативная замена NCALayer",
+  "description": "Нативная замена NCALayer для Windows. Вход и подпись ЭЦП НУЦ РК на eGov, в интернет-банках и других казахстанских сервисах без Java, с Windows Hello и зашифрованным хранилищем ключей.",
+  "url": "__SITE_URL__",
+  "image": "__SITE_URL__og.png",
+  "screenshot": "__SITE_URL__screenshots/main-light.webp",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Windows 10 2004+, Windows 11",
+  "processorRequirements": "x64, ARM64",
+  "inLanguage": "ru",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KZT" },
+  "downloadUrl": "https://github.com/DonnerTechDev/NativeNCA/releases/latest",
+  "sameAs": ["https://github.com/DonnerTechDev/NativeNCA"],
+  "author": { "@type": "Organization", "name": "DonnerTechDev", "url": "https://github.com/DonnerTechDev" }
+}
+</script>
+</head>
+<body>
+<!-- Fluent UI System Icons (MIT), generated from @fluentui/svg-icons -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="i-download" viewBox="0 0 24 24"><path d="M18.25 20.5a.75.75 0 1 1 0 1.5h-13a.75.75 0 1 1 0-1.5zm-6.6-18.49h.1c.38 0 .7.28.74.64l.01.1v13.7l3.72-3.73a.75.75 0 0 1 .98-.07l.08.07c.27.27.3.68.07.98l-.07.08-5 5a.75.75 0 0 1-.97.07l-.09-.07-5-5a.75.75 0 0 1 .98-1.13l.08.07L11 16.43V2.76c0-.38.28-.7.65-.75h.1z"/></symbol><symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M3 5.75c0-.41.34-.75.75-.75q3.99 0 7.8-2.85c.27-.2.63-.2.9 0Q16.26 5 20.25 5c.41 0 .75.34.75.75V11q0 .5-.04 1a7 7 0 0 0-1.46-.69V6.48a14.4 14.4 0 0 1-7.5-2.8 14.4 14.4 0 0 1-7.5 2.8V11c0 4.15 2.33 7.22 7.13 9.28q.4.84 1 1.52l-.36.15a.8.8 0 0 1-.54 0C5.96 19.68 3 16 3 11zM23 17.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0m-2.15-2.35a.5.5 0 0 0-.7 0l-3.65 3.64-1.65-1.64a.5.5 0 0 0-.7.7l2 2c.2.2.5.2.7 0l4-4a.5.5 0 0 0 0-.7"/></symbol><symbol id="i-shield-keyhole" viewBox="0 0 24 24"><path d="M14 11a2 2 0 0 1-1.25 1.85v2.4a.75.75 0 0 1-1.5 0v-2.4A2 2 0 1 1 14 11M3.75 5a.75.75 0 0 0-.75.75V11c0 5 2.96 8.68 8.73 10.95q.27.1.54 0C18.04 19.68 21 16 21 11V5.75a.75.75 0 0 0-.75-.75q-3.99 0-7.8-2.85a.75.75 0 0 0-.9 0Q7.74 5 3.75 5m.75 6V6.48a14.4 14.4 0 0 0 7.5-2.8 14.4 14.4 0 0 0 7.5 2.8V11c0 4.26-2.45 7.38-7.5 9.44-5.05-2.06-7.5-5.18-7.5-9.44"/></symbol><symbol id="i-fingerprint" viewBox="0 0 24 24"><path d="M14.86 12.16c.56.57.87 1.27 1.1 2.23l.1.45.18.95c.1.44.16.7.26.9q.45 1.02 1.6 2.07a.75.75 0 0 1-1.02 1.1 8 8 0 0 1-1.95-2.55 5 5 0 0 1-.35-1.18l-.21-1.1-.01-.06c-.18-.85-.4-1.39-.78-1.76-.7-.73-2.35-.54-2.8.15-.55.9-.7 2.4-.25 3.92q.51 1.76 1.37 3.47a.75.75 0 0 1-1.34.67 22 22 0 0 1-1.47-3.72c-.56-1.91-.38-3.86.43-5.14.95-1.5 3.74-1.83 5.14-.4m-2.37 2.31c.42-.01.76.31.78.73a8 8 0 0 0 1.44 4.3l.2.27.3.39a.75.75 0 0 1-1.12 1l-.07-.09-.3-.39a9.4 9.4 0 0 1-1.95-5.43.75.75 0 0 1 .72-.78M8.8 9.4a6 6 0 0 1 6.73-.28q1.4.9 2.1 2.09a.75.75 0 0 1-1.3.76 5 5 0 0 0-1.62-1.6 4.5 4.5 0 0 0-5.02.24c-1.64 1.2-2.33 3.29-2.13 5.48a11 11 0 0 0 1.12 3.72.75.75 0 0 1-1.35.67 12 12 0 0 1-1.26-4.25c-.25-2.67.61-5.26 2.72-6.83m9.17 4.3c.42-.02.77.3.79.71q.05.9.44 1.5.34.49.57.6l.06.02a.75.75 0 0 1-.44 1.43q-.8-.25-1.44-1.23a4.4 4.4 0 0 1-.69-2.24.75.75 0 0 1 .71-.79M10.51 6.1c.17.38 0 .82-.38 1q-2.75 1.23-4.08 3.54a10 10 0 0 0-1.16 6.08.75.75 0 1 1-1.5.2c-.28-2.2.06-4.78 1.36-7.03a10 10 0 0 1 4.77-4.16c.38-.17.82 0 1 .37m2.34-.79q2.75.06 5.46 2.5a10.3 10.3 0 0 1 3.3 6.57.75.75 0 1 1-1.49.2 8.9 8.9 0 0 0-2.8-5.66q-2.34-2.08-4.5-2.1a.75.75 0 1 1 .03-1.5m-6.87.02c.28.3.25.78-.06 1.06q-.4.36-.84.85-.42.47-.85 1.22a.75.75 0 1 1-1.3-.75 9 9 0 0 1 2-2.44.75.75 0 0 1 1.05.06m6.59-2.97q3.29.14 5.53 1.86a.75.75 0 0 1-.92 1.2 8 8 0 0 0-4.68-1.56 8.7 8.7 0 0 0-4.72.98c-.38.21-.81.1-1.03-.25A.74.74 0 0 1 7 3.56a10 10 0 0 1 5.57-1.2"/></symbol><symbol id="i-keys" viewBox="0 0 24 24"><path d="M12 2q.46 0 .9.08-.9.6-1.57 1.48a3.5 3.5 0 0 0-2.71 4.35c.07.26 0 .54-.2.73L3.5 13.56v2.94h2v-1.75c0-.41.34-.75.75-.75H8.5v-1.25q0-.31.22-.53l1.91-1.92q.34.7.83 1.3L10 13.06v1.69c0 .41-.34.75-.75.75H7v1.75c0 .41-.34.75-.75.75h-3.5a.75.75 0 0 1-.75-.75v-4q0-.31.22-.53l4.85-4.86A5.03 5.03 0 0 1 12 2m4.5 1.5a4 4 0 0 0-1.9 7.52c.25.13.4.39.4.66v7.74l2.02 1.83 2.12-1.8-.92-.92a.75.75 0 0 1 0-1.06l.97-.97-.97-.97A.8.8 0 0 1 18 15v-3.32c0-.27.15-.53.4-.66a4 4 0 0 0-1.9-7.52m-5.5 4a5.5 5.5 0 1 1 8.5 4.61v2.58l1.28 1.28c.29.3.29.77 0 1.06l-.97.97.97.97a.75.75 0 0 1-.05 1.1l-3.25 2.75a.75.75 0 0 1-.98-.02l-2.75-2.5a.8.8 0 0 1-.25-.55v-7.64A5.5 5.5 0 0 1 11 7.5m6.5-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/></symbol><symbol id="i-image" viewBox="0 0 24 24"><path d="M17.75 3C19.55 3 21 4.46 21 6.25v11.5c0 1.8-1.46 3.25-3.25 3.25H6.25A3.25 3.25 0 0 1 3 17.75V6.25C3 4.45 4.46 3 6.25 3zm.58 16.4-5.8-5.69a.75.75 0 0 0-.97-.07l-.08.07-5.81 5.7q.28.09.58.09h11.5q.3 0 .58-.1l-5.8-5.69zm-.58-14.9H6.25c-.97 0-1.75.78-1.75 1.75v11.5q0 .3.1.6l5.83-5.7a2.25 2.25 0 0 1 3.02-.12l.12.11 5.83 5.7q.1-.27.1-.59V6.25c0-.97-.78-1.75-1.75-1.75m-2.5 2a2.25 2.25 0 1 1 0 4.5 2.25 2.25 0 0 1 0-4.5m0 1.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5"/></symbol><symbol id="i-plug" viewBox="0 0 24 24"><path d="M19.49 5.57a5.97 5.97 0 0 1-1.9 8.96c-.64.35-1.42.14-1.94-.38l-5.8-5.8c-.52-.52-.73-1.3-.38-1.95a6 6 0 0 1 8.96-1.89l2.29-2.29a.75.75 0 1 1 1.06 1.06zm-2.02 7.26a4.5 4.5 0 1 0-6.3-6.3c-.27.35-.19.83.12 1.14l5.04 5.04c.31.3.8.39 1.14.12M3.28 21.78l2.3-2.29a5.97 5.97 0 0 0 8.95-1.9c.35-.64.14-1.42-.38-1.94l-5.8-5.8c-.52-.52-1.3-.73-1.95-.38a6 6 0 0 0-1.89 8.96l-2.29 2.29a.75.75 0 1 0 1.06 1.06m4.39-10.49 5.04 5.04c.3.31.39.8.12 1.14a4.5 4.5 0 1 1-6.3-6.3c.35-.27.83-.19 1.14.12"/></symbol><symbol id="i-clock-lock" viewBox="0 0 24 24"><path d="M11 21.5v-1.06q.5.06 1 .06a8.5 8.5 0 1 0-8.45-9.4 3.5 3.5 0 0 0-1.47 2.16 10 10 0 1 1 8.88 8.69q.04-.23.04-.45m1-14.85a.75.75 0 0 0-1.5.1v6.1c.06.37.37.65.75.65h4.1a.75.75 0 0 0-.1-1.5H12V6.65M3 15v-1a2.5 2.5 0 0 1 5 0v1h.5c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5h-6A1.5 1.5 0 0 1 1 21.5v-5c0-.83.67-1.5 1.5-1.5zm1.5-1v1h2v-1a1 1 0 1 0-2 0m2 5a1 1 0 1 0-2 0 1 1 0 0 0 2 0"/></symbol><symbol id="i-moon" viewBox="0 0 20 20"><path d="M15.5 13.5A6.98 6.98 0 0 1 4 14.39c2.83-1.09 4.56-2.42 5.6-4.4 1.04-2 1.33-4.16.75-6.9q1.36.17 2.58.87a7 7 0 0 1 2.55 9.54M5.45 16.92A7.98 7.98 0 1 0 9.88 2.04a.6.6 0 0 0-.61.73c.69 2.82.43 4.88-.55 6.76-.94 1.78-2.55 3.03-5.55 4.1a.6.6 0 0 0-.3.9 8 8 0 0 0 2.59 2.39"/></symbol><symbol id="i-sun" viewBox="0 0 20 20"><path d="M10 2c.28 0 .5.22.5.5v1a.5.5 0 0 1-1 0v-1c0-.28.22-.5.5-.5m0 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m0-1a3 3 0 1 1 0-6 3 3 0 0 1 0 6m7.5-2.5a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1zM10 16c.28 0 .5.22.5.5v1a.5.5 0 0 1-1 0v-1c0-.28.22-.5.5-.5m-6.5-5.5a.5.5 0 0 0 0-1H2.46a.5.5 0 0 0 0 1zm.65-6.35c.2-.2.5-.2.7 0l1 1a.5.5 0 1 1-.7.7l-1-1a.5.5 0 0 1 0-.7m.7 11.7a.5.5 0 0 1-.7-.7l1-1a.5.5 0 0 1 .7.7zm11-11.7a.5.5 0 0 0-.7 0l-1 1a.5.5 0 0 0 .7.7l1-1a.5.5 0 0 0 0-.7m-.7 11.7a.5.5 0 0 0 .7-.7l-1-1a.5.5 0 0 0-.7.7z"/></symbol><symbol id="i-code" viewBox="0 0 24 24"><path d="M15.05 1.5a.75.75 0 0 1 1.4.5l-7.5 20.5a.75.75 0 0 1-1.4-.5zM6.2 6.22a.75.75 0 0 1 1.08 1.04L2.8 12l4.5 4.73a.75.75 0 0 1-1.08 1.04l-5-5.25a.75.75 0 0 1 0-1.04zm10.52-.02a.75.75 0 0 1 1.06.02l5 5.25c.28.3.28.75 0 1.04l-5 5.25a.75.75 0 0 1-1.08-1.04L21.2 12l-4.5-4.73a.75.75 0 0 1 .02-1.06"/></symbol><symbol id="i-heart" viewBox="0 0 24 24"><path d="M12.82 5.58 12 6.4l-.82-.82a5.37 5.37 0 1 0-7.6 7.6l7.89 7.9c.3.29.77.29 1.06 0l7.9-7.9a5.38 5.38 0 1 0-7.61-7.6m6.55 6.54L12 19.48l-7.36-7.36a3.87 3.87 0 1 1 5.48-5.48L11.47 8c.3.3.79.29 1.08-.02l1.33-1.34a3.88 3.88 0 0 1 5.49 5.48"/></symbol><symbol id="i-heart-fill" viewBox="0 0 20 20"><path d="M9.39 4.29a4.3 4.3 0 0 0-6.13-.02 4.4 4.4 0 0 0 .02 6.2l6.27 6.33c.26.27.69.27.95 0l6.24-6.3a4.4 4.4 0 0 0-.02-6.19 4.3 4.3 0 0 0-6.13-.01l-.6.6z"/></symbol><symbol id="i-lock" viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 1 5 5v2.01c1.68.13 3 1.53 3 3.24v7.5c0 1.8-1.46 3.25-3.25 3.25h-9.5A3.25 3.25 0 0 1 4 18.75v-7.5a3.25 3.25 0 0 1 3-3.24V6a5 5 0 0 1 5-5M7.25 9.5c-.97 0-1.75.78-1.75 1.75v7.5c0 .97.78 1.75 1.75 1.75h9.5c.97 0 1.75-.78 1.75-1.75v-7.5c0-.97-.78-1.75-1.75-1.75zM12 13.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 2.5A3.5 3.5 0 0 0 8.5 6v2h7V6A3.5 3.5 0 0 0 12 2.5"/></symbol><symbol id="i-signature" viewBox="0 0 24 24"><path d="M4 4c0-1.1.9-2 2-2h6.17a2 2 0 0 1 1.42.59l5.1 5.1-.3.27L16.36 10H14a2 2 0 0 1-2-2V3.5H6a.5.5 0 0 0-.5.5v16c0 .28.22.5.5.5h12a.5.5 0 0 0 .5-.5v-2.85l1.5-1.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm10 4.5h3.38L13.5 4.62V8c0 .28.22.5.5.5m-.8 6.07 5.9-5.9a2.29 2.29 0 1 1 3.23 3.23l-5.9 5.9q-.53.54-1.25.71l-1.83.46A1 1 0 0 1 13 19H7.75a.75.75 0 0 1 0-1.5h4.32l.42-1.68q.18-.72.7-1.25"/></symbol><symbol id="i-laptop" viewBox="0 0 24 24"><path d="M6.25 4C5.01 4 4 5 4 6.25v7.5C4 14.99 5 16 6.25 16h11.5c1.24 0 2.25-1 2.25-2.25v-7.5C20 5.01 19 4 17.75 4zM5.5 6.25c0-.41.34-.75.75-.75h11.5c.41 0 .75.34.75.75v7.5c0 .41-.34.75-.75.75H6.25a.75.75 0 0 1-.75-.75zM2.75 17.5a.75.75 0 0 0 0 1.5h18.5a.75.75 0 0 0 0-1.5z"/></symbol><symbol id="i-check" viewBox="0 0 20 20"><path d="M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16m0 1a7 7 0 1 0 0 14 7 7 0 0 0 0-14m3.36 4.65c.17.17.2.44.06.63l-.06.07-4 4a.5.5 0 0 1-.64.07l-.07-.06-2-2a.5.5 0 0 1 .63-.77l.07.06L9 11.3l3.65-3.65c.2-.2.51-.2.7 0"/></symbol><symbol id="i-check-fill" viewBox="0 0 20 20"><path d="M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16m3.36 5.65a.5.5 0 0 0-.64-.06l-.07.06L9 11.3 7.35 9.65l-.07-.06a.5.5 0 0 0-.7.7l.07.07 2 2 .07.06c.17.11.4.11.56 0l.07-.06 4-4 .07-.08a.5.5 0 0 0-.06-.63"/></symbol><symbol id="i-dismiss-circle" viewBox="0 0 20 20"><path d="M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16m0 1a7 7 0 1 0 0 14 7 7 0 0 0 0-14M7.8 7.11l.08.06L10 9.3l2.12-2.12a.5.5 0 0 1 .64-.06l.07.06c.17.18.2.44.06.64l-.06.07L10.7 10l2.12 2.12c.17.17.2.44.06.64l-.06.07a.5.5 0 0 1-.64.06l-.07-.06L10 10.7l-2.12 2.12a.5.5 0 0 1-.64.06l-.07-.06a.5.5 0 0 1-.06-.64l.06-.07L9.3 10 7.17 7.88a.5.5 0 0 1-.06-.64l.06-.07a.5.5 0 0 1 .64-.06"/></symbol><symbol id="i-chevron" viewBox="0 0 20 20"><path d="M15.85 7.65c.2.2.2.5 0 .7l-5.46 5.49a.55.55 0 0 1-.78 0L4.15 8.35a.5.5 0 1 1 .7-.7L10 12.8l5.15-5.16c.2-.2.5-.2.7 0"/></symbol><symbol id="i-arrow-right" viewBox="0 0 20 20"><path d="M10.84 3.13a.5.5 0 0 0-.68.74l6.17 5.63H2.5a.5.5 0 0 0 0 1h13.83l-6.17 5.63a.5.5 0 0 0 .68.74l6.91-6.32a.75.75 0 0 0 0-1.1z"/></symbol><symbol id="i-open" viewBox="0 0 20 20"><path d="M6 4a2 2 0 0 0-2 2v8c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-2.5a.5.5 0 0 1 1 0V14a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h2.5a.5.5 0 0 1 0 1zm5-.5c0-.28.22-.5.5-.5h5c.28 0 .5.22.5.5v5a.5.5 0 0 1-1 0V4.7l-4.15 4.15a.5.5 0 0 1-.7-.7L15.29 4H11.5a.5.5 0 0 1-.5-.5"/></symbol><symbol id="i-flash" viewBox="0 0 24 24"><path d="M7.43 2.83C7.6 2.33 8.07 2 8.6 2h6.46c.85 0 1.45.84 1.18 1.65L14.8 8h3.96c1.1 0 1.67 1.33.9 2.12L8.59 21.54c-1.06 1.08-2.88.1-2.55-1.38l1.27-5.66-1.56-.01c-1.21 0-2.05-1.2-1.65-2.34zm1.35.67-3.26 9.16c-.06.16.06.33.23.33l2.5.01a.75.75 0 0 1 .73.91L7.51 20.5 18.16 9.5h-4.41a.75.75 0 0 1-.71-.99L14.7 3.5z"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M12 9a4 4 0 1 1 0 8 4 4 0 0 1 0-8m0 1.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5m0-5a10 10 0 0 1 9.7 7.56.75.75 0 1 1-1.45.37 8.5 8.5 0 0 0-16.5 0 .75.75 0 0 1-1.45-.36A10 10 0 0 1 12 5.5"/></symbol><symbol id="i-certificate" viewBox="0 0 24 24"><path d="M2 5.75A2.75 2.75 0 0 1 4.75 3h14.5A2.75 2.75 0 0 1 22 5.75v9.5A2.75 2.75 0 0 1 19.25 18H10v-1l.33-.5h8.92c.69 0 1.25-.56 1.25-1.25v-9.5c0-.69-.56-1.25-1.25-1.25H4.75c-.69 0-1.25.56-1.25 1.25v3.92Q2.6 10.19 2 11zM6.75 7a.75.75 0 0 0 0 1.5h10.5a.75.75 0 0 0 0-1.5zm6 5a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5zM6 10a4 4 0 1 0 0 8 4 4 0 0 0 0-8m3 8a5 5 0 0 1-6 0v3.25c0 .57.6.92 1.09.67l.09-.06L6 20.6l1.82 1.27a.75.75 0 0 0 1.17-.5v-.11z"/></symbol><symbol id="i-window-shield" viewBox="0 0 24 24"><path d="M6.25 3A3.25 3.25 0 0 0 3 6.25v11.5C3 19.55 4.46 21 6.25 21h7.6a7 7 0 0 1-1.12-1.5H6.25c-.97 0-1.75-.78-1.75-1.75V8.5h15v2.69c.42.3.93.6 1.5.79V6.25C21 4.45 19.54 3 17.75 3zM19.5 7h-15v-.75c0-.97.78-1.75 1.75-1.75h11.5c.97 0 1.75.78 1.75 1.75zm-1.51 4.2c.65.65 1.9 1.68 3.45 1.9.3.04.56.28.56.58v2.84c0 3.82-3.58 5.2-4.35 5.46q-.15.04-.3 0c-.77-.26-4.35-1.64-4.35-5.46v-2.84c0-.3.25-.54.56-.59a6.4 6.4 0 0 0 3.45-1.9.7.7 0 0 1 .98 0"/></symbol><symbol id="i-key" viewBox="0 0 24 24"><path d="M18.25 7a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0M15.5 2.05A6.55 6.55 0 0 0 9.06 9.7q.02.16-.07.25l-6.24 6.23c-.51.52-.8 1.22-.8 1.95v2.17c0 .97.78 1.75 1.75 1.75h2.5c.97 0 1.75-.78 1.75-1.75v-1.25H9.7c.69 0 1.25-.56 1.25-1.25v-1.75h1.75c.67 0 1.22-.54 1.25-1.2q.75.19 1.55.2a6.55 6.55 0 0 0 6.55-6.55 6.47 6.47 0 0 0-6.55-6.45M10.45 8.6a5.05 5.05 0 0 1 5.05-5.05c2.8 0 5.05 2.18 5.05 4.95a5.05 5.05 0 0 1-7.06 4.61.75.75 0 0 0-1.04.69v.75H10.7c-.7 0-1.25.56-1.25 1.25v1.75H7.7c-.7 0-1.25.56-1.25 1.25v1.5c0 .14-.11.25-.25.25H3.7a.25.25 0 0 1-.25-.25v-2.17q0-.51.37-.89l6.23-6.23c.42-.42.58-1 .49-1.57q-.1-.45-.1-.84"/></symbol><symbol id="i-dismiss" viewBox="0 0 20 20"><path d="m4.09 4.22.06-.07a.5.5 0 0 1 .63-.06l.07.06L10 9.29l5.15-5.14a.5.5 0 0 1 .63-.06l.07.06c.18.17.2.44.06.63l-.06.07L10.71 10l5.14 5.15c.18.17.2.44.06.63l-.06.07a.5.5 0 0 1-.63.06l-.07-.06L10 10.71l-5.15 5.14a.5.5 0 0 1-.63.06l-.07-.06a.5.5 0 0 1-.06-.63l.06-.07L9.29 10 4.15 4.85a.5.5 0 0 1-.06-.63l.06-.07z"/></symbol><symbol id="i-globe" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m2.94 14.5H9.06c.65 2.41 1.79 4 2.94 4s2.29-1.59 2.94-4m-7.43 0H4.79a8.5 8.5 0 0 0 4.09 3.41q-.79-1.25-1.27-3.02zm11.7 0H16.5c-.32 1.33-.79 2.5-1.37 3.41a8.5 8.5 0 0 0 3.9-3.13zM7.1 10H3.74v.02a8.5 8.5 0 0 0 .3 4.98h3.18a20 20 0 0 1-.13-5m8.3 0H8.6a19 19 0 0 0 .14 5h6.52a19 19 0 0 0 .14-5m4.87 0h-3.35a21 21 0 0 1-.13 5h3.18a8.5 8.5 0 0 0 .3-5M8.88 4.09h-.02a8.5 8.5 0 0 0-4.61 4.4l3.05.01c.31-1.75.86-3.28 1.58-4.41m3.12-.6-.12.01c-1.26.12-2.48 2.12-3.05 5h6.34c-.56-2.87-1.78-4.87-3.04-5zm3.12.6.1.17A13 13 0 0 1 16.7 8.5h3.05a8.5 8.5 0 0 0-4.34-4.29z"/></symbol><symbol id="i-github" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/></symbol><symbol id="i-server" viewBox="0 0 24 24"><path d="M9.25 6a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5zM8.5 17.75c0-.41.34-.75.75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75M9.25 14a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5zM6 5a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3zm3-1.5c-.83 0-1.5.67-1.5 1.5v14c0 .83.67 1.5 1.5 1.5h6c.83 0 1.5-.67 1.5-1.5V5c0-.83-.67-1.5-1.5-1.5z"/></symbol><symbol id="i-person-key" viewBox="0 0 24 24"><path d="M15 15.5q.01-.8.26-1.5h-9C5 14 4 15 4 16.25v.58c0 .89.32 1.75.9 2.43q2.1 2.45 6.1 2.7v-1.05a2 2 0 0 1 .05-.44q-3.36-.25-5-2.18c-.35-.41-.55-.93-.55-1.46v-.58c0-.41.34-.75.75-.75zM12 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7M19.5 19a3.5 3.5 0 1 0-3.39-2.61L12.3 20.2a1 1 0 0 0-.29.7v1.59c0 .28.22.5.5.5h2a.5.5 0 0 0 .5-.5V22h1a.5.5 0 0 0 .5-.5v-1h1a.5.5 0 0 0 .5-.5v-1zm.5-5a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></symbol><symbol id="i-warning" viewBox="0 0 20 20"><path d="M7.37 3.56a3 3 0 0 1 5.26 0l5.5 10A3 3 0 0 1 15.5 18h-11a3 3 0 0 1-2.63-4.44zm4.38.48a2 2 0 0 0-3.5 0l-5.5 10A2 2 0 0 0 4.5 17h11a2 2 0 0 0 1.75-2.96zM10 12.75a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5m0-6.25c.28 0 .5.22.5.5v4a.5.5 0 0 1-1 0V7c0-.28.22-.5.5-.5"/></symbol><symbol id="i-info" viewBox="0 0 20 20"><path d="M10.5 8.91a.5.5 0 0 0-1 .09v4.6a.5.5 0 0 0 1-.1V8.91m.3-2.16a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0M18 10a8 8 0 1 0-16 0 8 8 0 0 0 16 0M3 10a7 7 0 1 1 14 0 7 7 0 0 1-14 0"/></symbol><symbol id="i-copy" viewBox="0 0 20 20"><path d="M7 7H5.5C4.67 7 4 7.67 4 8.5v6c0 .83.67 1.5 1.5 1.5h4c.65 0 1.2-.42 1.41-1h1.04a2.5 2.5 0 0 1-2.45 2h-4A2.5 2.5 0 0 1 3 14.5v-6A2.5 2.5 0 0 1 5.5 6H7zm7.5-4A2.5 2.5 0 0 1 17 5.5v6a2.5 2.5 0 0 1-2.5 2.5h-4A2.5 2.5 0 0 1 8 11.5v-6A2.5 2.5 0 0 1 10.5 3zm-4 1C9.67 4 9 4.67 9 5.5v6c0 .83.67 1.5 1.5 1.5h4c.83 0 1.5-.67 1.5-1.5v-6c0-.83-.67-1.5-1.5-1.5z"/></symbol><symbol id="i-dark-theme" viewBox="0 0 20 20"><path d="M10 3a7 7 0 1 1 0 14zm0-1a8 8 0 1 0 0 16 8 8 0 0 0 0-16"/></symbol><symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M2.22 2.22a.75.75 0 0 0-.07.98l.07.08 4.03 4.03a10 10 0 0 0-3.95 5.75.75.75 0 0 0 1.45.37 8.5 8.5 0 0 1 3.58-5.04l1.81 1.81A3.99 3.99 0 0 0 12 17c1.09 0 2.08-.43 2.8-1.14l5.92 5.92a.75.75 0 0 0 1.13-.98l-.07-.08-6.11-6.11-1.2-1.2-2.87-2.87-2.88-2.88-1.13-1.13-4.31-4.31a.75.75 0 0 0-1.06 0m7.98 9.05 3.54 3.53A2.5 2.5 0 0 1 9.5 13c0-.67.27-1.28.7-1.73M12 5.5a10 10 0 0 0-2.89.42l1.24 1.24a8.5 8.5 0 0 1 9.9 6.27.75.75 0 0 0 1.45-.36A10 10 0 0 0 12 5.5m.2 3.5 3.8 3.81a4 4 0 0 0-3.8-3.8"/></symbol><symbol id="i-cloud-off" viewBox="0 0 24 24"><path d="M3.28 2.22a.75.75 0 1 0-1.06 1.06l4.63 4.63a6 6 0 0 0-.77 2.1A4.5 4.5 0 0 0 6.5 19h11q.21 0 .42-.02l2.8 2.8a.75.75 0 0 0 1.06-1.06zM16.44 17.5H6.5a3 3 0 1 1 0-6h.26c.4 0 .73-.31.75-.71q.04-.96.45-1.77zm4.06-3c0 .78-.3 1.5-.79 2.03l1.06 1.06a4.48 4.48 0 0 0-2.85-7.57A6 6 0 0 0 8.99 5.8l1.11 1.1a4.5 4.5 0 0 1 6.4 3.87c.01.4.34.72.74.72h.26a3 3 0 0 1 3 3"/></symbol><symbol id="i-chevron-left" viewBox="0 0 20 20"><path d="M12.35 15.85a.5.5 0 0 1-.7 0L6.16 10.4a.55.55 0 0 1 0-.78l5.49-5.46a.5.5 0 1 1 .7.7L7.2 10l5.16 5.15c.2.2.2.5 0 .7"/></symbol><symbol id="i-chevron-right" viewBox="0 0 20 20"><path d="M7.65 4.15c.2-.2.5-.2.7 0l5.49 5.46c.21.22.21.57 0 .78l-5.49 5.47a.5.5 0 0 1-.7-.71L12.8 10 7.65 4.85a.5.5 0 0 1 0-.7"/></symbol></svg>
+<a class="skip-link" href="#main">Перейти к содержимому</a>
+
+<header class="appbar" id="appbar">
+  <div class="wrap appbar-inner">
+    <a class="brand" href="#top" aria-label="NativeNCA, наверх">
+      <img src="icon.png" alt="" width="28" height="28">
+      <span>NativeNCA</span>
+    </a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#why">Почему не NCALayer</a>
+      <a href="#features">Возможности</a>
+      <a href="#security">Безопасность</a>
+      <a href="#screenshots">Скриншоты</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <button class="btn btn-subtle btn-icon theme-toggle" type="button" id="theme-toggle" aria-label="Сменить тему" title="Сменить тему">
+      <svg class="icon i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+      <svg class="icon i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+    </button>
+    <a class="btn btn-subtle btn-icon hide-sm" href="https://github.com/DonnerTechDev/NativeNCA" aria-label="Исходный код на GitHub" title="GitHub">
+      <svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>
+    </a>
+    <a class="btn btn-accent" href="https://github.com/DonnerTechDev/NativeNCA/releases/latest" data-download>
+      <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+      <span>Скачать</span>
+    </a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">
+        <svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>
+        Нативная замена NCALayer для Windows
+      </p>
+      <h1 class="display">ЭЦП без Java и&nbsp;<em>без пароля на&nbsp;каждую подпись</em></h1>
+      <p class="lead">NativeNCA входит и подписывает на eGov, в интернет-банках и других казахстанских сервисах ключом ЭЦП НУЦ РК. Сайты разговаривают с ней так же, как с NCALayer, а вы подтверждаете подпись лицом, отпечатком или PIN-кодом Windows Hello.</p>
+
+      <div class="hero-actions">
+        <a class="btn btn-accent btn-download" href="https://github.com/DonnerTechDev/NativeNCA/releases/latest" data-download data-download-main>
+          <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+          <span class="dl-text">
+            <span class="dl-title">Скачать для Windows</span>
+            <span class="dl-meta" data-dl-meta>Последний релиз с GitHub</span>
+          </span>
+        </a>
+        <a class="btn btn-lg" href="https://github.com/DonnerTechDev/NativeNCA">
+          <svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>
+          Исходный код
+        </a>
+      </div>
+      <div class="hero-sub">
+        <span data-dl-alt hidden></span>
+        <a href="#donate">Поддержать проект</a>
+      </div>
+
+      <div class="hero-facts">
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Бесплатно</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Открытый код</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Windows 10 и 11, x64 и ARM64</span>
+      </div>
+    </div>
+
+    <div class="hero-shot">
+      <div class="shot">
+        <img class="only-light" src="screenshots/main-light.webp" width="1600" height="1090" alt="Главное окно NativeNCA: список ключей ЭЦП с названиями и фото, сведения о сертификате" fetchpriority="high">
+        <img class="only-dark" src="screenshots/main-dark.webp" width="1600" height="1090" alt="Главное окно NativeNCA в тёмной теме" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY NOT NCALAYER ============ -->
+<section class="section" id="why" style="padding-top: 24px">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow">Почему не NCALayer</p>
+      <h2 class="title-lg">NCALayer заслужил пенсию</h2>
+      <p class="lead">Он годами подписывал за весь Казахстан, и мы ему за это благодарны. Но посмотрите, как выглядит одна подпись там и здесь. Нажмите любую кнопку.</p>
+    </div>
+
+    <div class="versus reveal">
+      <div class="versus-col">
+        <div class="versus-label"><strong>Типичный Java-апплет</strong><span class="timer" id="t-old">0,0 с</span></div>
+        <div class="retro" role="group" aria-label="Пародия на NCALayer">
+          <div class="retro-title"><span>NCALayer (Java)</span><span class="retro-title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+          <div class="retro-menu" aria-hidden="true"><span>Файл</span><span>Ключи</span><span>Справка</span></div>
+          <div class="retro-body">
+            <div class="retro-field" id="old-log" aria-live="polite">Готов к работе. Наверное.</div>
+            <div class="retro-progress" aria-hidden="true"><i id="old-bar"></i></div>
+            <div class="retro-actions">
+              <button class="retro-btn" type="button" id="old-run">Подписать</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="versus-col">
+        <div class="versus-label"><strong>NativeNCA</strong><span class="timer" id="t-new">0,0 с</span></div>
+        <div class="fluent-win" id="new-win" data-state="idle" role="group" aria-label="Окно подтверждения NativeNCA">
+          <div class="fluent-win-title"><svg class="icon" aria-hidden="true"><use href="#i-shield-keyhole"/></svg>NativeNCA</div>
+          <div class="fluent-win-body">
+            <div class="fw-form">
+              <div class="fw-head">
+                <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-person-key"/></svg></span>
+                <div><b>Вход в личный кабинет</b><span>Сайт запрашивает доступ к вашей ЭЦП</span></div>
+              </div>
+              <div class="fw-origin"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>idp.egov.kz<span class="pill">HTTPS</span></div>
+              <div class="fw-key"><span class="fw-avatar" aria-hidden="true"></span><div>Личный eGov<small>ГОСТ · Пароль в хранилище</small></div></div>
+              <div class="fw-actions">
+                <button class="btn btn-accent" type="button" id="new-run"><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Подтвердить через Windows Hello</button>
+                <button class="btn" type="button" tabindex="-1" aria-hidden="true">Отмена</button>
+              </div>
+            </div>
+            <div class="fw-state fw-hello" aria-live="polite"><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Windows Hello: приложите палец</div>
+            <div class="fw-state fw-done" aria-live="polite"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg><b>Подписано</b><span class="caption">Ключ не покидал компьютер. Пароль вводить не пришлось.</span><button class="btn btn-subtle" type="button" id="new-reset" style="--h:32px;font-size:14px">Ещё раз</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="versus-run reveal"><button class="btn btn-lg" type="button" id="race">
+      <svg class="icon" aria-hidden="true"><use href="#i-flash"/></svg>Запустить наперегонки</button></div>
+    <p class="parody-note">Это пародия. Совпадения с реальностью не случайны.</p>
+
+    <div class="card compare reveal">
+      <table>
+        <caption class="visually-hidden">Сравнение NCALayer и NativeNCA</caption>
+        <thead><tr><th scope="col">Если коротко</th><th scope="col">NCALayer</th><th scope="col">NativeNCA</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Java</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Везёт с собой целую Java-машину и держит её в памяти</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Не нужна. Небольшое приложение на .NET, живёт в трее</span></td></tr>
+          <tr><th scope="row">Пароль от ключа</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Найти файл .p12, ввести пароль. На каждую подпись</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Один раз при добавлении ключа, дальше Windows Hello</span></td></tr>
+          <tr><th scope="row">Выбор ключа</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Угадать, какой из <code>GOST512_…p12</code> нужный</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Понятные имена и фото: «Личный eGov», «ТОО Шанырак»</span></td></tr>
+          <tr><th scope="row">Сертификат для 127.0.0.1</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Один и тот же закрытый ключ на всех компьютерах</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Свой на каждом компьютере, ключ центра сертификации уничтожен</span></td></tr>
+          <tr><th scope="row">Исходный код</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Закрыт. Остаётся верить</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Открыт на GitHub. Можно проверить и собрать самому</span></td></tr>
+          <tr><th scope="row">Внешний вид</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Привет из эпохи Java-апплетов</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Fluent Design, Mica, светлая и тёмная темы</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Возможности</p>
+      <h2 class="title-lg">Всё, что умеет NCALayer, только без страданий</h2>
+      <p class="lead">Вы один раз добавляете свои ключи <code>.p12</code>, а дальше на каждый запрос появляется понятное окно: какой сайт спрашивает, что он хочет подписать и каким ключом.</p>
+    </div>
+    <div class="grid grid-4">
+      <article class="card feature reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-plug"/></svg></span>
+        <h3>Совместим с NCALayer</h3>
+        <p>Слушает тот же <code>wss://127.0.0.1:13579</code> и говорит на том же протоколе. Сайтам ничего менять не нужно.</p>
+      </article>
+      <article class="card feature reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg></span>
+        <h3>Ключи ГОСТ и RSA</h3>
+        <p>СТ РК ГОСТ Р 34.10-2015 (512 бит) и RSA от НУЦ. Подписи CMS/CAdES и XML, сверены с эталонными подписями Kalkan.</p>
+      </article>
+      <article class="card feature reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg></span>
+        <h3>Windows Hello</h3>
+        <p>Подпись подтверждается лицом, отпечатком пальца или PIN-кодом. Пароль от ключа можно больше никогда не вводить.</p>
+      </article>
+      <article class="card feature reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-keys"/></svg></span>
+        <h3>Зашифрованное хранилище</h3>
+        <p>Ключи и пароли шифруются Windows DPAPI, а по желанию ещё и ключом Windows Hello из TPM.</p>
+      </article>
+      <article class="card feature reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg></span>
+        <h3>Видно, что подписываете</h3>
+        <p>В окне подтверждения домен сайта, сами данные и подходящие ключи. Никаких подписей вслепую.</p>
+      </article>
+      <article class="card feature reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-image"/></svg></span>
+        <h3>Фото ключей</h3>
+        <p>Назначьте ключу фото или логотип компании и кадрируйте прямо в приложении. Нужный ключ видно сразу.</p>
+      </article>
+      <article class="card feature reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-clock-lock"/></svg></span>
+        <h3>Метки времени НУЦ</h3>
+        <p>CAdES-T: подпись остаётся проверяемой и после того, как срок сертификата закончится.</p>
+      </article>
+      <article class="card feature reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg></span>
+        <h3>Сделано для Windows 11</h3>
+        <p>Fluent Design, Mica, тёмная тема, значок в трее и запуск вместе с Windows. Мгновенно, без заставок.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="how" style="padding-top: 0">
+  <div class="wrap how">
+    <div class="reveal">
+      <p class="eyebrow">Как проходит подпись</p>
+      <h2 class="title-lg">Одно окно, одно касание</h2>
+      <ol class="steps" style="margin-top: 28px">
+        <li><div><h3>Сайт просит подпись</h3><p>eGov или банк обращается к <code>127.0.0.1:13579</code>, как привык с NCALayer.</p></div></li>
+        <li><div><h3>Вы видите, кто и что просит</h3><p>Домен, содержимое запроса и подходящие ключи. Можно выбрать другой ключ или отменить.</p></div></li>
+        <li><div><h3>Подтверждаете через Windows Hello</h3><p>Ключ расшифровывается в памяти, данные подписываются прямо на вашем компьютере.</p></div></li>
+        <li><div><h3>Сайт получает только подпись</h3><p>Туда уходят подпись и открытый сертификат. Закрытый ключ компьютер не покидает.</p></div></li>
+      </ol>
+    </div>
+    <div class="how-shot reveal">
+      <div class="shot">
+        <img class="only-light" src="screenshots/overlay-light.webp" width="900" height="1089" alt="Окно подтверждения NativeNCA: idp.egov.kz запрашивает вход, выбран ключ, кнопка «Подтвердить через Windows Hello»" loading="lazy">
+        <img class="only-dark" src="screenshots/overlay-dark.webp" width="900" height="1089" alt="Окно подтверждения NativeNCA в тёмной теме" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECURITY ============ -->
+<section class="section" id="security">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Безопасность</p>
+      <h2 class="title-lg">Безопасность без «просто поверьте»</h2>
+      <p class="lead">NCALayer предлагает доверять закрытой Java-программе. NativeNCA предлагает проверить: весь код открыт, а каждое решение о защите ключей описано в README.</p>
+    </div>
+
+    <div class="grid grid-3">
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg></span>
+        <h3>Открытый исходный код</h3>
+        <p>Криптография, хранилище и протокол лежат на GitHub. Релизы собирает GitHub Actions из этого же кода, к каждому архиву приложена контрольная сумма SHA-256.</p>
+        <div class="vs">
+          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: код закрыт</div>
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: читайте, проверяйте, собирайте сами</div>
+        </div>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg></span>
+        <h3>Свой сертификат на каждом компьютере</h3>
+        <p>Браузеру нужен сертификат для <code>127.0.0.1</code>. NativeNCA выпускает его своим центром сертификации и сразу уничтожает ключ этого центра. Ограничения имён разрешают только локальные адреса.</p>
+        <div class="vs">
+          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: закрытый ключ одинаковый во всех установках</div>
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: уникальный, подделать нечем</div>
+        </div>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-shield-keyhole"/></svg></span>
+        <h3>Хранилище под замком Windows</h3>
+        <p>Ключи и пароли зашифрованы DPAPI для вашей учётной записи. В защищённом режиме их дополнительно закрывает AES-256-GCM с ключом из TPM, который открывается только через Windows Hello.</p>
+        <div class="vs">
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Даже программа, запущенная от вашего имени, не расшифрует ключи без вас</div>
+        </div>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-key"/></svg></span>
+        <h3>Ключ не покидает компьютер</h3>
+        <p>Подпись создаётся локально. Сайт получает только подпись и ваш открытый сертификат.</p>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-server"/></svg></span>
+        <h3>Сервер только для этого компьютера</h3>
+        <p>NativeNCA слушает лишь <code>127.0.0.1</code>: из локальной сети и интернета к нему не подключиться. На каждый запрос видно, какой сайт его прислал.</p>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-cloud-off"/></svg></span>
+        <h3>Без телеметрии</h3>
+        <p>Программа ничего не отправляет разработчику. Единственный её запрос в интернет идёт к службе меток времени НУЦ, и только если вы включили метки времени.</p>
+      </article>
+    </div>
+
+    <div class="infobar reveal" role="note">
+      <svg class="icon" aria-hidden="true"><use href="#i-warning"/></svg>
+      <div>
+        <b>Честно о том, чего NativeNCA не обещает</b>
+        <ul>
+          <li>Это независимый проект. Он не связан с НУЦ РК и АО «НИТ», не одобрен ими и не является сертифицированным средством криптографической защиты информации.</li>
+          <li>Если сбросить PIN-код Windows при включённой защите Windows Hello, хранилище не расшифровать. Храните исходные файлы <code>.p12</code> и пароли.</li>
+          <li>Держите NCALayer под рукой на случай, если какой-то сервис не примет подпись, и сообщите нам об этом.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="verify reveal">
+      <a class="btn" href="https://github.com/DonnerTechDev/NativeNCA"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>Посмотреть код</a>
+      <a class="btn" href="https://github.com/DonnerTechDev/NativeNCA/blob/main/README.ru.md#как-это-работает"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Как устроена защита</a>
+      <a class="btn" href="https://github.com/DonnerTechDev/NativeNCA/actions"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Сборки в GitHub Actions</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREENSHOTS ============ -->
+<section class="section" id="screenshots" style="padding-top: 0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Скриншоты</p>
+      <h2 class="title-lg">Выглядит как часть Windows</h2>
+      <p class="lead">Потому что сделано на тех же принципах, что и Параметры Windows 11. Тема переключается вместе с сайтом.</p>
+    </div>
+
+    <div class="selector reveal" role="tablist" aria-label="Скриншоты" id="shots-tabs">
+      <button role="tab" type="button" aria-selected="true" data-shot="main" data-title="Мои ключи" data-text="Все ключи в одном списке: с названиями, фото, сроком действия и назначением. Сведения о сертификате, ИИН и издатель под рукой.">Ключи</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="overlay" data-portrait data-title="Подтверждение подписи" data-text="Окно, которое появляется вместо NCALayer: какой сайт просит, что именно подписать и каким ключом. Подтверждение через Windows Hello.">Подтверждение</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="add-key" data-title="Новый ключ" data-text="Выберите файл .p12 от НУЦ, введите пароль один раз и дайте ключу понятное название. Пароль можно сохранить в защищённом хранилище.">Новый ключ</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="avatar-crop" data-title="Фото ключа" data-text="Фото или логотип компании помогают сразу узнать ключ в списке и в окне подписи. Кадрирование прямо в приложении.">Фото ключа</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="settings" data-title="Параметры" data-text="Windows Hello при каждой подписи, запоминание подтверждения, метки времени НУЦ, защита хранилища и автозапуск. Применяются сразу, как в Windows 11.">Параметры</button>
+    </div>
+
+    <div class="gallery reveal">
+      <div class="gallery-stage" role="tabpanel" id="shots-panel">
+        <button class="shot" type="button" id="shot-open" aria-label="Открыть скриншот крупно" style="padding:0;border:0;width:100%">
+          <img class="only-light" id="shot-light" src="screenshots/main-light.webp" width="1600" height="1090" alt="Скриншот NativeNCA: Мои ключи" loading="lazy">
+          <img class="only-dark" id="shot-dark" src="screenshots/main-dark.webp" width="1600" height="1090" alt="Скриншот NativeNCA: Мои ключи, тёмная тема" loading="lazy">
+        </button>
+        <button class="btn btn-icon flip-btn prev" type="button" id="shot-prev" aria-label="Предыдущий скриншот"><svg class="icon" aria-hidden="true"><use href="#i-chevron-left"/></svg></button>
+        <button class="btn btn-icon flip-btn next" type="button" id="shot-next" aria-label="Следующий скриншот"><svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+      </div>
+      <div class="card gallery-caption">
+        <h3 id="shot-title">Мои ключи</h3>
+        <p id="shot-text">Все ключи в одном списке: с названиями, фото, сроком действия и назначением. Сведения о сертификате, ИИН и издатель под рукой.</p>
+        <div class="pips" id="shot-pips" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GET STARTED ============ -->
+<section class="section" id="start">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Как начать</p>
+      <h2 class="title-lg">Пять минут, и NCALayer можно закрыть</h2>
+    </div>
+    <div class="start-grid">
+      <div class="card start-step reveal"><span class="num">ШАГ 1</span><h3>Скачайте и распакуйте</h3><p>Архив с последним релизом, в любую папку. Установщика нет, и он не нужен.</p></div>
+      <div class="card start-step reveal"><span class="num">ШАГ 2</span><h3>Запустите NativeNCA.exe</h3><p>Программа установит сертификат для браузеров. Windows один раз спросит разрешение: ответьте «Да».</p></div>
+      <div class="card start-step reveal"><span class="num">ШАГ 3</span><h3>Добавьте ключ</h3><p>Выберите файл <code>.p12</code> от НУЦ, введите пароль и назовите ключ. Оставьте «Сохранить пароль», чтобы подписывать касанием.</p></div>
+      <div class="card start-step reveal"><span class="num">ШАГ 4</span><h3>Войдите на eGov</h3><p>Как обычно. Вместо NCALayer появится окно NativeNCA. Если NCALayer запущен, программа предложит его закрыть.</p></div>
+    </div>
+    <div class="card start-cta reveal">
+      <div>
+        <div class="reqs">
+          <span><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg>Windows 10 версии 2004+ или Windows 11</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-flash"/></svg>x64 или ARM64</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Windows Hello желателен</span>
+        </div>
+        <div class="dl-alt" data-dl-alt hidden></div>
+      </div>
+      <a class="btn btn-accent btn-download" href="https://github.com/DonnerTechDev/NativeNCA/releases/latest" data-download>
+        <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+        <span class="dl-text">
+          <span class="dl-title">Скачать NativeNCA</span>
+          <span class="dl-meta" data-dl-meta>Последний релиз с GitHub</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="section" id="faq" style="padding-top: 0">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <p class="eyebrow">Вопросы</p>
+      <h2 class="title-lg">Частые вопросы</h2>
+    </div>
+    <div class="faq reveal" id="faq-list">
+      <details class="expander">
+        <summary>Это официальная программа?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Нет. NativeNCA — независимый проект с открытым кодом. Он не связан с НУЦ РК и АО «Национальные информационные технологии» и не является сертифицированным СКЗИ. Сайтам разницы нет: они общаются с NativeNCA по тому же протоколу, что и с NCALayer.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Нужно ли удалять NCALayer?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Нет, удалять не нужно. Но запускать их одновременно нельзя: сайты ждут обе программы на одном и том же порту 13579. Если NCALayer запущен, NativeNCA предложит закрыть его и отключить его автозапуск. Включить обратно можно в любой момент.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Работает ли NativeNCA с eGov и банками?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Да. NativeNCA реализует модули NCALayer <code>commonUtils</code> и <code>basics</code>: вход, подписи CMS/CAdES и XML, несколько документов за раз. Если какой-то сервис не принял подпись, напишите в <a href="https://github.com/DonnerTechDev/NativeNCA/issues">Issues</a> и пока воспользуйтесь NCALayer.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Нужна ли Java?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Нет. NativeNCA — приложение на .NET, всё нужное уже внутри одного файла. Ни Java, ни Kalkan SDK не требуются.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Какие ключи поддерживаются?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Файловые ключи <code>.p12</code> от НУЦ РК: СТ РК ГОСТ Р 34.10-2015 (512 бит) и RSA.</p><p>Пока не поддерживаются аппаратные носители и удостоверение личности (Kaztoken, eToken, JaCarta, ID-карта), а также старые ключи ГОСТ 34.310-2004: НУЦ перестал их выпускать, и срок всех таких ключей уже истёк.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Где хранятся мои ключи и пароли?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>В папке <code>%APPDATA%\NativeNCA\Vault</code>, зашифрованные Windows DPAPI для вашей учётной записи. Если включить защиту Windows Hello, они дополнительно шифруются AES-256-GCM, а ключ к ним хранится в TPM и открывается только вашим лицом, отпечатком или PIN-кодом.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Зачем программа устанавливает сертификат?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Сайты подключаются к <code>wss://127.0.0.1:13579</code> по TLS, поэтому браузер должен доверять локальному сертификату. NativeNCA создаёт удостоверяющий центр только для вашего компьютера, выпускает им один сертификат для <code>127.0.0.1</code> и <code>localhost</code> и сразу уничтожает закрытый ключ центра. Подтвердить им что-либо ещё невозможно.</p><p>Chrome, Edge и Firefox берут сертификат из хранилища Windows. Firefox, открытый во время установки, нужно перезапустить. Удалить сертификат можно в параметрах программы.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Windows SmartScreen предупреждает при запуске. Это нормально?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>SmartScreen так реагирует на программы, которые скачало ещё мало людей. Нажмите «Подробнее», затем «Выполнить в любом случае». Если хотите убедиться, что файл не подменили, сверьте его SHA-256 с файлом <code>.sha256</code> со страницы релиза: <code>Get-FileHash NativeNCA-*.zip</code> в PowerShell.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Что будет, если сбросить PIN-код Windows?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Если включена защита хранилища Windows Hello, ключ Windows Hello пропадёт вместе с PIN-кодом, и защищённые данные восстановить не получится. Без этой защиты сброс PIN ни на что не влияет. В любом случае храните исходные файлы <code>.p12</code> и пароли к ним.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Есть версия для macOS или Linux?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Нет. NativeNCA опирается на Windows Hello, DPAPI и хранилище сертификатов Windows, поэтому работает только в Windows 10 и 11.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Сколько стоит?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Нисколько, и рекламы нет. Если программа сэкономила вам нервы, можно <a href="#donate">поддержать разработку</a>.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DONATE ============ -->
+<section class="section" id="donate" style="padding-top: 0">
+  <div class="wrap">
+    <div class="card donate reveal">
+      <span class="heart"><svg class="icon" aria-hidden="true"><use href="#i-heart-fill"/></svg></span>
+      <div>
+        <h2 class="title">Сэкономили вам нервы?</h2>
+        <p>NativeNCA бесплатна, без рекламы и телеметрии. Донаты помогают поддерживать совместимость с сайтами, добавить аппаратные носители и, однажды, подписать программу сертификатом, чтобы SmartScreen перестал ворчать.</p>
+      </div>
+      <button class="btn btn-accent btn-lg" type="button" id="donate-open">
+        <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Поддержать
+      </button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <a class="brand" href="#top"><img src="icon.png" alt="" width="28" height="28" loading="lazy"><span>NativeNCA</span></a>
+      <nav class="footer-links" aria-label="Ссылки">
+        <a href="https://github.com/DonnerTechDev/NativeNCA">GitHub</a>
+        <a href="https://github.com/DonnerTechDev/NativeNCA/releases">Релизы</a>
+        <a href="https://github.com/DonnerTechDev/NativeNCA/issues">Сообщить о проблеме</a>
+        <a href="https://github.com/DonnerTechDev/NativeNCA/blob/main/README.ru.md">README</a>
+        <a href="#donate">Поддержать</a>
+      </nav>
+    </div>
+    <div class="footer-legal">
+      <p>NativeNCA — независимый проект. Он не связан с Национальным удостоверяющим центром Республики Казахстан и АО «Национальные информационные технологии», не одобрен и не сертифицирован ими. Программа не является сертифицированным средством криптографической защиты информации. Используйте её на свой риск.</p>
+      <p>NCALayer, eGov, Kalkan и Windows принадлежат их правообладателям и упомянуты только для описания совместимости.</p>
+    </div>
+  </div>
+</footer>
+
+<dialog id="donate-dialog" aria-labelledby="donate-title">
+  <div class="dlg-body">
+    <h2 id="donate-title">Поддержать NativeNCA</h2>
+    <p>Спасибо! Выберите удобный способ.</p>
+    <div class="donate-list" id="donate-list"></div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn" type="button" data-close>Закрыть</button>
+  </div>
+</dialog>
+
+<dialog class="lightbox" id="lightbox" aria-label="Скриншот">
+  <button class="btn btn-icon" type="button" data-close aria-label="Закрыть"><svg class="icon" aria-hidden="true"><use href="#i-dismiss"/></svg></button>
+  <img id="lightbox-img" src="" alt="">
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+  <div>
+    <b>Загрузка началась</b>
+    <p>Распакуйте архив и запустите <code>NativeNCA.exe</code>. Если SmartScreen спросит, нажмите «Подробнее» и «Выполнить в любом случае».</p>
+  </div>
+  <button class="btn btn-subtle btn-icon" type="button" id="toast-close" aria-label="Закрыть"><svg class="icon" aria-hidden="true"><use href="#i-dismiss"/></svg></button>
+</div>
+
+<script src="assets/site.js" defer></script>
+</body>
+</html>

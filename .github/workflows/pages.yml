@@ -1,0 +1,70 @@
+name: Site
+
+# Builds site/ and deploys it to GitHub Pages.
+# Runs when the site or the screenshots change, and after every tagged release
+# (so release.json, the download button fallback, lists the new version).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'docs/screenshots/**'
+      - 'docs/icon.png'
+      - 'NativeNCA.App/Assets/app.ico'
+      - '.github/workflows/pages.yml'
+  # Releases are published by the Build workflow with GITHUB_TOKEN, and such
+  # releases do not trigger `release` events. workflow_run does fire.
+  workflow_run:
+    workflows: [Build]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build site
+    if: >
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'v'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install --quiet pillow
+
+      - name: Build
+        run: python site/build.py _site
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}/
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

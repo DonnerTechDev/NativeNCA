@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Build the NativeNCA website into a static folder for GitHub Pages.
+
+    python site/build.py [out_dir]
+
+Environment:
+    SITE_URL   Public URL with a trailing slash (GitHub Actions passes the Pages URL).
+    GH_TOKEN   Optional. Used to bake the latest releases into release.json, so the
+               download button still works when the visitor hits the GitHub API rate limit.
+
+Needs Pillow for the WebP screenshots (pip install pillow).
+"""
+import datetime
+import html
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+SRC = ROOT / "site"
+OUT = Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / "_site").resolve()
+REPO = os.environ.get("GITHUB_REPOSITORY", "DonnerTechDev/NativeNCA")
+SITE_URL = os.environ.get("SITE_URL") or "https://donnertechdev.github.io/NativeNCA/"
+if not SITE_URL.endswith("/"):
+    SITE_URL += "/"
+
+
+def copy_sources():
+    if OUT.exists():
+        shutil.rmtree(OUT)
+    shutil.copytree(SRC, OUT, ignore=shutil.ignore_patterns("build.py", "__pycache__", ".DS_Store"))
+    shutil.copy2(ROOT / "docs" / "icon.png", OUT / "icon.png")
+    shutil.copy2(ROOT / "NativeNCA.App" / "Assets" / "app.ico", OUT / "favicon.ico")
+    (OUT / ".nojekyll").write_text("")
+
+
+def screenshots():
+    """docs/screenshots/*.png (rendered at 2x) -> screenshots/*.webp, sized for the web."""
+    from PIL import Image
+
+    dst = OUT / "screenshots"
+    dst.mkdir(exist_ok=True)
+    for png in sorted((ROOT / "docs" / "screenshots").glob("*.png")):
+        im = Image.open(png).convert("RGB")
+        width = 1600 if im.width > 2000 else 900
+        if im.width > width:
+            im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
+        im.save(dst / (png.stem + ".webp"), "WEBP", quality=84, method=6)
+        print(f"  {png.name} -> {png.stem}.webp {im.size[0]}x{im.size[1]}")
+
+
+def releases():
+    """Bake the latest releases as a fallback for the download button."""
+    data = []
+    if os.environ.get("GH_TOKEN") and shutil.which("gh"):
+        jq = ("[.[] | {tag_name, name, draft, prerelease, html_url, published_at,"
+              " assets: [.assets[] | {name, size, browser_download_url}]}]")
+        try:
+            out = subprocess.run(["gh", "api", f"repos/{REPO}/releases?per_page=10", "--jq", jq],
+                                 check=True, capture_output=True, text=True).stdout
+            data = json.loads(out)
+        except (subprocess.CalledProcessError, json.JSONDecodeError) as e:
+            print(f"  could not read releases: {e}", file=sys.stderr)
+    (OUT / "release.json").write_text(json.dumps(data, ensure_ascii=False))
+    print(f"  release.json: {len(data)} release(s)")
+
+
+def faq_jsonld(page: str) -> str:
+    """FAQPage structured data from the <details> expanders, so the FAQ has one source."""
+    items = []
+    for m in re.finditer(r'<details class="expander">\s*<summary>(.*?)<span class="chev">.*?</summary>\s*'
+                         r'<div class="exp-body">(.*?)</div>\s*</details>', page, re.S):
+        q = html.unescape(re.sub(r"<[^>]+>", "", m.group(1))).strip()
+        a = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", m.group(2)))).strip()
+        a = re.sub(r" ([.,:;!?])(?=\s|$)", r"\1", a)
+        items.append({"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}})
+    data = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": items}
+    return '<script type="application/ld+json">\n' + json.dumps(data, ensure_ascii=False, indent=1) + "\n</script>\n"
+
+
+def finalize():
+    today = datetime.date.today().isoformat()
+    for f in OUT.rglob("*"):
+        if f.suffix not in {".html", ".xml", ".txt"}:
+            continue
+        s = f.read_text(encoding="utf-8")
+        s = s.replace("__SITE_URL__", SITE_URL).replace("__BUILD_DATE__", today)
+        if f.name == "index.html":
+            s = s.replace("</head>", faq_jsonld(s) + "</head>", 1)
+        f.write_text(s, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    print(f"Building {SITE_URL} into {OUT}")
+    copy_sources()
+    screenshots()
+    releases()
+    finalize()
+    print("Done.")

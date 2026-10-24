@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Страница не найдена — NativeNCA</title>
+<meta name="robots" content="noindex">
+<base href="__SITE_URL__">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="stylesheet" href="assets/site.css">
+<script>
+  (function () {
+    var t = null; try { t = localStorage.getItem("theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<style>
+  .nf { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+  .nf .card { max-width: 520px; padding: 32px; }
+  .nf .code { font: 600 13px/1 var(--mono); color: var(--accent-text); letter-spacing: .06em; }
+  .nf h1 { margin: 12px 0 10px; }
+  .nf p { margin: 0 0 24px; color: var(--text-2); }
+</style>
+</head>
+<body>
+<main class="nf">
+  <div class="card">
+    <img src="icon.png" alt="" width="48" height="48">
+    <p class="code" style="margin:20px 0 0">ОШИБКА 404</p>
+    <h1 class="title">Такой страницы нет</h1>
+    <p>Зато NCALayer бы сейчас всё ещё запускался. Вернитесь на главную, там всё быстрее.</p>
+    <a class="btn btn-accent" href="./">На главную</a>
+  </div>
+</main>
+</body>
+</html>

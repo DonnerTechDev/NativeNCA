@@ -28,3 +28,6 @@ design/
 
 # Generated for the translator, shared by hand (tools/LocalizationReview)
 docs/localization-review.md
+
+# Website build output
+_site/
