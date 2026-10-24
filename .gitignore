@@ -1,0 +1,27 @@
+# Build output
+bin/
+obj/
+publish/
+artifacts/
+TestResults/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Never commit key containers or certificates (test data is generated in code)
+*.p12
+*.pfx
+*.jks
+!NativeNCA.Tests/TestData/*.p7s
+
+# Local-only files (internal notes, design prototypes)
+CLAUDE_TASK.md
+design/

@@ -1,0 +1,566 @@
+<ui:FluentWindow x:Class="NativeNCA.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
+        xmlns:vm="clr-namespace:NativeNCA.Core.ViewModels;assembly=NativeNCA.Core"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
+        Title="NativeNCA"
+        Icon="pack://application:,,,/NativeNCA;component/Assets/app.ico"
+        Width="1080" Height="720"
+        MinWidth="860" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        WindowBackdropType="Mica"
+        WindowCornerPreference="Round"
+        ExtendsContentIntoTitleBar="True">
+
+    <ui:FluentWindow.Resources>
+        <!-- Key card in the left pane -->
+        <DataTemplate x:Key="KeyCardTemplate" DataType="{x:Type vm:KeyItemViewModel}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Style="{StaticResource KeyAvatar}" Margin="0,0,12,0" VerticalAlignment="Top">
+                    <TextBlock Text="{Binding Initials}" Style="{StaticResource AvatarText}" />
+                </Border>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                    <TextBlock Text="{Binding FullName}" Margin="0,1,0,0" Style="{StaticResource SecondaryText}" />
+                    <DockPanel Margin="0,6,0,0" LastChildFill="False">
+                        <ContentControl DockPanel.Dock="Left" Template="{StaticResource KeyStatusBadge}" Focusable="False" />
+                        <ui:SymbolIcon DockPanel.Dock="Right" Symbol="LockClosed16" FontSize="14" Margin="8,0,0,0"
+                                       ToolTip="Пароль хранится в защищённом хранилище"
+                                       Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                                       Visibility="{Binding IsPasswordSaved, Converter={StaticResource BoolToVisibility}}" />
+                        <ui:SymbolIcon DockPanel.Dock="Right" FontSize="14"
+                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}">
+                            <ui:SymbolIcon.Style>
+                                <Style TargetType="ui:SymbolIcon">
+                                    <Setter Property="Symbol" Value="Signature20" />
+                                    <Setter Property="ToolTip" Value="Ключ для подписи (SIGN)" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAuth}" Value="True">
+                                            <Setter Property="Symbol" Value="PersonKey20" />
+                                            <Setter Property="ToolTip" Value="Ключ для входа (AUTH)" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsAuthAndSign}" Value="True">
+                                            <Setter Property="Symbol" Value="Key24" />
+                                            <Setter Property="ToolTip" Value="Ключ для входа и подписи" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:SymbolIcon.Style>
+                        </ui:SymbolIcon>
+                    </DockPanel>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Nav-style button at the bottom of the left pane ("Параметры") -->
+        <Style x:Key="PaneNavButton" TargetType="ToggleButton">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Border x:Name="Bg" CornerRadius="6" Background="Transparent" />
+                            <Border x:Name="Pill" Width="3" Height="16" CornerRadius="1.5" HorizontalAlignment="Left"
+                                    Background="{DynamicResource AccentFillColorDefaultBrush}" Visibility="Collapsed" />
+                            <ContentPresenter Margin="14,0" VerticalAlignment="Center" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                                <Setter TargetName="Pill" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Tray icon: the app keeps running in the background when the window is closed -->
+        <tray:NotifyIcon x:Name="TrayIcon"
+                         Grid.Row="0"
+                         Icon="pack://application:,,,/NativeNCA;component/Assets/app.ico"
+                         TooltipText="NativeNCA — готов к подписанию"
+                         FocusOnLeftClick="False"
+                         MenuOnRightClick="True"
+                         LeftClick="OnTrayLeftClick">
+            <tray:NotifyIcon.Menu>
+                <ContextMenu>
+                    <ui:MenuItem Header="Открыть NativeNCA" Icon="{ui:SymbolIcon ShieldKeyhole24}" Click="OnTrayOpenClick" />
+                    <ui:MenuItem Header="Параметры" Icon="{ui:SymbolIcon Settings24}" Click="OnTraySettingsClick" />
+                    <Separator />
+                    <ui:MenuItem Header="Выход" Icon="{ui:SymbolIcon Power24}" Click="OnTrayExitClick" />
+                </ContextMenu>
+            </tray:NotifyIcon.Menu>
+        </tray:NotifyIcon>
+
+        <ui:TitleBar Grid.Row="0" Title="NativeNCA · ЭЦП Казахстана">
+            <ui:TitleBar.Icon>
+                <ui:SymbolIcon Symbol="ShieldKeyhole24" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ===================== LEFT PANE: key vault ===================== -->
+            <Grid Grid.Column="0" Margin="16,4,12,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="4,0,0,14">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Мои ключи" FontSize="20" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                        <Border Style="{StaticResource Pill}" Margin="10,2,0,0">
+                            <TextBlock Text="{Binding Keys.Count}" Style="{StaticResource PillText}" />
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <ui:SymbolIcon Symbol="ShieldCheckmark16" FontSize="14" Margin="0,0,6,0"
+                                       Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                        <TextBlock Text="Зашифрованы в хранилище Windows (DPAPI)" Style="{StaticResource SecondaryText}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <ListBox x:Name="KeysList" Grid.Row="1"
+                         ItemsSource="{Binding Keys}"
+                         SelectedItem="{Binding SelectedKey}"
+                         ItemTemplate="{StaticResource KeyCardTemplate}"
+                         ItemContainerStyle="{StaticResource KeyCardItem}"
+                         Style="{StaticResource CardListBox}"
+                         SelectionChanged="OnKeySelectionChanged"
+                         PreviewMouseLeftButtonUp="OnKeysListClicked" />
+
+                <!-- Empty vault -->
+                <TextBlock Grid.Row="1" Margin="4,4,4,0" VerticalAlignment="Top" TextWrapping="Wrap"
+                           Style="{StaticResource TertiaryText}"
+                           Text="Здесь появятся ваши ключи ЭЦП."
+                           Visibility="{Binding HasKeys, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}" />
+
+                <StackPanel Grid.Row="2" Margin="0,12,0,0">
+                    <ui:Button Appearance="Primary"
+                               Icon="{ui:SymbolIcon Add24}"
+                               Content="Добавить ключ"
+                               HorizontalAlignment="Stretch"
+                               Height="36"
+                               Click="OnAddKeyClick" />
+
+                    <Border Height="1" Margin="4,12,4,8" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+
+                    <ToggleButton x:Name="SettingsNavButton" Style="{StaticResource PaneNavButton}" Click="OnSettingsNavClick">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Settings24" FontSize="18" Margin="0,0,12,0" />
+                            <TextBlock Text="Параметры" FontSize="14" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                        </StackPanel>
+                    </ToggleButton>
+                </StackPanel>
+            </Grid>
+
+            <!-- ===================== RIGHT PANE: content layer ===================== -->
+            <Border Grid.Column="1" CornerRadius="8,0,0,0" BorderThickness="1,1,0,0"
+                    Background="{DynamicResource LayerFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Server problem banner (port taken by NCALayer, missing TLS certificate, ...) -->
+                <Border Grid.Row="0" Margin="24,16,24,0" Padding="16,12" CornerRadius="8" BorderThickness="1"
+                        Background="{DynamicResource SystemFillColorCriticalBackgroundBrush}"
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                        Visibility="{Binding ServerError, Converter={StaticResource NullToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="ErrorCircle24" Filled="True" FontSize="18" Margin="0,1,12,0" VerticalAlignment="Top"
+                                       Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Сервер подписи не запущен — сайты не увидят NativeNCA" FontWeight="SemiBold"
+                                       TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                            <TextBlock Text="{Binding ServerError}" Margin="0,2,0,0" FontSize="13" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                        </StackPanel>
+                        <ui:Button Grid.Column="2" Margin="16,0,0,0" VerticalAlignment="Center"
+                                   Content="Повторить" Icon="{ui:SymbolIcon ArrowSync24}"
+                                   Command="{Binding RetryServerCommand}" />
+                    </Grid>
+                </Border>
+
+                <Grid x:Name="ContentHost" Grid.Row="1" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <TranslateTransform />
+                    </Grid.RenderTransform>
+
+                    <!-- ============ Key details ============ -->
+                    <ScrollViewer x:Name="KeyDetailsView" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="36,28,36,36" MaxWidth="880" DataContext="{Binding SelectedKey}">
+
+                            <!-- Hero -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border Style="{StaticResource KeyAvatar}" Width="72" Height="72" CornerRadius="36">
+                                    <TextBlock Text="{Binding Initials}" FontSize="26" Style="{StaticResource AvatarText}" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1" Margin="20,0,12,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource PageTitleText}" />
+                                    <TextBlock Text="{Binding Organization}" Margin="0,2,0,0" FontSize="14"
+                                               Style="{StaticResource SecondaryText}" />
+                                    <WrapPanel Margin="0,10,0,0">
+                                        <ContentControl Template="{StaticResource KeyStatusBadge}" Margin="0,0,12,0" Focusable="False" />
+                                        <ContentControl Template="{StaticResource KeyUsagePill}" Margin="0,0,6,0" Focusable="False" />
+                                        <Border Style="{StaticResource Pill}" Margin="0,0,6,0">
+                                            <TextBlock Text="{Binding KeyAlgorithm}" Style="{StaticResource PillText}" />
+                                        </Border>
+                                        <ContentControl Template="{StaticResource SavedPasswordPill}" Focusable="False" />
+                                    </WrapPanel>
+                                </StackPanel>
+
+                                <ui:Button Grid.Column="2" VerticalAlignment="Top"
+                                           Icon="{ui:SymbolIcon Rename24}" Content="Переименовать"
+                                           Click="OnRenameKeyClick" />
+                            </Grid>
+
+                            <!-- Expiry warning -->
+                            <ui:InfoBar Margin="0,20,0,0" Severity="Warning" IsClosable="False"
+                                        Title="Срок действия скоро закончится"
+                                        Message="Перевыпустите ключ на pki.gov.kz заранее, чтобы не потерять доступ к eGov и банкам."
+                                        IsOpen="{Binding IsExpiringSoon}" />
+                            <ui:InfoBar Margin="0,20,0,0" Severity="Error" IsClosable="False"
+                                        Title="Сертификат истёк"
+                                        Message="Этот ключ больше нельзя использовать для подписи. Получите новый ключ в НУЦ РК."
+                                        IsOpen="{Binding IsExpired}" />
+
+                            <!-- Certificate -->
+                            <TextBlock Text="Сертификат" Style="{StaticResource SectionHeaderText}" />
+                            <ui:Card Padding="16,0">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource DetailRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Владелец" Style="{StaticResource DetailLabelText}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding FullName}" Style="{StaticResource DetailValueText}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowDivider}" />
+
+                                    <Grid Style="{StaticResource DetailRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="ИИН" Style="{StaticResource DetailLabelText}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Iin}" FontFamily="{StaticResource MonoFontFamily}" Style="{StaticResource DetailValueText}" />
+                                        <ui:Button Grid.Column="2" Style="{StaticResource IconButton}" ToolTip="Скопировать ИИН"
+                                                   Icon="{ui:SymbolIcon Copy16}" Tag="{Binding Iin}" Click="OnCopyClick" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowDivider}" />
+
+                                    <!-- БИН: only for legal entities -->
+                                    <StackPanel Visibility="{Binding HasBin, Converter={StaticResource BoolToVisibility}}">
+                                        <Grid Style="{StaticResource DetailRow}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="180" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="БИН" Style="{StaticResource DetailLabelText}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Bin}" FontFamily="{StaticResource MonoFontFamily}" Style="{StaticResource DetailValueText}" />
+                                            <ui:Button Grid.Column="2" Style="{StaticResource IconButton}" ToolTip="Скопировать БИН"
+                                                       Icon="{ui:SymbolIcon Copy16}" Tag="{Binding Bin}" Click="OnCopyClick" />
+                                        </Grid>
+                                        <Border Style="{StaticResource RowDivider}" />
+                                    </StackPanel>
+
+                                    <Grid Style="{StaticResource DetailRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Организация" Style="{StaticResource DetailLabelText}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Organization}" Style="{StaticResource DetailValueText}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowDivider}" />
+
+                                    <Grid Style="{StaticResource DetailRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Срок действия" Style="{StaticResource DetailLabelText}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding ValidityPeriodText}" Style="{StaticResource DetailValueText}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowDivider}" />
+
+                                    <Grid Style="{StaticResource DetailRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Назначение" Style="{StaticResource DetailLabelText}" />
+                                        <TextBlock Grid.Column="1" Style="{StaticResource DetailValueText}">
+                                            <Run Text="{Binding BadgeText, Mode=OneWay}" /><Run Text="  ·  " /><Run Text="{Binding KeyAlgorithm, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+                                    <Border Style="{StaticResource RowDivider}" />
+
+                                    <Grid Style="{StaticResource DetailRow}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Издатель" Style="{StaticResource DetailLabelText}" />
+                                        <TextBlock Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Issuer}" FontSize="12"
+                                                   Style="{StaticResource DetailValueText}"
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    </Grid>
+                                </StackPanel>
+                            </ui:Card>
+
+                            <!-- Security -->
+                            <TextBlock Text="Безопасность" Style="{StaticResource SectionHeaderText}" />
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon LockClosed24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Сохранить пароль в защищённом хранилище" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Пароль шифруется Windows DPAPI — при подписании останется только подтверждение Windows Hello"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch x:Name="SavePasswordToggle"
+                                                 IsChecked="{Binding IsPasswordSaved, Mode=OneWay}"
+                                                 Click="OnSavePasswordToggleClick" />
+                            </ui:CardControl>
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon KeyReset24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Пароль ключа" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Перешифровать ключ новым паролем. Исходный файл .p12 на диске не изменится"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:Button Content="Сменить пароль" Click="OnChangePasswordClick" />
+                            </ui:CardControl>
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon Delete24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Удалить ключ из хранилища" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Зашифрованная копия и сохранённый пароль будут удалены без возможности восстановления"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:Button Content="Удалить" Appearance="Danger" Icon="{ui:SymbolIcon Delete24}" Click="OnDeleteKeyClick" />
+                            </ui:CardControl>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- ============ Settings ============ -->
+                    <ScrollViewer x:Name="SettingsView" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                        <StackPanel Margin="36,28,36,36" MaxWidth="880">
+                            <TextBlock Text="Параметры" Style="{StaticResource PageTitleText}" />
+
+                            <TextBlock Text="Подписание" Style="{StaticResource SectionHeaderText}" />
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon Fingerprint24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Windows Hello при каждом подписании" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Подтверждение лицом, отпечатком пальца или PIN-кодом перед использованием ключа"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch IsChecked="{Binding RequireWindowsHello}"
+                                                 IsEnabled="{Binding IsHelloProtected, Converter={StaticResource InverseBool}}" />
+                            </ui:CardControl>
+
+                            <ui:InfoBar x:Name="HelloUnavailableBar" Margin="0,0,0,4" Severity="Warning" IsClosable="False"
+                                        Title="Windows Hello не настроен"
+                                        Message="На этом устройстве нет PIN-кода или биометрии — подтверждение будет пропускаться. Настройте Windows Hello в «Параметры → Учётные записи → Варианты входа»." />
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon Timer24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Запоминать подтверждение" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Не запрашивать Windows Hello повторно для того же сайта в течение выбранного времени"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ComboBox MinWidth="160"
+                                          ItemsSource="{Binding SessionCacheOptions}"
+                                          SelectedItem="{Binding SessionCacheMinutes}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource CacheMinutesToText}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </ui:CardControl>
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon Clock24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Метка времени НУЦ (CAdES-T)" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Сервер НУЦ подтверждает время подписания — подпись остаётся проверяемой и после окончания срока сертификата. Нужен интернет"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch IsChecked="{Binding UseTimestamp}" />
+                            </ui:CardControl>
+
+                            <TextBlock Text="Хранилище" Style="{StaticResource SectionHeaderText}" />
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon ShieldLock24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Защитить хранилище Windows Hello" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Ключи и пароли дополнительно шифруются ключом Windows Hello из TPM. Без лица, отпечатка или PIN-кода их не расшифрует даже программа, запущенная от вашего имени"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:Button Content="Заблокировать" Icon="{ui:SymbolIcon LockClosed24}" Margin="0,0,12,0"
+                                               Command="{Binding LockVaultCommand}"
+                                               Visibility="{Binding IsHelloProtected, Converter={StaticResource BoolToVisibility}}" />
+                                    <ui:ToggleSwitch x:Name="HelloVaultToggle"
+                                                     IsChecked="{Binding IsHelloProtected, Mode=OneWay}"
+                                                     Click="OnHelloVaultToggleClick" />
+                                </StackPanel>
+                            </ui:CardControl>
+
+                            <TextBlock Text="Система" Style="{StaticResource SectionHeaderText}" />
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon Power24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Запускать вместе с Windows" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="NativeNCA будет готов к подписанию сразу после входа в систему"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch IsChecked="{Binding AutoStartWithWindows}" />
+                            </ui:CardControl>
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon PlugConnected24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Локальный сервер" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="Совместим с протоколом NCALayer — сайты работают без изменений"
+                                                   Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="wss://127.0.0.1:13579" FontFamily="{StaticResource MonoFontFamily}" FontSize="13"
+                                               VerticalAlignment="Center" Margin="0,0,12,0"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <Border Style="{StaticResource Pill}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="8" Height="8" Margin="0,1,6,0" VerticalAlignment="Center">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsServerRunning}" Value="True">
+                                                                <Setter Property="Fill" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <TextBlock>
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock" BasedOn="{StaticResource PillText}">
+                                                        <Setter Property="Text" Value="Остановлен" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsServerRunning}" Value="True">
+                                                                <Setter Property="Text" Value="Работает" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ui:CardControl>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- ============ Nothing selected ============ -->
+                    <StackPanel x:Name="EmptyView" VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="360"
+                                Visibility="Collapsed">
+                        <Border Width="88" Height="88" CornerRadius="44" HorizontalAlignment="Center"
+                                Background="{DynamicResource SubtleFillColorSecondaryBrush}">
+                            <ui:SymbolIcon Symbol="ShieldKeyhole24" FontSize="40"
+                                           Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                        </Border>
+                        <TextBlock Text="Добро пожаловать в NativeNCA" Margin="0,20,0,6" HorizontalAlignment="Center"
+                                   FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                        <TextBlock TextAlignment="Center" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
+                                   Text="Добавьте ключ ЭЦП, и при подписании на eGov или в банке появится окно подтверждения через Windows Hello." />
+                        <ui:Button Margin="0,20,0,0" HorizontalAlignment="Center" Appearance="Primary"
+                                   Icon="{ui:SymbolIcon Add24}" Content="Добавить ключ" Click="OnAddKeyClick" />
+                    </StackPanel>
+                </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Hosts for ContentDialogs and toast notifications -->
+        <ui:SnackbarPresenter x:Name="SnackbarPresenter" Grid.Row="1" VerticalAlignment="Bottom" />
+        <ui:ContentDialogHost x:Name="DialogHost" Grid.Row="0" Grid.RowSpan="2" />
+    </Grid>
+</ui:FluentWindow>
