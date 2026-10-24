@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,24 +10,40 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using NativeNCA.App.Views;
 using NativeNCA.App.Views.Dialogs;
+using NativeNCA.Core.Localization;
 using NativeNCA.Core.Models;
 using NativeNCA.Core.Security;
 using NativeNCA.Core.Updates;
 using NativeNCA.Core.ViewModels;
 using Wpf.Ui.Appearance;
 
-// Renders the README screenshots (docs/screenshots) with fictional keys and pictures.
+// Renders the README screenshots (docs/screenshots/<language>) with fictional keys and pictures.
 // Windows are shown off-screen, composited on a soft backdrop with an approximation of Mica,
 // with a fixed blue accent so the result does not depend on the machine's personalization.
 //
-//   dotnet run --project tools/Screenshots -- docs/screenshots
-//   dotnet run --project tools/Screenshots -- <dir> --extra    (also the certificate and NCALayer states, for review)
-//   dotnet run --project tools/Screenshots -- <dir> --updates  (only the install, update and rollback UI, for review)
+//   dotnet run --project tools/Screenshots -- docs/screenshots              (en, ru and kk subfolders)
+//   dotnet run --project tools/Screenshots -- <dir> --lang kk               (one language)
+//   dotnet run --project tools/Screenshots -- <dir> --extra                 (also the certificate and NCALayer states)
+//   dotnet run --project tools/Screenshots -- <dir> --updates               (only the install, update and rollback UI)
+//   dotnet run --project tools/Screenshots -- <dir> --review                (every screen and dialog, light theme, for layout review)
 class Program
 {
+    static string Root = "";
     static string Out = "";
     static bool Extra;
     static bool Updates;
+    static bool Review;
+    static Lang L;
+
+    /// <summary>Fictional data in each language: key names are the user's own, certificate data stays as НУЦ issues it.</summary>
+    sealed record Lang(AppLanguage Language, string Code, string PersonalKey, string CompanyKey, string SoleKey, string LoginDescription);
+
+    static readonly Lang[] Languages =
+    {
+        new(AppLanguage.English, "en", "Personal eGov", "Shanyrak Logistics LLP", "IE Akhmetov", "Sign in to your account"),
+        new(AppLanguage.Russian, "ru", "Личный eGov", "ТОО «Шанырак Логистик»", "ИП Ахметов", "Вход в личный кабинет"),
+        new(AppLanguage.Kazakh, "kk", "Жеке eGov", "«Шаңырақ Логистик» ЖШС", "ЖК Ахметов", "Жеке кабинетке кіру"),
+    };
 
     /// <summary>Stand-in for CurrentUser\Root: the renderer must never install anything into Windows.</summary>
     sealed class PreviewRootStore : IRootCertificateStore
@@ -51,10 +68,12 @@ class Program
     [STAThread]
     static void Main(string[] args)
     {
-        Out = args[0];
+        Root = args[0];
         Extra = args.Contains("--extra");
         Updates = args.Contains("--updates");
-        Directory.CreateDirectory(Out);
+        Review = args.Contains("--review");
+        int langIndex = Array.IndexOf(args, "--lang");
+        var languages = langIndex >= 0 ? Languages.Where(l => l.Code == args[langIndex + 1]).ToArray() : Languages;
 
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
         app.Resources.MergedDictionaries.Add(new Wpf.Ui.Markup.ThemesDictionary { Theme = ApplicationTheme.Dark });
@@ -63,7 +82,22 @@ class Program
 
         app.Dispatcher.InvokeAsync(async () =>
         {
-            try { await Run(); } catch (Exception ex) { File.WriteAllText(Path.Combine(Out, "crash.txt"), ex.ToString()); }
+            try
+            {
+                foreach (var lang in languages)
+                {
+                    L = lang;
+                    LocalizationSource.Instance.SetLanguage(lang.Language);
+                    Out = Path.Combine(Root, lang.Code);
+                    Directory.CreateDirectory(Out);
+                    await Run();
+                }
+            }
+            catch (Exception ex)
+            {
+                Directory.CreateDirectory(Root);
+                File.WriteAllText(Path.Combine(Root, "crash.txt"), ex.ToString());
+            }
             app.Shutdown();
         });
         app.Run();
@@ -102,6 +136,9 @@ class Program
         using var ms = new MemoryStream(); enc.Save(ms); return ms.ToArray();
     }
 
+    /// <summary>A fixed check time, so every language shows the same moment.</summary>
+    static readonly DateTime CheckedAt = new(2026, 10, 24, 14, 32, 0);
+
     /// <summary>
     /// Update state for an installed 0.2.0 in a temp folder (never the real install folder), optionally with
     /// 0.1.0 kept for rollback. Nothing is checked online.
@@ -116,11 +153,11 @@ class Program
             File.WriteAllText(Path.Combine(dir, AppInstallation.PreviousInfoName), "{\"Version\":\"0.1.0\"}");
         }
         var store = new UpdateStateStore(Path.Combine(dir, "update.json"));
-        // A client is passed only so "Проверить обновления" looks enabled; nothing calls it.
+        // A client is passed only so "Check for updates" looks enabled; nothing calls it.
         var client = new GitHubReleaseClient(new System.Net.Http.HttpClient());
         return new UpdateViewModel(AppVersion.Parse("0.2.0"), new AppInstallation(dir), installed, store, client, downloader: null)
         {
-            CheckStatusText = "Установлена последняя версия · Проверено 14:32"
+            CheckStatus = new LocText(() => Loc.Format(Strings.Update_UpToDate, Loc.Format(Strings.Update_CheckedAt, Loc.Time(CheckedAt))))
         };
     }
 
@@ -132,18 +169,20 @@ class Program
         var dir = Path.Combine(Path.GetTempPath(), "nnca_preview_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         var db = new VaultDatabase { UseTimestamp = true };
-        db.Keys.Add(new VaultKeyItem { Name = "Личный eGov", FullName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ", Iin = "880412300517", KeyAlgorithm = "ГОСТ", KeyUsage = "BOTH", NotBefore = DateTime.UtcNow.AddDays(-120), NotAfter = DateTime.UtcNow.AddDays(245), IsPasswordSaved = true, Issuer = "C=KZ, CN=ҰЛТТЫҚ КУӘЛАНДЫРУШЫ ОРТАЛЫҚ (GOST) 2022", LastUsedAt = DateTime.UtcNow, CertificateSerial = "3f1a" });
-        db.Keys.Add(new VaultKeyItem { Name = "ТОО «Шанырак Логистик»", FullName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ", Iin = "880412300517", Bin = "190540012388", Organization = "ТОО «ШАНЫРАК ЛОГИСТИК»", KeyAlgorithm = "ГОСТ", KeyUsage = "BOTH", NotBefore = DateTime.UtcNow.AddDays(-300), NotAfter = DateTime.UtcNow.AddDays(65), IsPasswordSaved = true, Issuer = "C=KZ, CN=ҰЛТТЫҚ КУӘЛАНДЫРУШЫ ОРТАЛЫҚ (GOST) 2022", LastUsedAt = DateTime.UtcNow.AddHours(-3), CertificateSerial = "3f1b" });
-        db.Keys.Add(new VaultKeyItem { Name = "ИП Ахметов", FullName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ", Iin = "880412300517", Organization = "ИП АХМЕТОВ", KeyAlgorithm = "ГОСТ", KeyUsage = "BOTH", NotBefore = DateTime.UtcNow.AddDays(-350), NotAfter = DateTime.UtcNow.AddDays(14), IsPasswordSaved = false, Issuer = "C=KZ, CN=ҰЛТТЫҚ КУӘЛАНДЫРУШЫ ОРТАЛЫҚ (GOST) 2022", LastUsedAt = DateTime.UtcNow.AddDays(-2), CertificateSerial = "3f1c" });
+        db.Keys.Add(new VaultKeyItem { Name = L.PersonalKey, FullName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ", Iin = "880412300517", KeyAlgorithm = CertificateInfoGost, KeyUsage = "BOTH", NotBefore = DateTime.UtcNow.AddDays(-120), NotAfter = DateTime.UtcNow.AddDays(245), IsPasswordSaved = true, Issuer = "C=KZ, CN=ҰЛТТЫҚ КУӘЛАНДЫРУШЫ ОРТАЛЫҚ (GOST) 2022", LastUsedAt = DateTime.UtcNow, CertificateSerial = "3f1a" });
+        db.Keys.Add(new VaultKeyItem { Name = L.CompanyKey, FullName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ", Iin = "880412300517", Bin = "190540012388", Organization = "ТОО «ШАНЫРАК ЛОГИСТИК»", KeyAlgorithm = CertificateInfoGost, KeyUsage = "BOTH", NotBefore = DateTime.UtcNow.AddDays(-300), NotAfter = DateTime.UtcNow.AddDays(65), IsPasswordSaved = true, Issuer = "C=KZ, CN=ҰЛТТЫҚ КУӘЛАНДЫРУШЫ ОРТАЛЫҚ (GOST) 2022", LastUsedAt = DateTime.UtcNow.AddHours(-3), CertificateSerial = "3f1b" });
+        db.Keys.Add(new VaultKeyItem { Name = L.SoleKey, FullName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ", Iin = "880412300517", Organization = "ИП АХМЕТОВ", KeyAlgorithm = CertificateInfoGost, KeyUsage = "BOTH", NotBefore = DateTime.UtcNow.AddDays(-350), NotAfter = DateTime.UtcNow.AddDays(14), IsPasswordSaved = false, Issuer = "C=KZ, CN=ҰЛТТЫҚ КУӘЛАНДЫРУШЫ ОРТАЛЫҚ (GOST) 2022", LastUsedAt = DateTime.UtcNow.AddDays(-2), CertificateSerial = "3f1c" });
         db.Keys = db.Keys.Take(count).ToList();
         File.WriteAllText(Path.Combine(dir, "vault.json"), JsonSerializer.Serialize(db));
         var vault = new SecureVaultService(dir);
         var keys = vault.GetKeys();
         // Square crop from the middle of the landscape, and a logo for the company key
-        vault.SetAvatar(keys.First(k => k.Name == "Личный eGov").Id, CropSquare(Landscape(384, 256)));
-        if (count > 1) vault.SetAvatar(keys.First(k => k.Name.StartsWith("ТОО")).Id, Logo(256));
+        if (count > 0) vault.SetAvatar(keys.First(k => k.Name == L.PersonalKey).Id, CropSquare(Landscape(384, 256)));
+        if (count > 1) vault.SetAvatar(keys.First(k => k.Name == L.CompanyKey).Id, Logo(256));
         return vault;
     }
+
+    static string CertificateInfoGost => NativeNCA.Core.Crypto.CertificateInfo.GostAlgorithm;
 
     static byte[] CropSquare(byte[] png)
     {
@@ -240,6 +279,28 @@ class Program
         ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false);
     }
 
+    static void OpenSettings(MainWindow main) =>
+        ((ToggleButton)main.FindName("SettingsNavButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+
+    static void ScrollTo(MainWindow main, string elementName, double offset = -16)
+    {
+        var scroll = (ScrollViewer)main.FindName("SettingsView");
+        var element = (FrameworkElement)main.FindName(elementName);
+        scroll.ScrollToVerticalOffset(element.TranslatePoint(new Point(0, 0), (UIElement)scroll.Content).Y + offset);
+    }
+
+    static SignOverlayWindow MakeOverlay(int keys, SigningPromptRequest request = null)
+    {
+        request ??= new SigningPromptRequest
+        {
+            Origin = "https://idp.egov.kz",
+            Description = LocText.Raw(L.LoginDescription),
+            DataToSignPreview = LocText.Raw("<login><timeTicket>1729771200000</timeTicket><nonce>7d1f0c2a-3b4e</nonce></login>"),
+            RequiredUsage = KeyUsageFilter.Auth
+        };
+        return new SignOverlayWindow(new SignOverlayViewModel(MakeVault(keys), new ConsentCache(), request));
+    }
+
     static async Task RunUpdates(ApplicationTheme theme, string t, bool dark)
     {
         // Update available, stacked under a server problem.
@@ -251,19 +312,18 @@ class Program
         updates.AvailableRelease = FakeRelease("0.3.0");
         await Idle(); Snap(main, $"u-banner-{t}", dark);
 
-        updates.UpdateError = "Подпись обновления недействительна. Обновление не установлено";
+        updates.UpdateErrorText = new LocText(() => Strings.Update_BadSignature);
         vm.ServerErrorKind = NativeNCA.Core.Server.ServerErrorKind.NcaLayerRunning;
-        vm.ServerErrorTitle = "Запущен NCALayer";
-        vm.ServerError = "Оригинальный NCALayer занимает порт 13579, который сайты используют для подписи. " +
-                         "Две программы не могут работать одновременно — закройте NCALayer, и NativeNCA запустится сам.";
+        vm.ServerErrorTitle = new LocText(() => Strings.Server_NcaLayerTitle);
+        vm.ServerErrorText = new LocText(() => Strings.Server_NcaLayerMessage);
         await Idle(); Snap(main, $"u-stacked-{t}", dark);
 
-        vm.ServerError = null;
-        updates.UpdateError = null;
+        vm.ServerErrorText = null;
+        updates.UpdateErrorText = null;
         updates.IsDownloading = true;
         updates.IsDownloadIndeterminate = false;
         updates.DownloadFraction = 0.42;
-        updates.DownloadText = "Загрузка 28,4 из 67,7 МБ · 42 %";
+        updates.DownloadStatus = new LocText(() => Loc.Format(Strings.Update_Downloading, 28.4.ToString("0.0", Loc.FormatCulture), 67.7.ToString("0.0", Loc.FormatCulture), 0.42));
         await Idle(); Snap(main, $"u-downloading-{t}", dark);
 
         updates.IsDownloading = false;
@@ -271,13 +331,14 @@ class Program
         updates.ApplyStartupArguments(new[] { UpdateViewModel.UpdatedFromArgument, "0.1.0" });
         await Idle(); Snap(main, $"u-updated-{t}", dark);
 
-        ((ToggleButton)main.FindName("SettingsNavButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        updates.ApplyStartupArguments(new[] { UpdateViewModel.RolledBackFromArgument, "0.3.0" });
+        await Idle(); Snap(main, $"u-rolled-back-{t}", dark);
+
+        OpenSettings(main);
         updates.DismissRestartBannerCommand.Execute(null);
         await Idle();
         var settingsScroll = (ScrollViewer)main.FindName("SettingsView");
-        var section = (FrameworkElement)main.FindName("UpdatesSection");
-        section.BringIntoView(); await Idle();
-        settingsScroll.ScrollToVerticalOffset(section.TranslatePoint(new Point(0, 0), (UIElement)settingsScroll.Content).Y - 16);
+        ScrollTo(main, "UpdatesSection");
         await Idle(); Snap(main, $"u-settings-{t}", dark);
         settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"u-settings-end-{t}", dark);
         main.CloseForExit();
@@ -288,11 +349,9 @@ class Program
         portable.AvailableRelease = FakeRelease("0.3.0");
         var main2 = new MainWindow(portableVm, portable) { Width = 1080, Height = 700 };
         Place(main2); main2.Show(); await Idle(); ApplyTheme(theme); await Idle();
-        ((ToggleButton)main2.FindName("SettingsNavButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        OpenSettings(main2);
         await Idle();
-        var scroll2 = (ScrollViewer)main2.FindName("SettingsView");
-        var section2 = (FrameworkElement)main2.FindName("UpdatesSection");
-        scroll2.ScrollToVerticalOffset(section2.TranslatePoint(new Point(0, 0), (UIElement)scroll2.Content).Y - 16);
+        ScrollTo(main2, "UpdatesSection");
         await Idle(); Snap(main2, $"u-portable-{t}", dark);
         main2.CloseForExit();
 
@@ -319,33 +378,172 @@ class Program
         await SnapSetup(SetupWindow.ForInstall(v, null, () => Task.CompletedTask, () => { }), $"u-setup-install-{t}");
         await SnapSetup(SetupWindow.ForInstall(v, AppVersion.Parse("0.1.0"), () => Task.CompletedTask, () => { }), $"u-setup-upgrade-{t}");
         await SnapSetup(SetupWindow.ForInstall(v, v, () => Task.CompletedTask, () => { }), $"u-setup-installed-{t}");
+        await SnapSetup(SetupWindow.ForInstall(v, AppVersion.Parse("0.3.0"), () => Task.CompletedTask, () => { }), $"u-setup-newer-{t}");
+        await SnapSetup(SetupWindow.ForInstall(v, null, () => throw new InvalidOperationException(Strings.Setup_CloseRunningFailed), () => { }),
+            $"u-setup-error-{t}", w => ((Wpf.Ui.Controls.Button)w.FindName("PrimaryButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)));
         await SnapSetup(SetupWindow.ForUninstall(v, _ => Task.FromResult<string>(null)), $"u-uninstall-{t}");
         await SnapSetup(SetupWindow.ForUninstall(v, _ => Task.FromResult<string>(null)), $"u-uninstall-done-{t}", w =>
             ((Wpf.Ui.Controls.Button)w.FindName("PrimaryButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)));
+        await SnapSetup(SetupWindow.ForUninstall(v, _ => Task.FromResult(Strings.Uninstall_RootLeft)), $"u-uninstall-warning-{t}", w =>
+            ((Wpf.Ui.Controls.Button)w.FindName("PrimaryButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)));
+    }
+
+    /// <summary>The dialogs built in MainWindow's code-behind, opened through their handlers.</summary>
+    static async Task RunDialogs(ApplicationTheme theme, string t, bool dark)
+    {
+        var vm = new SettingsViewModel(MakeVault(), MakeTls(installed: true)) { IsServerRunning = true, IsNcaLayerAutostartEnabled = true };
+        var updates = MakeUpdates(withPrevious: true);
+        var main = new MainWindow(vm, updates) { Width = 1080, Height = 700 };
+        Place(main); main.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        var host = (Wpf.Ui.Controls.ContentDialogHost)main.FindName("DialogHost");
+
+        async Task SnapHandler(string handler, string name, object sender = null)
+        {
+            var method = typeof(MainWindow).GetMethod(handler, BindingFlags.Instance | BindingFlags.NonPublic)
+                         ?? throw new MissingMethodException(handler);
+            var result = method.Invoke(main, method.GetParameters().Length == 0 ? null : new[] { sender, new RoutedEventArgs() });
+            await Idle();
+            Snap(main, name, dark);
+            if (FindDialog(host) is { } dialog) dialog.Hide();
+            await Idle();
+        }
+
+        vm.SelectedKey = vm.Keys[0];
+        await Idle();
+        await SnapHandler("OnRenameKeyClick", $"d-rename-{t}");
+        await SnapHandler("OnDeleteKeyClick", $"d-delete-key-{t}");
+        ((ToggleButton)main.FindName("HelloVaultToggle")).IsChecked = true;
+        await SnapHandler("OnHelloVaultToggleClick", $"d-hello-vault-{t}");
+        await SnapHandler("OnRemoveTlsCertificateClick", $"d-tls-remove-{t}");
+        await SnapHandler("OnCloseNcaLayerClick", $"d-close-ncalayer-{t}");
+        await SnapHandler("OnDisableNcaLayerAutostartClick", $"d-disable-autostart-{t}");
+        await SnapHandler("OnRollbackClick", $"d-rollback-{t}");
+        await SnapHandler("OfferInstallAsync", $"d-install-{t}");
+
+        // Save password: the switch is "on" when clicked.
+        vm.SelectedKey = vm.Keys.First(k => !k.IsPasswordSaved);
+        await Idle();
+        ((ToggleButton)main.FindName("SavePasswordToggle")).IsChecked = true;
+        await SnapHandler("OnSavePasswordToggleClick", $"d-save-password-{t}");
+
+        var change = new ChangePasswordDialog(host, vm, vm.Keys[0]);
+        _ = change.ShowAsync(); await Idle(); Snap(main, $"d-change-password-{t}", dark);
+        change.Hide(); await Idle();
+
+        var tlsSetup = new TlsSetupDialog(host);
+        _ = tlsSetup.ShowAsync(); await Idle(); Snap(main, $"d-tls-setup-{t}", dark);
+        tlsSetup.Hide(); await Idle();
+
+        var addKey = new AddKeyDialog(host, vm);
+        _ = addKey.ShowAsync(); await Idle();
+        typeof(AddKeyDialog).GetMethod("ShowError", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(addKey, new object[] { Strings.AddKey_WrongPasswordOrDamaged });
+        await Idle(); Snap(main, $"d-add-key-error-{t}", dark);
+        addKey.Hide(); await Idle();
+
+        var crop = new AvatarCropDialog(host, null);
+        _ = crop.ShowAsync(); await Idle(); Snap(main, $"d-avatar-empty-{t}", dark);
+        crop.Hide(); await Idle();
+
+        // Toast with the longest error text (the snackbar shows one message at a time).
+        main.ShowError(Strings.NcaLayer_AutostartNeedsSettings);
+        await Idle(); Snap(main, $"d-toast-error-{t}", dark);
+
+        // Empty vault: welcome screen.
+        main.CloseForExit();
+        var emptyVm = new SettingsViewModel(MakeVault(0), MakeTls(installed: true)) { IsServerRunning = true };
+        var empty = new MainWindow(emptyVm, MakeUpdates()) { Width = 1080, Height = 700 };
+        Place(empty); empty.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        Snap(empty, $"d-welcome-{t}", dark);
+        empty.CloseForExit();
+
+        // Overlay states: certificate only, no keys, unsafe origin with an error and a password.
+        var select = MakeOverlay(2, new SigningPromptRequest
+        {
+            Origin = "https://cabinet.example.kz",
+            Description = new LocText(() => Strings.Request_ShareCertificate),
+            DataToSignPreview = new LocText(() => Strings.Request_ShareCertificatePreview),
+            RequiredUsage = KeyUsageFilter.Any,
+            RequiresPrivateKey = false
+        });
+        Place(select); select.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        Snap(select, $"d-overlay-certificate-{t}", dark); select.Close();
+
+        var none = MakeOverlay(0, new SigningPromptRequest
+        {
+            Origin = "http://localhost:8080",
+            Description = new LocText(() => Loc.Format(Strings.Request_SignDocuments, 3)),
+            DataToSignPreview = new LocText(() => Loc.Plural(18734, Strings.Request_BinaryPreview_Plural, "9F2C41D07A3B55E1")),
+        });
+        Place(none); none.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        Snap(none, $"d-overlay-no-keys-{t}", dark); none.Close();
+
+        var vault = MakeVault(3);
+        var sign = new SignOverlayViewModel(vault, new ConsentCache(), new SigningPromptRequest
+        {
+            Origin = "",
+            Description = new LocText(() => Strings.Request_SignCms),
+            DataToSignPreview = new LocText(() => Loc.Plural(2, Strings.Request_BinaryPreview_Plural, "0011223344556677")),
+            RequiredUsage = KeyUsageFilter.Sign
+        });
+        sign.SelectedKey = sign.MatchingKeys.First(k => !k.IsPasswordSaved);
+        var signWindow = new SignOverlayWindow(sign);
+        Place(signWindow); signWindow.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        typeof(SignOverlayViewModel).GetMethod("RequireManualPassword", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(sign, new object[] { new LocText(() => Strings.Overlay_SavedPasswordWrong) });
+        await Idle(); Snap(signWindow, $"d-overlay-error-{t}", dark); signWindow.Close();
+    }
+
+    static Wpf.Ui.Controls.ContentDialog FindDialog(DependencyObject root)
+    {
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is Wpf.Ui.Controls.ContentDialog dialog) return dialog;
+            if (FindDialog(child) is { } found) return found;
+        }
+        return null;
     }
 
     static async Task Run()
     {
-        foreach (var theme in new[] { ApplicationTheme.Dark, ApplicationTheme.Light })
+        var themes = Review ? new[] { ApplicationTheme.Light } : new[] { ApplicationTheme.Dark, ApplicationTheme.Light };
+        foreach (var theme in themes)
         {
             bool dark = theme == ApplicationTheme.Dark;
             string t = dark ? "dark" : "light";
             ApplicationThemeManager.Apply(theme, Wpf.Ui.Controls.WindowBackdropType.Mica, true);
 
-            if (Updates)
+            if (Updates || Review)
             {
                 await RunUpdates(theme, t, dark);
-                continue;
+                if (!Review) continue;
+                await RunDialogs(theme, t, dark);
             }
 
             var vm = new SettingsViewModel(MakeVault(), MakeTls(installed: true)) { IsServerRunning = true };
             var main = new MainWindow(vm, MakeUpdates()) { Width = 1080, Height = 700 };
-            Place(main); main.Show(); await Idle();
-            ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false); ApplicationThemeManager.Apply(theme, Wpf.Ui.Controls.WindowBackdropType.Mica, false); ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false); await Idle();
+            Place(main); main.Show(); await Idle(); ApplyTheme(theme); await Idle();
             Snap(main, $"main-{t}", dark);
 
-            ((ToggleButton)main.FindName("SettingsNavButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            OpenSettings(main);
             await Idle(); Snap(main, $"settings-{t}", dark);
+
+            if (Review)
+            {
+                var settingsScroll = (ScrollViewer)main.FindName("SettingsView");
+                ScrollTo(main, "UpdatesSection"); await Idle(); Snap(main, $"settings-middle-{t}", dark);
+                settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"settings-end-{t}", dark);
+
+                // The narrowest window: long texts must wrap, not clip.
+                main.Width = main.MinWidth; main.Height = main.MinHeight; await Idle();
+                settingsScroll.ScrollToHome(); await Idle(); Snap(main, $"settings-narrow-{t}", dark);
+                ScrollTo(main, "UpdatesSection"); await Idle(); Snap(main, $"settings-narrow-middle-{t}", dark);
+                settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"settings-narrow-end-{t}", dark);
+                vm.SelectedKey = vm.Keys[2]; await Idle(); Snap(main, $"main-narrow-{t}", dark);
+                main.Width = 1080; main.Height = 700; await Idle();
+            }
+
             vm.SelectedKey = vm.Keys[0]; await Idle();
 
             var dlg = new AddKeyDialog((Wpf.Ui.Controls.ContentDialogHost)main.FindName("DialogHost"), vm);
@@ -359,11 +557,11 @@ class Program
             crop.Hide(); await Idle();
             File.Delete(photo);
 
-            if (Extra)
+            if (Extra || Review)
             {
                 var host = (Wpf.Ui.Controls.ContentDialogHost)main.FindName("DialogHost");
                 var settingsScroll = (ScrollViewer)main.FindName("SettingsView");
-                ((ToggleButton)main.FindName("SettingsNavButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                OpenSettings(main);
                 await Idle(); settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"x-settings-own-{t}", dark);
 
                 // NCALayer certificate in use, NCALayer running and starting with Windows.
@@ -371,36 +569,45 @@ class Program
                 vm.IsServerRunning = false;
                 vm.IsNcaLayerAutostartEnabled = true;
                 vm.ServerErrorKind = NativeNCA.Core.Server.ServerErrorKind.NcaLayerRunning;
-                vm.ServerErrorTitle = "Запущен NCALayer";
-                vm.ServerError = "Оригинальный NCALayer занимает порт 13579, который сайты используют для подписи. " +
-                                 "Две программы не могут работать одновременно — закройте NCALayer, и NativeNCA запустится сам.";
+                vm.ServerErrorTitle = new LocText(() => Strings.Server_NcaLayerTitle);
+                vm.ServerErrorText = new LocText(() => Strings.Server_NcaLayerMessage);
                 await Idle(); settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"x-ncalayer-{t}", dark);
 
                 // No certificate at all.
                 vm.TlsSource = TlsCertificateSource.None;
                 vm.ServerErrorKind = NativeNCA.Core.Server.ServerErrorKind.Certificate;
-                vm.ServerErrorTitle = "Нет сертификата для браузеров";
-                vm.ServerError = "Нет сертификата, которому доверяют браузеры. Нажмите «Настроить сертификат» — NativeNCA создаст собственный сертификат для этого компьютера.";
+                vm.ServerErrorTitle = new LocText(() => Strings.Server_NoCertificateTitle);
+                vm.ServerErrorText = new LocText(() => Strings.Tls_MissingMessage);
                 await Idle(); settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"x-no-certificate-{t}", dark);
+
+                // Another program on the port.
+                vm.ServerErrorKind = NativeNCA.Core.Server.ServerErrorKind.Other;
+                vm.ServerErrorTitle = new LocText(() => Strings.Server_PortBusyTitle);
+                vm.ServerErrorText = new LocText(() => Loc.Format(Strings.Server_PortBusyOwner, "java.exe") + " " + Strings.Server_PortBusyMessage);
+                await Idle(); settingsScroll.ScrollToHome(); await Idle(); Snap(main, $"x-port-busy-{t}", dark);
 
                 var setup = new TlsSetupDialog(host);
                 _ = setup.ShowAsync(); await Idle(); Snap(main, $"x-tls-setup-{t}", dark);
                 setup.Hide(); await Idle();
             }
 
+            if (Review)
+            {
+                // Live switch: the open window follows the language without a restart.
+                var current = LocalizationSource.Instance.Language;
+                var other = current == AppLanguage.Kazakh ? AppLanguage.English : AppLanguage.Kazakh;
+                vm.ServerErrorText = null;
+                vm.Language = other;
+                await Idle(); ((ScrollViewer)main.FindName("SettingsView")).ScrollToHome(); await Idle();
+                Snap(main, $"live-switch-to-{LocalizationSource.ToSetting(other)}-{t}", dark);
+                vm.Language = current;
+                await Idle();
+            }
+
             main.CloseForExit();
 
-            var req = new SigningPromptRequest
-            {
-                Origin = "https://idp.egov.kz",
-                Description = "Вход в личный кабинет",
-                DataToSignPreview = "<login><timeTicket>1729771200000</timeTicket><nonce>7d1f0c2a-3b4e</nonce></login>",
-                RequiredUsage = KeyUsageFilter.Auth
-            };
-            var ovm = new SignOverlayViewModel(MakeVault(2), new ConsentCache(), req);
-            var ov = new SignOverlayWindow(ovm);
-            Place(ov); ov.Show(); await Idle();
-            ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false); ApplicationThemeManager.Apply(theme, Wpf.Ui.Controls.WindowBackdropType.Mica, false); ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false); await Idle();
+            var ov = MakeOverlay(2);
+            Place(ov); ov.Show(); await Idle(); ApplyTheme(theme); await Idle();
             Snap(ov, $"overlay-{t}", dark);
             ov.Close();
         }

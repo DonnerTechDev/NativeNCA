@@ -9,8 +9,8 @@ NativeNCA is a native Windows replacement for NCALayer. It lets you log in and s
 Websites talk to it exactly as they talk to NCALayer, so nothing has to change on their side. You add your `.p12` keys once, and from then on every request shows a clear confirmation window: which site is asking, what it wants to sign, and which key will be used. You approve with Windows Hello.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/main-dark.png">
-  <img alt="NativeNCA key vault" src="docs/screenshots/main-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/en/main-dark.png">
+  <img alt="NativeNCA key vault" src="docs/screenshots/en/main-light.png">
 </picture>
 
 ## Why another NCALayer
@@ -26,11 +26,12 @@ NCALayer does its job, but it is a Java application: it takes a while to start, 
 - **Windows Hello.** Every signature can require face, fingerprint or PIN. In the optional protected mode, the vault itself is encrypted with a Windows Hello key kept in the TPM, so the keys cannot be decrypted without you, even by a program running under your account.
 - **Timestamps.** CMS signatures can carry a trusted timestamp from the NCA time-stamping service (CAdES-T), so they remain verifiable after the certificate expires.
 - **Built for Windows 11.** Fluent design, Mica, light and dark themes, tray icon, start with Windows.
+- **Kazakh, Russian and English.** The language follows Windows (Kazakh and Russian Windows get their own, everything else English) or can be chosen in Settings. It switches at once, without a restart.
 
 <table>
   <tr>
-    <td width="40%"><img alt="Signing confirmation" src="docs/screenshots/overlay-light.png"></td>
-    <td width="60%"><img alt="Settings" src="docs/screenshots/settings-dark.png"><br><img alt="Adding a key" src="docs/screenshots/add-key-light.png"></td>
+    <td width="40%"><img alt="Signing confirmation" src="docs/screenshots/en/overlay-light.png"></td>
+    <td width="60%"><img alt="Settings" src="docs/screenshots/en/settings-dark.png"><br><img alt="Adding a key" src="docs/screenshots/en/add-key-light.png"></td>
   </tr>
 </table>
 
@@ -45,14 +46,14 @@ NCALayer does its job, but it is a Java application: it takes a while to start, 
 1. Download the latest archive for your processor from [Releases](../../releases) (`win-x64` fits most computers, `win-arm64` is for ARM) and extract it.
 2. Run `NativeNCA.exe` and click **Install**. NativeNCA is installed for your Windows account only, without administrator rights, into `%LOCALAPPDATA%\Programs\NativeNCA`, and appears in the Start menu and in Installed apps. **Run without installing** starts it from the current folder instead, but such a copy does not update itself.
 3. On the first start NativeNCA explains and sets up its certificate for browsers. Windows then shows a security warning about installing a certificate once; answer **Yes**. NativeNCA appears in the tray and starts listening for websites.
-4. Click **Add key**, choose your `.p12` file from NCA, enter its password and give the key a name. Leave **Save password** on if you want to sign with Windows Hello alone.
+4. Click **Add key**, choose your `.p12` file from NCA, enter its password and give the key a name. Leave **Save the password in the secure Vault** on if you want to sign with Windows Hello alone.
 5. Open eGov or your bank and sign in as usual. NativeNCA shows a confirmation window instead of NCALayer.
 
 ## Updates and uninstalling
 
 - The installed NativeNCA checks GitHub for a new version at startup and every six hours. You can turn this off in Settings, under **Updates**. When a new version is out, a banner appears in the window and Windows shows a notification once per version. **Update** downloads the archive, checks it and restarts NativeNCA within a few seconds. Keys and settings are kept.
 - Every release archive is signed with the project's release key. NativeNCA installs an update only if the signature is valid for exactly that version and processor architecture and the version is newer than the installed one; anything else is refused. Files are downloaded only from github.com over HTTPS.
-- The previous version is kept. If something stops working after an update, click **Roll back to the previous version** in Settings. The version you rolled back from is not offered automatically again, but **Check for updates** still finds it.
+- The previous version is kept. If something stops working after an update, click **Go back to the previous version** in Settings. The version you rolled back from is not offered automatically again, but **Check for updates** still finds it.
 - To uninstall, use **Uninstall NativeNCA** in Settings, or Windows Settings → Apps → Installed apps. By default your keys and settings stay in `%APPDATA%\NativeNCA` in case you install NativeNCA again; tick the box to delete them together with the browser certificate. Your original `.p12` files are never touched.
 
 ## How it works
