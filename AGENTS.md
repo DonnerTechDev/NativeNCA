@@ -16,10 +16,12 @@ The UI is in Russian. Code, comments, commit messages and the English README are
 | `NativeNCA.Core/Security` | Key vault (DPAPI, optional Windows Hello layer), Windows Hello, TLS certificate, autostart, consent cache |
 | `NativeNCA.Core/Server` | `NativeNcaServer` (TLS + WebSocket transport) and `NcaProtocolHandler` (request handling, transport independent) |
 | `NativeNCA.Core/Services` | Prompt service interface, `NcaLayerService` (detect, close and un-autostart the original NCALayer) |
+| `NativeNCA.Core/Updates` | Versions, GitHub release check, release signatures, download/verify, install folder swap and rollback, setup (shortcut, Uninstall key) |
 | `NativeNCA.Core/ViewModels` | MVVM view models (CommunityToolkit.Mvvm). Core has no WPF dependency |
 | `NativeNCA.App` | WPF UI on WPF-UI 4.3.0: main window, signing overlay, dialogs, tray. Assembly name is `NativeNCA` |
 | `NativeNCA.Tests` | xUnit tests |
-| `tools/Screenshots` | Renders `docs/screenshots` with fictional data |
+| `tools/Screenshots` | Renders `docs/screenshots` with fictional data (`--updates` renders the install/update UI for review) |
+| `tools/ReleaseSigning` | Generates the release signing key, signs and verifies release zips |
 | `.github/workflows/build.yml` | CI, packaging and releases |
 
 `design/` and `CLAUDE_TASK.md` are local-only and ignored by git. Never add them to a commit.
@@ -31,8 +33,10 @@ dotnet build NativeNCA.slnx
 dotnet test NativeNCA.Tests --filter "Category!=Network"
 dotnet test NativeNCA.Tests                                  # also calls the real НУЦ TSA
 dotnet run --project tools/Screenshots -- docs/screenshots   # refresh README screenshots
-dotnet publish NativeNCA.App -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/win-x64
+dotnet publish NativeNCA.App -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:Version=0.2.0-dev -o publish/win-x64
 ```
+
+Without `-p:Version` the app reports `0.0.0-dev` (set in `NativeNCA.App.csproj`). CI passes the tag's version; the updater reads `AssemblyInformationalVersion` and ignores the `+commit` suffix.
 
 Releases: pushing a tag `vX.Y.Z` makes GitHub Actions run the tests and publish self-contained x64 and ARM64 zips. Tags with a `-` suffix become pre-releases.
 
@@ -66,6 +70,7 @@ These were established against real НУЦ data. Do not change them without a te
 - With Windows Hello protection on, the DPAPI payload is an envelope: magic `00 4E 4E 48 01 A5 5A 00`, then nonce, tag, and AES-256-GCM ciphertext under a master key. The master key is RSA-PKCS#1-wrapped by a key in the Microsoft Passport KSP named `<SID>//NativeNCA/Vault/MasterKey`. One unlock lasts `SessionCacheMinutes`, minimum 2.
 - `WindowsHelloKeyProtector` uses ncrypt.dll P/Invoke on purpose: the managed `CngKey` API mishandles this provider (`CngKey.Exists` throws `NTE_NO_KEY` instead of returning false). Anything that shows the Hello UI must run off the UI thread with the owner HWND set.
 - Real Windows Hello cannot run in tests; `FakeHelloProtector` covers the logic. Ask the user to verify Hello-related changes on their machine.
+- `vault.json` has `FormatVersion` (absent means 1, `SecureVaultService.SupportedFormatVersion` is the newest this build writes). Bump both only for a change an older build would misread or lose data on (a rollback runs the older build on the same vault). A build that finds a newer format opens the vault read-only: every change throws `VaultFormatTooNewException`, `MarkKeyUsed` is skipped, the main window shows a banner. Adding an optional property is not a format change.
 - Avatars are not secret and are stored unencrypted. Every change uses a new file name so caches never show the old picture.
 - `RefreshCertificateMetadata` re-derives KeyUsage, IIN and BIN from the stored certificate on load, so rule fixes reach existing vaults.
 - Never log or display passwords, private keys or decrypted containers.
@@ -82,12 +87,28 @@ Adding or removing a root in CurrentUser\Root makes Windows show its own securit
 
 NCALayer and NativeNCA cannot run at the same time because websites hardcode port 13579. When the port is busy, `NcaLayerService` finds the owner (GetExtendedTcpTable, then the process image path under NCALayer's install folder; NCALayer.exe launches the bundled `jre\bin\javaw.exe`, which owns the port) and the banner offers "Закрыть NCALayer" (kills it, then retries) and "Отключить автозапуск NCALayer". NCALayer's installer autostarts it with an `NCALayer.lnk` in the Startup folder; autostart is turned off the way Task Manager does it (an odd first byte in `Explorer\StartupApproved`), so the user can turn it back on in Settings. Machine-wide entries need administrator rights, so the app opens `ms-settings:startupapps` for those.
 
+## Install, update and rollback
+
+Everything lives in the one `NativeNCA.exe`; there is no separate installer or updater.
+
+- **Install folder.** `%LOCALAPPDATA%\Programs\NativeNCA` (per user, no admin): `NativeNCA.exe`, and after an update `NativeNCA.prev.exe` + `NativeNCA.prev.json` (`{"Version":"0.1.0"}`). `AppInstallation` owns these names and all renames. Registration (`SetupService`): Start menu `NativeNCA.lnk` (IShellLink via COM interop) and `HKCU\...\Uninstall\NativeNCA` with `UninstallString = "...\NativeNCA.exe" --uninstall`. The installed copy refreshes `DisplayVersion` on start.
+- **Start-up** (`App.Application_Startup`). `--uninstall` shows `SetupWindow` (uninstall mode). A Release build started from anywhere but the install folder shows `SetupWindow` (install mode) unless it is `--background`, a hand-over, `--portable` or has a file named `portable` next to it. Debug builds are always portable. Installing closes a running NativeNCA (exit event, or kill for versions before 0.2.0), copies the exe (over an older install it becomes the previous version), moves an existing Run entry to the installed path and starts the installed copy with `--installed`.
+- **Instances** (`InstanceSignals`). `Local\NativeNCA.SingleInstance` mutex (whoever serves the port), `...ShowMainWindow` and `...Exit` events, `...HandOffReady`. A hand-over (`--updated-from X`, `--rolled-back-from X`, `--installed`) waits up to 30 s for the mutex instead of signalling "show". `App.HandOffAsync` stops the server, releases the mutex, starts the new exe and waits up to 20 s for HandOffReady (set after the new server started) or the process exiting. If it exits, the old process takes the mutex and port back and the renames are undone. A timeout with the process alive counts as success (0.1.0 cannot signal).
+- **Update check.** `releases/latest` of `DonnerTechDev/NativeNCA` (stable only), with User-Agent and ETag; 403/429 back off until `x-ratelimit-reset`; offline is silent. At start (8 s delay) and every 6 h while "Автоматически проверять обновления" is on. State is in `%APPDATA%\NativeNCA\update.json` (not the vault): `AutoCheck`, `NotifiedVersion` (the tray balloon shows once per version), `SkippedVersion` (rolled back from: not offered unless checked by hand).
+- **Release signature.** CI signs each zip: `<zip>.sig` is base64 ECDSA P-256/SHA-256 (P1363 r‖s) over the text `NativeNCA release signature v1\nversion: X\narch: win-x64\nsha256: <hex>\n`. The updater rebuilds the text from the version and architecture it expects, so another version's or architecture's signature fails. The public key is `ReleaseSignature.PublicKeyBase64`; the private key is only in the `RELEASE_SIGNING_KEY` secret and in the maintainer's file outside the repo. Never commit a private key. Tag builds fail without the secret. Changing the key means old installs reject new releases until users reinstall by hand.
+- **Download.** Only HTTPS to github.com / objects.githubusercontent.com / release-assets.githubusercontent.com, redirects followed by hand and each hop checked. Asset names must be exactly `NativeNCA-<version>-<arch>.zip` and `.zip.sig`. After the signature, `NativeNCA.exe` is extracted and its own ProductVersion must equal the release version, then it becomes `NativeNCA.new.exe`.
+- **Swap.** Delete old prev, rename `NativeNCA.exe` → `NativeNCA.prev.exe` (allowed while running), `new` → `NativeNCA.exe`, write prev json, hand over. Any failure renames back. Rollback renames the running exe to `NativeNCA.old.exe` and prev back to `NativeNCA.exe`; the installed copy deletes `old`/`new` leftovers on start. Only one previous version is kept; after a rollback there is none.
+- **Uninstall.** Closes the running instance, removes the Run entry, shortcut and Uninstall key, optionally the TLS root (`RemoveOwnCertificate`), the Hello key and `%APPDATA%\NativeNCA`, then a hidden `cmd` (working dir %TEMP%) retries `rmdir` of the install folder for ~30 s after the process exits.
+- **Tray notification.** WPF-UI's NotifyIcon has no balloon API. `TrayNotification` reads the icon's hWnd/uID/callback message from its internal manager by reflection and calls `Shell_NotifyIcon(NIM_MODIFY, NIF_INFO)`; clicks arrive as `NIN_BALLOONUSERCLICK` on the hook window. Re-check after a WPF-UI upgrade.
+- **Tests** use temp folders and fake HTTP handlers only. Never touch the real install folder, Start menu, Uninstall key or Run key from tests or tools.
+
 ## UI notes (WPF-UI 4.3.0)
 
 - Shared styles are in `NativeNCA.App/Resources/Styles.xaml`. Use DynamicResource theme brushes, never hard-coded colours (except the avatar crop mask). Key avatars use the `KeyAvatarView` template.
 - Pack URIs must use `pack://application:,,,/NativeNCA;component/...` (assembly name `NativeNCA`).
 - Some `SymbolRegular` values have no glyph in the bundled font (for example `DocumentSignature24`, `DocumentKey20`). Check new icons visually.
-- `ui:InfoBar` does not render child content. Use a custom Border for banners with buttons.
+- `ui:InfoBar` does not render child content. Use a custom Border for banners with buttons (`BannerBorder` in the main window). Banners stack in `BannerHost`: server error, read-only vault, update, after-restart; the host collapses when all are hidden.
+- `FluentWindow` has MinHeight 320 by default; `SizeToContent` windows that can be shorter set `MinHeight="0"`.
 - Subclassed `ContentDialog` needs `<Style BasedOn="{StaticResource {x:Type ui:ContentDialog}}" TargetType="local:...">` in its resources. It is created with the window's `ContentDialogHost`.
 - The tray `NotifyIcon` registers on `Loaded`, so a background start shows the window off-screen once and hides it. WPF-UI's tray converter always uses the first frame of a `BitmapFrame` and assumes premultiplied pixels: pass an exact-size `Pbgra32` bitmap (see `LoadTrayIcon`).
 - List selection follows NavigationView: fill plus accent pill, no accent outline. Radio cards in the overlay keep the outline.
