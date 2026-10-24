@@ -153,8 +153,39 @@ public sealed class ProtocolTests : IDisposable
 
         Assert.Equal(1, prompt.OfferedKeyCounts.Single());
         Assert.True(response["status"]!.GetValue<bool>());
-        var cms = Convert.FromBase64String(response["body"]!["result"]!.GetValue<string>());
+        var cms = Convert.FromBase64String(response["body"]!["result"]!.AsArray().Single()!.GetValue<string>());
         Assert.True(CmsVerifier.Verify(cms).IsValid);
+    }
+
+    [Fact]
+    public async Task Basics_sign_single_string_returns_array_like_egov_expects()
+    {
+        AddKey(TestKeys.CreateGostPfx());
+        var handler = new NcaProtocolHandler(_vault, new FakePrompt(_vault));
+
+        // The request egov.kz sends for login; it then posts body.result[0] to its server.
+        var request = new JsonObject
+        {
+            ["module"] = NcaProtocolHandler.BasicsModule,
+            ["method"] = "sign",
+            ["args"] = new JsonObject
+            {
+                ["data"] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><login><client-type>PORTAL</client-type></login>",
+                ["allowedStorages"] = new JsonArray("PKCS12", "AKKaztokenStore", "AKKZIDCardStore"),
+                ["format"] = "xml",
+                ["signingParams"] = new JsonObject(),
+                ["signerParams"] = new JsonObject { ["extKeyUsageOids"] = new JsonArray(KzOids.EkuClientAuth) },
+                ["locale"] = "ru"
+            }
+        }.ToJsonString();
+
+        var response = JsonNode.Parse(await handler.HandleAsync(request, Origin, default))!;
+
+        Assert.True(response["status"]!.GetValue<bool>());
+        string xml = response["body"]!["result"]!.AsArray().Single()!.GetValue<string>();
+        Assert.StartsWith("<?xml", xml);
+        Assert.Contains("<client-type>PORTAL</client-type>", xml);
+        Assert.True(XmlDsigSigner.Verify(xml, out _));
     }
 
     [Fact]

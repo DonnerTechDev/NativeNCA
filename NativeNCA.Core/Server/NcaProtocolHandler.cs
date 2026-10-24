@@ -214,7 +214,6 @@ public class NcaProtocolHandler
         // NCALayer adds a TSA time-stamp when the site passes a tsaProfile (even an empty one).
         bool timestamp = signingParams?.ContainsKey("tsaProfile") == true && signingParams["tsaProfile"] != null;
 
-        bool isArray = args["data"] is JsonArray;
         List<string> items = args["data"] switch
         {
             JsonArray arr => arr.Select(n => n?.GetValue<string>() ?? string.Empty).ToList(),
@@ -266,7 +265,8 @@ public class NcaProtocolHandler
 
         _vault.MarkKeyUsed(result.SelectedKey.Id);
 
-        JsonNode payload = isArray ? new JsonArray(signed.Select(s => (JsonNode)s).ToArray()) : JsonValue.Create(signed[0])!;
+        // NCALayer always answers with an array, even for a single string: eGov reads body.result[0].
+        var payload = new JsonArray(signed.Select(s => (JsonNode)s).ToArray());
         return new JsonObject { ["status"] = true, ["body"] = new JsonObject { ["result"] = payload } }.ToJsonString();
     }
 

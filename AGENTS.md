@@ -54,7 +54,7 @@ These were established against real НУЦ data. Do not change them without a te
 ## Protocol
 
 - `kz.gov.pki.knca.commonUtils`: responses are `{"code":"200","responseObject":...}`; errors and cancellation are `{"code":"500","message":"action.canceled"}`. The first message after connect is `{"result":{"version":"1.4"}}`. `--heartbeat--` is echoed.
-- `kz.gov.pki.knca.basics` `sign`: responses are `{"status":true,"body":{"result":...}}`. Cancel is `{"status":true,"body":{}}`, and errors are `{"status":false,"code","message","details"}`. A `tsaProfile` key in `signingParams` means "add a time-stamp". `data` may be a string or an array, and the result mirrors it.
+- `kz.gov.pki.knca.basics` `sign`: responses are `{"status":true,"body":{"result":...}}`. Cancel is `{"status":true,"body":{}}`, and errors are `{"status":false,"code","message","details"}`. A `tsaProfile` key in `signingParams` means "add a time-stamp". `data` may be a string or an array, but `body.result` is always an array, as in NCALayer: eGov login sends a single string and reads `body.result[0]`.
 - Only one confirmation overlay is shown at a time (`_promptGate`). Requests from a connection run concurrently so heartbeats keep flowing, and closing the browser tab cancels the pending overlay.
 - `getKeyInfo` reveals only the stored certificate (`RequiresPrivateKey = false`): no password and no Windows Hello.
 
