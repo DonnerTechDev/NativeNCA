@@ -21,6 +21,8 @@
     <RootNamespace>NativeNCA.App</RootNamespace>
     <AssemblyTitle>NativeNCA</AssemblyTitle>
     <Product>NativeNCA</Product>
+    <!-- CI passes -p:Version from the release tag; the updater compares the informational version. -->
+    <Version>0.0.0-dev</Version>
   </PropertyGroup>
 
   <ItemGroup>
