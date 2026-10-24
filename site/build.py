@@ -5,8 +5,9 @@
 
 Environment:
     SITE_URL   Public URL with a trailing slash (GitHub Actions passes the Pages URL).
-    GH_TOKEN   Optional. Used to bake the latest releases into release.json, so the
-               download button still works when the visitor hits the GitHub API rate limit.
+    GH_TOKEN   Optional. Used to read the latest releases: the download buttons get a
+               direct link to the newest zip, and release.json keeps a copy for site.js.
+               The Site workflow rebuilds after every tagged release.
 
 Needs Pillow for the WebP screenshots (pip install pillow).
 """
@@ -67,6 +68,25 @@ def releases():
             print(f"  could not read releases: {e}", file=sys.stderr)
     (OUT / "release.json").write_text(json.dumps(data, ensure_ascii=False))
     print(f"  release.json: {len(data)} release(s)")
+    return data
+
+
+def download_link(data):
+    """Direct link to the newest x64 zip, so the button downloads without waiting for JS.
+
+    Same choice as site.js: the newest stable release, a pre-release only if nothing
+    stable exists. Without releases the button leads to the Releases page.
+    """
+    ok = [r for r in data if not r.get("draft") and any(a["name"].endswith(".zip") for a in r["assets"])]
+    rel = next((r for r in ok if not r.get("prerelease")), ok[0] if ok else None)
+    if not rel:
+        return f"https://github.com/{REPO}/releases", "Страница релизов на GitHub"
+    asset = next((a for a in rel["assets"] if a["name"].endswith("-win-x64.zip")),
+                 next(a for a in rel["assets"] if a["name"].endswith(".zip")))
+    version = rel["tag_name"].lstrip("v") + (" (бета)" if rel.get("prerelease") else "")
+    size = f"{asset['size'] / 1048576:.1f}".replace(".", ",")
+    arch = "ARM64" if "arm64" in asset["name"] else "x64"
+    return asset["browser_download_url"], f"Версия {version} · {arch} · {size} МБ"
 
 
 def faq_jsonld(page: str) -> str:
@@ -82,13 +102,15 @@ def faq_jsonld(page: str) -> str:
     return '<script type="application/ld+json">\n' + json.dumps(data, ensure_ascii=False, indent=1) + "\n</script>\n"
 
 
-def finalize():
+def finalize(data):
     today = datetime.date.today().isoformat()
+    dl_url, dl_meta = download_link(data)
     for f in OUT.rglob("*"):
         if f.suffix not in {".html", ".xml", ".txt"}:
             continue
         s = f.read_text(encoding="utf-8")
         s = s.replace("__SITE_URL__", SITE_URL).replace("__BUILD_DATE__", today)
+        s = s.replace("__DOWNLOAD_URL__", html.escape(dl_url)).replace("__DOWNLOAD_META__", html.escape(dl_meta))
         if f.name == "index.html":
             s = s.replace("</head>", faq_jsonld(s) + "</head>", 1)
         f.write_text(s, encoding="utf-8")
@@ -98,6 +120,5 @@ if __name__ == "__main__":
     print(f"Building {SITE_URL} into {OUT}")
     copy_sources()
     screenshots()
-    releases()
-    finalize()
+    finalize(releases())
     print("Done.")

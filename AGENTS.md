@@ -136,7 +136,7 @@ Everything lives in the one `NativeNCA.exe`; there is no separate installer or u
 
 - `site/` is plain HTML, CSS and JS with no framework or bundler. `site/build.py` copies it to `_site/`, converts `docs/screenshots/*.png` to WebP, copies `docs/icon.png` and `app.ico`, replaces `__SITE_URL__` and `__BUILD_DATE__`, adds FAQPage JSON-LD built from the FAQ expanders and bakes the latest releases into `release.json`. Build locally with `pip install pillow` and `python site/build.py`, then serve `_site/` with any static server.
 - Screenshots on the site come from `docs/screenshots`, so refreshing them with `tools/Screenshots` updates the site too. The site expects the current file names (`main`, `overlay`, `add-key`, `avatar-crop`, `settings`, each `-light` and `-dark`).
-- The download button reads releases from the GitHub API, then `release.json`, then falls back to the Releases page. It picks the asset ending in `-win-x64.zip` or `-win-arm64.zip`, so keep that suffix in `build.yml`.
+- Download buttons link straight to the newest release zip: `build.py` writes the `-win-x64.zip` URL into the HTML (the Site workflow rebuilds after every tagged release), then `site.js` switches ARM64 visitors to `-win-arm64.zip` and picks up a release newer than the build from the GitHub API. Without any release the buttons lead to the Releases page. Keep the `-win-x64.zip` / `-win-arm64.zip` suffixes in `build.yml`.
 - Icons are Fluent UI System Icons inlined as an SVG sprite at the top of `index.html`. Donation links live in `CONFIG.donate` in `site/assets/site.js`.
 - Copy is Russian, natural, no emoji. Claims about security must match the code and the README.
 

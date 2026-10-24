@@ -87,7 +87,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ---------- Download: latest GitHub release ---------- */
 (async function download() {
-  const releasesPage = `https://github.com/${CONFIG.repo}/releases/latest`;
+  const releasesPage = `https://github.com/${CONFIG.repo}/releases`;
 
   async function detectArch() {
     try {
@@ -118,15 +118,23 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   };
 
   let release = null;
-  try { release = pick(await getJson(`https://api.github.com/repos/${CONFIG.repo}/releases?per_page=10`, 4000)); } catch (e) {}
-  if (!release) { try { release = pick(await getJson("release.json", 3000)); } catch (e) {} }
+  // Our own copy first: same origin, no rate limit. Then the API, in case a release
+  // came out after the last build.
+  try { release = pick(await getJson("release.json", 3000)); } catch (e) {}
+  try {
+    const fresh = pick(await getJson(`https://api.github.com/repos/${CONFIG.repo}/releases?per_page=10`, 4000));
+    if (fresh) release = fresh;
+  } catch (e) {}
 
   const arch = await detectArch();
   const mb = (b) => fmt.format(b / 1048576) + " МБ";
 
+  // The build already put a direct link to the newest x64 zip into the buttons.
+  // Here we only switch to ARM64 when needed and catch a release newer than the build.
+  const baked = (a) => /\.zip$/i.test(a.getAttribute("href") || "");
+
   if (!release) {
-    $$("[data-download]").forEach((a) => { a.href = releasesPage; });
-    $$("[data-dl-meta]").forEach((m) => { m.textContent = "Страница релизов на GitHub"; });
+    $$("[data-download]").forEach((a) => { if (!baked(a)) a.href = releasesPage; });
     return;
   }
 
@@ -140,7 +148,6 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   $$("[data-download]").forEach((a) => {
     a.href = main.browser_download_url;
-    a.dataset.ready = "1";
   });
   $$("[data-dl-meta]").forEach((m) => {
     m.textContent = `Версия ${version}${release.prerelease ? " (бета)" : ""} · ${label} · ${mb(main.size)}`;
@@ -163,8 +170,8 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let timer;
   const hide = () => t.classList.remove("show");
   document.addEventListener("click", (e) => {
-    const a = e.target.closest("[data-download][data-ready], [data-download-alt]");
-    if (!a) return;
+    const a = e.target.closest("[data-download], [data-download-alt]");
+    if (!a || !/\.zip$/i.test(a.getAttribute("href") || "")) return;
     t.classList.add("show");
     clearTimeout(timer);
     timer = setTimeout(hide, 9000);
@@ -252,23 +259,47 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const pips = $$("#shot-pips span");
   let index = 0;
 
+  const frame = $("#shot-open");
+  const src = (name, theme) => `screenshots/${name}-${theme}.webp`;
+  const currentTheme = () => document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  let token = 0;
+
   function show(i, focus) {
     index = (i + tabs.length) % tabs.length;
     const t = tabs[index];
     tabs.forEach((b, k) => { b.setAttribute("aria-selected", k === index); b.tabIndex = k === index ? 0 : -1; });
     pips.forEach((p, k) => p.classList.toggle("on", k === index));
-    const name = t.dataset.shot;
-    const [w, h] = "portrait" in t.dataset ? [900, 1089] : [1600, 1090];
-    for (const [img, theme] of [[light, "light"], [dark, "dark"]]) {
-      img.src = `screenshots/${name}-${theme}.webp`;
-      img.width = w; img.height = h;
-      img.alt = `Скриншот NativeNCA: ${t.dataset.title}${theme === "dark" ? ", тёмная тема" : ""}`;
-      img.style.animation = "none"; void img.offsetWidth; img.style.animation = "";
-    }
     title.textContent = t.dataset.title;
     text.textContent = t.dataset.text;
     if (focus) t.focus();
+
+    // Hide the old picture at once, swap, and fade the new one in once it is decoded,
+    // so a slow connection never shows the previous tab's screenshot under the new caption.
+    const my = ++token;
+    frame.classList.add("loading");
+    const name = t.dataset.shot;
+    const [w, h] = "portrait" in t.dataset ? [900, 1089] : [1600, 1090];
+    for (const [img, theme] of [[light, "light"], [dark, "dark"]]) {
+      img.width = w; img.height = h;
+      img.alt = `Скриншот NativeNCA: ${t.dataset.title}${theme === "dark" ? ", тёмная тема" : ""}`;
+      img.src = src(name, theme);
+    }
+    const visible = currentTheme() === "dark" ? dark : light;
+    const done = () => { if (my === token) frame.classList.remove("loading"); };
+    (visible.decode ? visible.decode() : Promise.resolve()).then(done, done);
   }
+
+  // Warm the cache for the other tabs once the gallery is near, so switching is instant.
+  let warmed = false;
+  const warm = () => {
+    if (warmed) return; warmed = true;
+    const theme = currentTheme(), other = theme === "dark" ? "light" : "dark";
+    for (const th of [theme, other]) tabs.forEach((t) => { const im = new Image(); im.decoding = "async"; im.src = src(t.dataset.shot, th); });
+  };
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { warm(); io.disconnect(); } }, { rootMargin: "800px 0px" });
+    io.observe(frame);
+  } else { warm(); }
 
   tabs.forEach((t, i) => t.addEventListener("click", () => show(i)));
   $("#shots-tabs").addEventListener("keydown", (e) => {
@@ -292,9 +323,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   // Lightbox
   const lb = $("#lightbox"), lbImg = $("#lightbox-img");
   $("#shot-open").addEventListener("click", () => {
-    const dark = document.documentElement.getAttribute("data-theme") === "dark";
-    const name = tabs[index].dataset.shot;
-    lbImg.src = `screenshots/${name}-${dark ? "dark" : "light"}.webp`;
+    lbImg.src = src(tabs[index].dataset.shot, currentTheme());
     lbImg.alt = `Скриншот NativeNCA: ${tabs[index].dataset.title}`;
     lb.showModal();
   });

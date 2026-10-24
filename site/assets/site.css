@@ -53,6 +53,9 @@
   --shadow-flyout: 0 8px 16px rgba(0, 0, 0, .14);
   --shadow-dialog: 0 32px 64px rgba(0, 0, 0, .19), 0 2px 21px rgba(0, 0, 0, .15);
   --shadow-shot: 0 24px 60px -18px rgba(30, 50, 90, .35), 0 2px 8px rgba(30, 50, 90, .08);
+  /* Wallpaper the app screenshots are rendered on, used to letterbox them. */
+  --shot-a: #cfe3f7;
+  --shot-b: #e9ddf6;
 
   --r-ctrl: 4px;
   --r-card: 8px;
@@ -113,6 +116,8 @@
   --shadow-flyout: 0 8px 16px rgba(0, 0, 0, .3);
   --shadow-dialog: 0 32px 64px rgba(0, 0, 0, .4), 0 2px 21px rgba(0, 0, 0, .3);
   --shadow-shot: 0 24px 60px -18px rgba(0, 0, 0, .7), 0 2px 8px rgba(0, 0, 0, .3);
+  --shot-a: #1b2a45;
+  --shot-b: #104e6b;
 }
 
 /* ---------- Base ---------- */
@@ -667,8 +672,20 @@ section { position: relative; }
 .gallery { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
 @media (max-width: 960px) { .gallery { grid-template-columns: 1fr; } }
 .gallery-stage { position: relative; }
-.gallery-stage .shot { cursor: zoom-in; display: grid; place-items: center; aspect-ratio: 2384 / 1624; }
-.gallery-stage .shot img { height: 100%; width: 100%; object-fit: contain; animation: fadeIn .3s var(--ease); }
+.gallery-stage .shot {
+  display: block; position: relative; width: 100%;
+  aspect-ratio: 2384 / 1624; max-width: 100%;
+  padding: 0; border: 0; cursor: zoom-in;
+  background: linear-gradient(135deg, var(--shot-a), var(--shot-b));
+}
+/* Both orientations fit whole: landscape fills the frame, portrait is letterboxed on the same wallpaper. */
+.gallery-stage .shot img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  transition: opacity .18s linear;
+}
+.gallery-stage .shot.loading img { opacity: 0; transition-duration: .08s; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .flip-btn {
   position: absolute; top: 50%; translate: 0 -50%;
