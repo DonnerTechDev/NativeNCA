@@ -468,6 +468,25 @@
                                         <TextBlock Text="Защитить хранилище Windows Hello" Style="{StaticResource SettingsTitleText}" />
                                         <TextBlock Text="Ключи и пароли дополнительно шифруются ключом Windows Hello из TPM. Без лица, отпечатка или PIN-кода их не расшифрует даже программа, запущенная от вашего имени"
                                                    Style="{StaticResource SettingsDescriptionText}" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0"
+                                                    Visibility="{Binding IsHelloProtected, Converter={StaticResource BoolToVisibility}}">
+                                            <ui:SymbolIcon FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center">
+                                                <ui:SymbolIcon.Style>
+                                                    <Style TargetType="ui:SymbolIcon">
+                                                        <Setter Property="Symbol" Value="LockClosed16" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsVaultUnlocked}" Value="True">
+                                                                <Setter Property="Symbol" Value="LockOpen16" />
+                                                                <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ui:SymbolIcon.Style>
+                                            </ui:SymbolIcon>
+                                            <TextBlock Text="{Binding VaultStateText}" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                        </StackPanel>
                                     </StackPanel>
                                 </ui:CardControl.Header>
                                 <StackPanel Orientation="Horizontal">

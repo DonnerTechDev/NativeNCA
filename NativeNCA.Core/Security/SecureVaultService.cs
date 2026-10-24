@@ -45,6 +45,18 @@ public class SecureVaultService
 
     public event EventHandler? Changed;
 
+    /// <summary>Raised when the vault is unlocked with Windows Hello or locked again.</summary>
+    public event EventHandler? LockStateChanged;
+
+    /// <summary>When the Windows Hello session ends (null when locked or not protected).</summary>
+    public DateTime? UnlockedUntil
+    {
+        get
+        {
+            lock (_lock) return IsHelloProtected && _masterKey != null && DateTime.UtcNow < _masterKeyExpiresAt ? _masterKeyExpiresAt : null;
+        }
+    }
+
     // ===================== Queries =====================
 
     public IReadOnlyList<VaultKeyItem> GetKeys()
@@ -119,6 +131,7 @@ public class SecureVaultService
             SetMasterKey(key);
         });
 
+    /// <summary>Forgets the master key: the next operation will ask for Windows Hello again.</summary>
     public void Lock()
     {
         lock (_lock)
@@ -126,6 +139,7 @@ public class SecureVaultService
             if (_masterKey != null) CryptographicOperations.ZeroMemory(_masterKey);
             _masterKey = null;
         }
+        LockStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -174,6 +188,7 @@ public class SecureVaultService
     private void SetMasterKey(byte[] key)
     {
         lock (_lock) SetMasterKeyLocked(key);
+        LockStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void SetMasterKeyLocked(byte[] key)

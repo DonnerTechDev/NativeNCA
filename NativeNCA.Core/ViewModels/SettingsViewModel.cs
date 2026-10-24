@@ -47,6 +47,17 @@ public partial class SettingsViewModel : ObservableObject
     /// <summary>Set by the host application: tries to start the server again.</summary>
     public Action? RetryServerAction { get; set; }
 
+    /// <summary>Protected vault is currently open (a Windows Hello verification is still valid).</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LockVaultCommand))]
+    private bool _isVaultUnlocked;
+
+    /// <summary>"Открыто ещё 12 мин" / "Заблокировано". Empty when protection is off.</summary>
+    [ObservableProperty]
+    private string _vaultStateText = string.Empty;
+
+    private readonly Timer _lockStateTimer;
+
     /// <summary>Set by the main window so Windows Hello prompts are parented to it.</summary>
     public IntPtr OwnerWindowHandle { get; set; }
 
@@ -63,6 +74,26 @@ public partial class SettingsViewModel : ObservableObject
         Keys.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasKeys));
         LoadSettings();
         RefreshKeys();
+
+        // The session expires on its own, so refresh the state periodically as well as on events.
+        var context = SynchronizationContext.Current;
+        void Refresh() { if (context != null) context.Post(_ => UpdateLockState(), null); else UpdateLockState(); }
+        _vault.LockStateChanged += (_, _) => Refresh();
+        _lockStateTimer = new Timer(_ => Refresh(), null, TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(15));
+        UpdateLockState();
+    }
+
+    private void UpdateLockState()
+    {
+        var until = _vault.UnlockedUntil;
+        IsVaultUnlocked = until != null;
+
+        if (!IsHelloProtected)
+            VaultStateText = string.Empty;
+        else if (until is { } u)
+            VaultStateText = $"Открыто ещё {Math.Max(1, (int)Math.Ceiling((u - DateTime.UtcNow).TotalMinutes))} мин — подпись пройдёт без запроса Windows Hello";
+        else
+            VaultStateText = "Заблокировано — для подписи понадобится Windows Hello";
     }
 
     public void RefreshKeys(Guid? selectId = null)
@@ -114,6 +145,7 @@ public partial class SettingsViewModel : ObservableObject
     {
         await _vault.EnableHelloProtectionAsync(OwnerWindowHandle);
         IsHelloProtected = true;
+        UpdateLockState();
         _isLoading = true;
         RequireWindowsHello = true;
         _isLoading = false;
@@ -124,10 +156,11 @@ public partial class SettingsViewModel : ObservableObject
     {
         await _vault.DisableHelloProtectionAsync(OwnerWindowHandle);
         IsHelloProtected = false;
+        UpdateLockState();
         StatusMessage = "Защита Windows Hello отключена — используется только DPAPI";
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsVaultUnlocked))]
     private void LockVault()
     {
         _vault.Lock();
