@@ -37,13 +37,13 @@ NCALayer does its job, but it is a Java application: it takes a while to start, 
 ## Requirements
 
 - Windows 10 version 2004 or later, or Windows 11 (x64 or ARM64).
-- NCALayer installed at least once. Browsers only trust the local connection because of the certificate that NCALayer installs, and NativeNCA reuses that certificate. Keep NCALayer installed, but do not run it: both programs use the same port. Close NCALayer from its tray icon and turn off its autostart.
+- NCALayer is not needed. If it is installed, it must not run at the same time as NativeNCA: websites expect both programs on the same port. When NCALayer is running, NativeNCA offers to close it and turn off its autostart.
 - Windows Hello (PIN, fingerprint or face) is recommended but not required.
 
 ## Getting started
 
 1. Download the latest archive from [Releases](../../releases) and extract it to any folder.
-2. Run `NativeNCA.exe`. It appears in the tray and starts listening for websites.
+2. Run `NativeNCA.exe`. On the first start it explains and sets up its certificate for browsers. Windows then shows a security warning about installing a certificate once; answer **Yes**. NativeNCA appears in the tray and starts listening for websites.
 3. Click **Add key**, choose your `.p12` file from NCA, enter its password and give the key a name. Leave **Save password** on if you want to sign with Windows Hello alone.
 4. Open eGov or your bank and sign in as usual. NativeNCA shows a confirmation window instead of NCALayer.
 
@@ -56,6 +56,12 @@ Storage:
 - Key files and saved passwords are encrypted with DPAPI for your Windows account and stored in `%APPDATA%\NativeNCA\Vault`.
 - With Windows Hello protection turned on, they are additionally encrypted with AES-256-GCM. The vault key is wrapped by an RSA key in the Microsoft Passport key storage provider, which only Windows Hello can unlock. One verification opens the vault for the time set in Settings.
 - If you reset your Windows PIN, the Windows Hello key is lost and protected data cannot be recovered. Keep your original `.p12` files and passwords.
+
+Browser certificate:
+
+- Websites connect to `wss://127.0.0.1:13579` over TLS, so the browser has to trust the local certificate. NativeNCA creates its own certificate authority for your computer, uses it once to issue a certificate for `127.0.0.1` and `localhost`, and destroys its private key right away. Only the public root certificate is added to your Windows trusted roots, so it can never vouch for anything else. On top of that, the root carries name constraints that limit it to local addresses.
+- The server certificate and its key are encrypted with DPAPI and stored in `%APPDATA%\NativeNCA\Tls`. Chrome, Edge and Firefox use the Windows certificate store, so no browser settings are needed. Firefox reads it only at startup: if it was open during setup, restart it.
+- You can remove the certificate in Settings, under **Browser certificate**. Until you set it up, NativeNCA falls back to NCALayer's certificate if NCALayer is installed. That certificate's private key is the same on every computer, which is why NativeNCA prefers its own.
 
 ## Limitations
 

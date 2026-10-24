@@ -15,6 +15,7 @@ The UI is in Russian. Code, comments, commit messages and the English README are
 | `NativeNCA.Core/Crypto` | PKCS#12 reader/writer, СТ РК ГОСТ Р 34.10-2015 (512), RSA, CMS/CAdES(-T), XMLDSig, TSA client, certificate parsing |
 | `NativeNCA.Core/Security` | Key vault (DPAPI, optional Windows Hello layer), Windows Hello, TLS certificate, autostart, consent cache |
 | `NativeNCA.Core/Server` | `NativeNcaServer` (TLS + WebSocket transport) and `NcaProtocolHandler` (request handling, transport independent) |
+| `NativeNCA.Core/Services` | Prompt service interface, `NcaLayerService` (detect, close and un-autostart the original NCALayer) |
 | `NativeNCA.Core/ViewModels` | MVVM view models (CommunityToolkit.Mvvm). Core has no WPF dependency |
 | `NativeNCA.App` | WPF UI on WPF-UI 4.3.0: main window, signing overlay, dialogs, tray. Assembly name is `NativeNCA` |
 | `NativeNCA.Tests` | xUnit tests |
@@ -60,7 +61,7 @@ These were established against real НУЦ data. Do not change them without a te
 
 ## Vault and Windows Hello
 
-- Files are in `%APPDATA%\NativeNCA\Vault`: `vault.json` (metadata), `keys/*.enc`, `avatars/*.png`. The TLS certificate copy is `%APPDATA%\NativeNCA\tls_127_0_0_1.pfx`.
+- Files are in `%APPDATA%\NativeNCA\Vault`: `vault.json` (metadata), `keys/*.enc`, `avatars/*.png`. TLS certificates are described in the TLS section below.
 - Secrets (key containers, saved passwords) are always DPAPI (CurrentUser) with a fixed entropy. Changing the entropy breaks existing vaults.
 - With Windows Hello protection on, the DPAPI payload is an envelope: magic `00 4E 4E 48 01 A5 5A 00`, then nonce, tag, and AES-256-GCM ciphertext under a master key. The master key is RSA-PKCS#1-wrapped by a key in the Microsoft Passport KSP named `<SID>//NativeNCA/Vault/MasterKey`. One unlock lasts `SessionCacheMinutes`, minimum 2.
 - `WindowsHelloKeyProtector` uses ncrypt.dll P/Invoke on purpose: the managed `CngKey` API mishandles this provider (`CngKey.Exists` throws `NTE_NO_KEY` instead of returning false). Anything that shows the Hello UI must run off the UI thread with the owner HWND set.
@@ -71,7 +72,15 @@ These were established against real НУЦ data. Do not change them without a te
 
 ## TLS
 
-Browsers trust NCALayer's `127.0.0.1` certificate, which is issued by НУЦ RSA 2022 and whose root NCALayer installs. `TlsCertificateService` reads `keystore.jks` from NCALayer's bundles with BouncyCastle `JksStore`; the public password is `nb1B3dau`. It then caches a PFX copy. NCALayer and NativeNCA cannot run at the same time because they share port 13579.
+NCALayer does not need to be installed. `TlsCertificateService` picks the certificate in this order:
+
+1. **Own certificate.** `LocalCertificateAuthority` creates a per-machine root (ECDSA P-256, pathLen 0, critical nameConstraints permitting only dNSName `localhost`, `127.0.0.1/32` and `::1/128`) and one leaf (SAN localhost, 127.0.0.1, ::1; EKU serverAuth; KeyUsage digitalSignature). The root's private key is ephemeral and disposed right after signing the leaf: never persist it. Lifetimes are 25 and 20 years (local roots are exempt from public limits; renewing means a new Windows prompt). Files are in `%APPDATA%\NativeNCA\Tls`: `root.cer` (public) and `localhost.p12.dpapi` (leaf PKCS#12, DPAPI CurrentUser with entropy `NativeNCA.Tls.Entropy.v1`). Used only while the root is in CurrentUser\Root and nothing has expired.
+2. **NCALayer fallback.** NCALayer's shared `127.0.0.1` certificate (issued by НУЦ RSA 2022, root installed by NCALayer), read from `keystore.jks` in its bundles with BouncyCastle `JksStore` (public password `nb1B3dau`) and cached as `%APPDATA%\NativeNCA\tls_127_0_0_1.pfx`. Its key is identical in every installation, so it is only a fallback.
+3. Otherwise `TlsCertificateMissingException`, shown in the server banner with a "Настроить сертификат" button.
+
+Adding or removing a root in CurrentUser\Root makes Windows show its own security prompt; `CurrentUserRootStore` turns a declined prompt into `OperationCanceledException` and must run off the UI thread. The first start shows `TlsSetupDialog` before that prompt; "Не сейчас" or a declined prompt writes `tls_setup_declined` so it is not offered unprompted again. Tests and `tools/Screenshots` use a fake `IRootCertificateStore`: never install anything into the real store from them. SChannel cannot use ephemeral keys, so the server loads the leaf with `UserKeySet`. Chrome, Edge and Firefox 120+ trust user-added roots from the Windows store; no browser configuration is needed.
+
+NCALayer and NativeNCA cannot run at the same time because websites hardcode port 13579. When the port is busy, `NcaLayerService` finds the owner (GetExtendedTcpTable, then the process image path under NCALayer's install folder; NCALayer.exe launches the bundled `jre\bin\javaw.exe`, which owns the port) and the banner offers "Закрыть NCALayer" (kills it, then retries) and "Отключить автозапуск NCALayer". NCALayer's installer autostarts it with an `NCALayer.lnk` in the Startup folder; autostart is turned off the way Task Manager does it (an odd first byte in `Explorer\StartupApproved`), so the user can turn it back on in Settings. Machine-wide entries need administrator rights, so the app opens `ms-settings:startupapps` for those.
 
 ## UI notes (WPF-UI 4.3.0)
 
