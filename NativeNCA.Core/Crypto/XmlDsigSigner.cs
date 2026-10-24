@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
@@ -15,6 +16,11 @@ namespace NativeNCA.Core.Crypto;
 /// </summary>
 public static class XmlDsigSigner
 {
+    private static readonly MethodInfo GetC14NDigestMethod = typeof(SignedXml).GetMethod(
+        "GetC14NDigest",
+        BindingFlags.Instance | BindingFlags.NonPublic,
+        new[] { typeof(HashAlgorithm) })!;
+
     static XmlDsigSigner()
     {
         CryptoConfig.AddAlgorithm(typeof(Gost2015SignatureDescription), KzOids.XmlGost2015Signature);
@@ -59,9 +65,53 @@ public static class XmlDsigSigner
         signedXml.KeyInfo = keyInfo;
 
         signedXml.ComputeSignature();
-        parent.AppendChild(doc.ImportNode(signedXml.GetXml(), true));
+        var sigXml = signedXml.GetXml();
+
+        // NCALayer compatibility: some deprecated Kazakhstan backends (such as nca.pki.gov.kz) search for
+        // "ds:Signature" and "ds:X509Certificate" using non-namespace-aware getElementsByTagName.
+        // Prefix all XMLDSig nodes with "ds:" and recompute SignatureValue over canonicalized <ds:SignedInfo>.
+        AddDsPrefix(sigXml);
+
+        var importedSig = (XmlElement)parent.AppendChild(doc.ImportNode(sigXml, true))!;
+
+        // Recompute the digest of <ds:SignedInfo> in the context of parent so inherited namespaces
+        // are canonicalized identically during signing and verification.
+        var contextSx = new SignedXml(parent);
+        contextSx.LoadXml(importedSig);
+
+        using HashAlgorithm hashAlg = key.Kind == KeyAlgorithmKind.Gost2015 ? new Streebog512HashAlgorithm() : SHA256.Create();
+        byte[] c14nHash = (byte[])GetC14NDigestMethod.Invoke(contextSx, new object[] { hashAlg })!;
+        byte[] signatureBytes = key.SignDigest(c14nHash);
+
+        var sigValueElement = (XmlElement)importedSig.GetElementsByTagName("SignatureValue", SignedXml.XmlDsigNamespaceUrl)[0]!;
+        sigValueElement.InnerText = Convert.ToBase64String(signatureBytes);
 
         return doc.OuterXml;
+    }
+
+    private static void AddDsPrefix(XmlNode node)
+    {
+        if (node is XmlElement el && el.NamespaceURI == SignedXml.XmlDsigNamespaceUrl)
+        {
+            if (string.IsNullOrEmpty(el.Prefix))
+            {
+                el.Prefix = "ds";
+            }
+
+            if (el.LocalName == "Signature")
+            {
+                if (el.HasAttribute("xmlns"))
+                {
+                    el.RemoveAttribute("xmlns");
+                }
+                el.SetAttribute("xmlns:ds", SignedXml.XmlDsigNamespaceUrl);
+            }
+        }
+
+        foreach (XmlNode child in node.ChildNodes)
+        {
+            AddDsPrefix(child);
+        }
     }
 
     /// <summary>Verifies the first ds:Signature in the document using the embedded certificate.</summary>

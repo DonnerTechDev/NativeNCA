@@ -115,6 +115,50 @@ public class GostKeyTests
 
         Assert.True(XmlDsigSigner.Verify(signed, out _));
     }
+
+    [Fact]
+    public void XmlDsig_emits_ds_prefix_for_ncalayer_compatibility()
+    {
+        var key = SigningKey.Load(TestKeys.CreateGostPfx(), TestKeys.Password);
+        string signed = XmlDsigSigner.Sign(key, "<root><data>test</data></root>");
+
+        var doc = new XmlDocument { PreserveWhitespace = true };
+        doc.LoadXml(signed);
+
+        // Non-namespace-aware search as performed by legacy Java backends (e.g. nca.pki.gov.kz)
+        var sigList = doc.GetElementsByTagName("ds:Signature");
+        Assert.Equal(1, sigList.Count);
+
+        var certList = doc.GetElementsByTagName("ds:X509Certificate");
+        Assert.Equal(1, certList.Count);
+
+        var sig = (XmlElement)sigList[0]!;
+        Assert.Equal(SignedXml.XmlDsigNamespaceUrl, sig.GetAttribute("xmlns:ds"));
+
+        // All XMLDSig elements must carry the ds: prefix
+        string[] requiredPrefixElements =
+        [
+            "ds:Signature",
+            "ds:SignedInfo",
+            "ds:CanonicalizationMethod",
+            "ds:SignatureMethod",
+            "ds:Reference",
+            "ds:Transforms",
+            "ds:Transform",
+            "ds:DigestMethod",
+            "ds:DigestValue",
+            "ds:SignatureValue",
+            "ds:KeyInfo",
+            "ds:X509Data",
+            "ds:X509Certificate"
+        ];
+        foreach (string tagName in requiredPrefixElements)
+        {
+            Assert.True(doc.GetElementsByTagName(tagName).Count >= 1, $"Missing element with ds: prefix: {tagName}");
+        }
+
+        Assert.True(XmlDsigSigner.Verify(signed, out _));
+    }
 }
 
 public class RsaKeyTests
@@ -147,5 +191,9 @@ public class RsaKeyTests
         sx.LoadXml((XmlElement)doc.GetElementsByTagName("Signature", SignedXml.XmlDsigNamespaceUrl)[0]!);
         var cert = X509CertificateLoader.LoadCertificate(key.Certificate.GetEncoded());
         Assert.True(sx.CheckSignature(cert, verifySignatureOnly: true));
+
+        // Non-namespace-aware search should also succeed for RSA signatures
+        Assert.Equal(1, doc.GetElementsByTagName("ds:Signature").Count);
+        Assert.Equal(1, doc.GetElementsByTagName("ds:X509Certificate").Count);
     }
 }
