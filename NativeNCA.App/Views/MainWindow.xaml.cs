@@ -31,12 +31,34 @@ public partial class MainWindow : FluentWindow
         SystemThemeWatcher.Watch(this);
         _snackbar.SetSnackbarPresenter(SnackbarPresenter);
         SourceInitialized += (_, _) => _viewModel.OwnerWindowHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        TrayIcon.Icon = LoadTrayIcon();
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         Loaded += OnLoaded;
     }
 
     // ===================== Lifetime & tray =====================
+
+    /// <summary>
+    /// The notification area shows 16 px icons scaled by the system DPI (24 px at 150%).
+    /// Pick the .ico frame of exactly that size; otherwise Windows stretches the first (16 px) frame and it looks blurry.
+    /// </summary>
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetDpiForSystem();
+
+    private static ImageSource LoadTrayIcon()
+    {
+        int wanted = (int)Math.Round(16 * GetDpiForSystem() / 96.0);
+
+        var decoder = System.Windows.Media.Imaging.BitmapDecoder.Create(
+            new Uri("pack://application:,,,/NativeNCA;component/Assets/app.ico"),
+            System.Windows.Media.Imaging.BitmapCreateOptions.None,
+            System.Windows.Media.Imaging.BitmapCacheOption.OnLoad);
+
+        return decoder.Frames
+            .OrderBy(f => f.PixelWidth >= wanted ? f.PixelWidth - wanted : 1000 + wanted - f.PixelWidth)
+            .First();
+    }
 
     private bool _isExiting;
     private bool _startHidden;

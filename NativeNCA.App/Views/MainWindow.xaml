@@ -105,7 +105,6 @@
         <!-- Tray icon: the app keeps running in the background when the window is closed -->
         <tray:NotifyIcon x:Name="TrayIcon"
                          Grid.Row="0"
-                         Icon="pack://application:,,,/NativeNCA;component/Assets/app.ico"
                          TooltipText="NativeNCA — готов к подписанию"
                          FocusOnLeftClick="False"
                          MenuOnRightClick="True"

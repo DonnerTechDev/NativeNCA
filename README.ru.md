@@ -1,3 +1,5 @@
+<img src="docs/icon.png" alt="" width="96" align="right">
+
 # NativeNCA
 
 [English](README.md) | **Русский** | [Қазақша](README.kk.md)
