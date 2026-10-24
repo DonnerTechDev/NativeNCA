@@ -19,14 +19,37 @@ using Wpf.Ui.Appearance;
 // with a fixed blue accent so the result does not depend on the machine's personalization.
 //
 //   dotnet run --project tools/Screenshots -- docs/screenshots
+//   dotnet run --project tools/Screenshots -- <dir> --extra    (also the certificate and NCALayer states, for review)
 class Program
 {
     static string Out = "";
+    static bool Extra;
+
+    /// <summary>Stand-in for CurrentUser\Root: the renderer must never install anything into Windows.</summary>
+    sealed class PreviewRootStore : IRootCertificateStore
+    {
+        readonly List<System.Security.Cryptography.X509Certificates.X509Certificate2> _roots = new();
+        public bool Contains(System.Security.Cryptography.X509Certificates.X509Certificate2 c) => _roots.Any(r => r.Thumbprint == c.Thumbprint);
+        public void Add(System.Security.Cryptography.X509Certificates.X509Certificate2 c, IntPtr owner) =>
+            _roots.Add(System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadCertificate(c.RawData));
+        public void Remove(System.Security.Cryptography.X509Certificates.X509Certificate2 c, IntPtr owner) => _roots.RemoveAll(r => r.Thumbprint == c.Thumbprint);
+        public IReadOnlyList<System.Security.Cryptography.X509Certificates.X509Certificate2> FindByOrganization(string organization) => _roots.ToList();
+    }
+
+    /// <summary>Certificate service in a temp folder; with <paramref name="installed"/> the own certificate is set up.</summary>
+    static TlsCertificateService MakeTls(bool installed)
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "nnca_preview_tls_" + Guid.NewGuid().ToString("N"));
+        var tls = new TlsCertificateService(dir, Path.Combine(dir, "no-ncalayer"), new PreviewRootStore());
+        if (installed) tls.InstallOwnCertificate();
+        return tls;
+    }
 
     [STAThread]
     static void Main(string[] args)
     {
         Out = args[0];
+        Extra = args.Contains("--extra");
         Directory.CreateDirectory(Out);
 
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
@@ -189,7 +212,7 @@ class Program
             string t = dark ? "dark" : "light";
             ApplicationThemeManager.Apply(theme, Wpf.Ui.Controls.WindowBackdropType.Mica, true);
 
-            var vm = new SettingsViewModel(MakeVault()) { IsServerRunning = true };
+            var vm = new SettingsViewModel(MakeVault(), MakeTls(installed: true)) { IsServerRunning = true };
             var main = new MainWindow(vm) { Width = 1080, Height = 700 };
             Place(main); main.Show(); await Idle();
             ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false); ApplicationThemeManager.Apply(theme, Wpf.Ui.Controls.WindowBackdropType.Mica, false); ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), theme, false); await Idle();
@@ -209,6 +232,36 @@ class Program
             _ = crop.ShowAsync(); await Idle(); Snap(main, $"avatar-crop-{t}", dark);
             crop.Hide(); await Idle();
             File.Delete(photo);
+
+            if (Extra)
+            {
+                var host = (Wpf.Ui.Controls.ContentDialogHost)main.FindName("DialogHost");
+                var settingsScroll = (ScrollViewer)main.FindName("SettingsView");
+                ((ToggleButton)main.FindName("SettingsNavButton")).RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                await Idle(); settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"x-settings-own-{t}", dark);
+
+                // NCALayer certificate in use, NCALayer running and starting with Windows.
+                vm.TlsSource = TlsCertificateSource.NcaLayer;
+                vm.IsServerRunning = false;
+                vm.IsNcaLayerAutostartEnabled = true;
+                vm.ServerErrorKind = NativeNCA.Core.Server.ServerErrorKind.NcaLayerRunning;
+                vm.ServerErrorTitle = "Запущен NCALayer";
+                vm.ServerError = "Оригинальный NCALayer занимает порт 13579, который сайты используют для подписи. " +
+                                 "Две программы не могут работать одновременно — закройте NCALayer, и NativeNCA запустится сам.";
+                await Idle(); settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"x-ncalayer-{t}", dark);
+
+                // No certificate at all.
+                vm.TlsSource = TlsCertificateSource.None;
+                vm.ServerErrorKind = NativeNCA.Core.Server.ServerErrorKind.Certificate;
+                vm.ServerErrorTitle = "Нет сертификата для браузеров";
+                vm.ServerError = "Нет сертификата, которому доверяют браузеры. Нажмите «Настроить сертификат» — NativeNCA создаст собственный сертификат для этого компьютера.";
+                await Idle(); settingsScroll.ScrollToEnd(); await Idle(); Snap(main, $"x-no-certificate-{t}", dark);
+
+                var setup = new TlsSetupDialog(host);
+                _ = setup.ShowAsync(); await Idle(); Snap(main, $"x-tls-setup-{t}", dark);
+                setup.Hide(); await Idle();
+            }
+
             main.CloseForExit();
 
             var req = new SigningPromptRequest

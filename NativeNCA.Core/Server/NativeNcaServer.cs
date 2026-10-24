@@ -11,6 +11,21 @@ using NativeNCA.Core.Services;
 
 namespace NativeNCA.Core.Server;
 
+/// <summary>Why the server is not running; the main window offers a matching fix.</summary>
+public enum ServerErrorKind
+{
+    None,
+
+    /// <summary>No TLS certificate browsers trust: offer to set up the own one.</summary>
+    Certificate,
+
+    /// <summary>The original NCALayer holds port 13579: offer to close it.</summary>
+    NcaLayerRunning,
+
+    /// <summary>Anything else (another program on the port, socket errors).</summary>
+    Other
+}
+
 /// <summary>
 /// wss://127.0.0.1:13579 — the endpoint websites use to talk to NCALayer.
 /// Transport only: TLS, WebSocket handshake, greeting, heartbeat. Requests go to <see cref="NcaProtocolHandler"/>.
@@ -26,7 +41,7 @@ public class NativeNcaServer
     private readonly TlsCertificateService _tlsService;
     private readonly IUserPromptService _promptService;
     private readonly NcaProtocolHandler _handler;
-    private readonly CancellationTokenSource _cts = new();
+    private CancellationTokenSource _cts = new();
     private TcpListener? _listener;
     private SslStreamCertificateContext? _serverCert;
 
@@ -42,6 +57,14 @@ public class NativeNcaServer
     /// <summary>Why the server could not start (null when running).</summary>
     public string? StartError { get; private set; }
 
+    /// <summary>Short headline for <see cref="StartError"/>.</summary>
+    public string? StartErrorTitle { get; private set; }
+
+    public ServerErrorKind StartErrorKind { get; private set; }
+
+    /// <summary>Certificate the running server presents.</summary>
+    public TlsCertificateSource CertificateSource => IsRunning ? _tlsService.ActiveSource : TlsCertificateSource.None;
+
     public event EventHandler? StateChanged;
 
     public void Start()
@@ -52,9 +75,14 @@ public class NativeNcaServer
         {
             _serverCert = _tlsService.GetServerCertificateContext();
         }
+        catch (TlsCertificateMissingException ex)
+        {
+            Fail(ServerErrorKind.Certificate, "Нет сертификата для браузеров", ex.Message);
+            return;
+        }
         catch (Exception ex)
         {
-            Fail("Ошибка сертификата TLS", ex.Message);
+            Fail(ServerErrorKind.Certificate, "Ошибка сертификата TLS", ex.Message);
             return;
         }
 
@@ -65,13 +93,33 @@ public class NativeNcaServer
         }
         catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
         {
-            Fail("Порт 13579 занят",
-                "Скорее всего, запущен оригинальный NCALayer. Закройте его (значок в трее → Выход) и перезапустите NativeNCA.");
+            _listener = null;
+            if (NcaLayerService.IsPortOwnedByNcaLayer(WssPort))
+            {
+                Fail(ServerErrorKind.NcaLayerRunning, "Запущен NCALayer",
+                    "Оригинальный NCALayer занимает порт 13579, который сайты используют для подписи. " +
+                    "Две программы не могут работать одновременно — закройте NCALayer, и NativeNCA запустится сам.");
+            }
+            else
+            {
+                string owner = NcaLayerService.GetPortOwnerName(WssPort) is { } name ? $"Его использует {name}. " : "";
+                Fail(ServerErrorKind.Other, "Порт 13579 занят",
+                    $"{owner}Закройте программу, которая занимает порт, и нажмите «Повторить».");
+            }
+            return;
+        }
+        catch (SocketException ex)
+        {
+            _listener = null;
+            Fail(ServerErrorKind.Other, "Не удалось открыть порт 13579", ex.Message);
             return;
         }
 
+        _cts = new CancellationTokenSource();
         IsRunning = true;
         StartError = null;
+        StartErrorTitle = null;
+        StartErrorKind = ServerErrorKind.None;
         StateChanged?.Invoke(this, EventArgs.Empty);
         _ = AcceptLoopAsync(_listener, _cts.Token);
     }
@@ -81,13 +129,23 @@ public class NativeNcaServer
         if (!IsRunning) return;
         _cts.Cancel();
         _listener?.Stop();
+        _listener = null;
         IsRunning = false;
         StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void Fail(string title, string message)
+    /// <summary>Starts again with the currently best certificate (after it was installed or removed).</summary>
+    public void Restart()
     {
-        StartError = $"{title}: {message}";
+        Stop();
+        Start();
+    }
+
+    private void Fail(ServerErrorKind kind, string title, string message)
+    {
+        StartErrorKind = kind;
+        StartErrorTitle = title;
+        StartError = message;
         StateChanged?.Invoke(this, EventArgs.Empty);
         _ = _promptService.ShowNotificationAsync(title, message);
     }

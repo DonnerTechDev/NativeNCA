@@ -112,6 +112,9 @@ public partial class MainWindow : FluentWindow
         Topmost = true;  // reliably come to front when activated from the tray
         Topmost = false;
         Focus();
+
+        // Before Loaded the dialog host is not ready; OnLoaded makes the offer then.
+        if (IsLoaded) _ = OfferTlsSetupAsync();
     }
 
     public void CloseForExit()
@@ -151,6 +154,8 @@ public partial class MainWindow : FluentWindow
 
         UpdateView(animate: false);
         HelloUnavailableBar.IsOpen = !await WindowsHelloService.IsAvailableAsync();
+
+        if (!_startHidden) await OfferTlsSetupAsync();
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -454,9 +459,169 @@ public partial class MainWindow : FluentWindow
         }
     }
 
-    private void ShowToast(string message)
+    // ===================== Browser certificate =====================
+
+    private bool _tlsSetupOffered;
+
+    /// <summary>First appearance: explain and offer the own certificate once, until it is set up or declined.</summary>
+    private async Task OfferTlsSetupAsync()
     {
-        bool isError = message.StartsWith("Ошибка", StringComparison.OrdinalIgnoreCase);
+        if (_tlsSetupOffered || !_viewModel.ShouldOfferTlsSetup) return;
+        _tlsSetupOffered = true;
+        await SetUpTlsCertificateAsync(declineOnClose: true);
+    }
+
+    private async void OnInstallTlsCertificateClick(object sender, RoutedEventArgs e) =>
+        await SetUpTlsCertificateAsync(declineOnClose: false);
+
+    private async Task SetUpTlsCertificateAsync(bool declineOnClose)
+    {
+        if (await new TlsSetupDialog(DialogHost).ShowAsync() != ContentDialogResult.Primary)
+        {
+            if (declineOnClose) _viewModel.DeclineTlsSetup();
+            return;
+        }
+
+        try
+        {
+            await _viewModel.InstallTlsCertificateAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            ShowToast("Сертификат не установлен: в окне Windows выбран ответ «Нет»", isError: true);
+        }
+        catch (Exception ex)
+        {
+            ShowToast("Ошибка: " + ex.Message);
+        }
+    }
+
+    private async void OnRemoveTlsCertificateClick(object sender, RoutedEventArgs e)
+    {
+        var dialog = new ContentDialog(DialogHost)
+        {
+            Title = "Удалить сертификат NativeNCA?",
+            Content = new TextBlock
+            {
+                Text = "Корневой сертификат будет удалён из Windows, а сертификат сервера — с диска. " +
+                       "Windows попросит подтвердить удаление.\n\n" +
+                       "Без него браузеры смогут подключиться к NativeNCA, только если на компьютере установлен NCALayer. " +
+                       "Собственный сертификат можно снова установить в любой момент.",
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 440,
+                Style = (Style)FindResource("SecondaryText"),
+                FontSize = 13
+            },
+            PrimaryButtonText = "Удалить",
+            PrimaryButtonAppearance = ControlAppearance.Danger,
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Close
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+        try
+        {
+            await _viewModel.RemoveTlsCertificateAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            ShowToast("Сертификат не удалён: в окне Windows выбран ответ «Нет»", isError: true);
+        }
+        catch (Exception ex)
+        {
+            ShowToast("Ошибка: " + ex.Message);
+        }
+    }
+
+    // ===================== Original NCALayer =====================
+
+    private async void OnCloseNcaLayerClick(object sender, RoutedEventArgs e)
+    {
+        var alsoAutostart = new CheckBox
+        {
+            Content = "Также отключить автозапуск NCALayer",
+            IsChecked = true,
+            Margin = new Thickness(0, 16, 0, 0),
+            Visibility = _viewModel.IsNcaLayerAutostartEnabled ? Visibility.Visible : Visibility.Collapsed
+        };
+
+        var dialog = new ContentDialog(DialogHost)
+        {
+            Title = "Закрыть NCALayer?",
+            Content = new StackPanel
+            {
+                Width = 420,
+                Children =
+                {
+                    new TextBlock
+                    {
+                        Text = "NCALayer будет завершён, и NativeNCA начнёт принимать запросы сайтов на порту 13579. " +
+                               "Если NCALayer сейчас что-то подписывает, операция прервётся.",
+                        TextWrapping = TextWrapping.Wrap,
+                        Style = (Style)FindResource("SecondaryText"),
+                        FontSize = 13
+                    },
+                    alsoAutostart
+                }
+            },
+            PrimaryButtonText = "Закрыть NCALayer",
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+        if (alsoAutostart.Visibility == Visibility.Visible && alsoAutostart.IsChecked == true)
+            DisableNcaLayerAutostart(quiet: true);
+
+        if (await _viewModel.CloseNcaLayerAsync())
+            ShowToast("NCALayer закрыт — NativeNCA принимает запросы сайтов");
+        else
+            ShowToast("Ошибка: NCALayer не закрылся. Закройте его через значок в трее (Выход) и нажмите «Повторить»");
+    }
+
+    private async void OnDisableNcaLayerAutostartClick(object sender, RoutedEventArgs e)
+    {
+        var dialog = new ContentDialog(DialogHost)
+        {
+            Title = "Отключить автозапуск NCALayer?",
+            Content = new TextBlock
+            {
+                Text = "NCALayer перестанет запускаться при входе в Windows и занимать порт 13579. Сама программа " +
+                       "не удаляется: её можно запустить вручную или снова включить в «Параметры Windows → Приложения → Автозагрузка».",
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 440,
+                Style = (Style)FindResource("SecondaryText"),
+                FontSize = 13
+            },
+            PrimaryButtonText = "Отключить",
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            DisableNcaLayerAutostart(quiet: false);
+    }
+
+    private void DisableNcaLayerAutostart(bool quiet)
+    {
+        if (_viewModel.DisableNcaLayerAutostart())
+        {
+            if (!quiet) ShowToast("Автозапуск NCALayer отключён");
+            return;
+        }
+
+        // Installed for all users: StartupApproved under HKLM needs administrator rights, Windows Settings has them.
+        ShowToast("Автозапуск NCALayer для всех пользователей отключается в параметрах Windows — отключите NCALayer в открывшемся списке", isError: true);
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("ms-settings:startupapps") { UseShellExecute = true }); }
+        catch { /* Settings unavailable: the toast still explains where to go */ }
+    }
+
+    private void ShowToast(string message) => ShowToast(message, message.StartsWith("Ошибка", StringComparison.OrdinalIgnoreCase));
+
+    private void ShowToast(string message, bool isError)
+    {
         _snackbar.Show(
             isError ? "Ошибка" : "NativeNCA",
             message,

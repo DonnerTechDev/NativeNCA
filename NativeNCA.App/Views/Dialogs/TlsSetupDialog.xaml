@@ -1,0 +1,82 @@
+<ui:ContentDialog x:Class="NativeNCA.App.Views.Dialogs.TlsSetupDialog"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                  xmlns:local="clr-namespace:NativeNCA.App.Views.Dialogs"
+                  Title="Сертификат для браузеров"
+                  PrimaryButtonText="Продолжить"
+                  CloseButtonText="Не сейчас"
+                  DefaultButton="Primary"
+                  DialogMaxWidth="560">
+
+    <ui:ContentDialog.Resources>
+        <Style BasedOn="{StaticResource {x:Type ui:ContentDialog}}" TargetType="{x:Type local:TlsSetupDialog}" />
+
+        <!-- One "icon | title + text" point -->
+        <Style x:Key="PointIcon" TargetType="ui:SymbolIcon">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="0,1,14,0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+        </Style>
+    </ui:ContentDialog.Resources>
+
+    <StackPanel Width="460">
+        <TextBlock TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
+                   Text="Сайты обращаются к NativeNCA по защищённому адресу wss://127.0.0.1:13579. Чтобы браузеры доверяли этому соединению, NativeNCA создаст сертификат для этого компьютера и добавит его корневой сертификат в Windows." />
+
+        <Grid Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ui:SymbolIcon Symbol="Desktop24" Style="{StaticResource PointIcon}" />
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Только для этого компьютера" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
+                           Text="Сертификат действует лишь для адресов 127.0.0.1 и localhost. Подтвердить им какой-либо сайт или программу невозможно." />
+            </StackPanel>
+        </Grid>
+
+        <Grid Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ui:SymbolIcon Symbol="ShieldKeyhole24" Style="{StaticResource PointIcon}" />
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Ключ корневого сертификата уничтожается" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
+                           Text="Он нужен один раз, чтобы подписать сертификат NativeNCA, и сразу удаляется. Выпустить им что-то ещё больше нельзя." />
+            </StackPanel>
+        </Grid>
+
+        <Grid Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ui:SymbolIcon Symbol="Delete24" Style="{StaticResource PointIcon}" />
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Можно удалить в любой момент" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
+                           Text="В параметрах NativeNCA, строка «Сертификат для браузеров». NCALayer для работы больше не понадобится." />
+            </StackPanel>
+        </Grid>
+
+        <Border Margin="0,20,0,0" Padding="12,10" CornerRadius="6" BorderThickness="1"
+                Background="{DynamicResource SystemFillColorAttentionBackgroundBrush}"
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ui:SymbolIcon Symbol="Info24" Filled="True" FontSize="16" Margin="0,1,10,0" VerticalAlignment="Top"
+                               Foreground="{DynamicResource SystemFillColorAttentionBrush}" />
+                <TextBlock Grid.Column="1" TextWrapping="Wrap" FontSize="13" Style="{StaticResource PrimaryText}"
+                           Text="Затем Windows покажет предупреждение системы безопасности об установке сертификата «NativeNCA Localhost Root». Нажмите «Да»." />
+            </Grid>
+        </Border>
+    </StackPanel>
+</ui:ContentDialog>

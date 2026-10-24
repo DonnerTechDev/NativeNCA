@@ -6,6 +6,7 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
         xmlns:vm="clr-namespace:NativeNCA.Core.ViewModels;assembly=NativeNCA.Core"
+        xmlns:sec="clr-namespace:NativeNCA.Core.Security;assembly=NativeNCA.Core"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
         Title="NativeNCA"
@@ -198,28 +199,72 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <!-- Server problem banner (port taken by NCALayer, missing TLS certificate, ...) -->
-                <Border Grid.Row="0" Margin="24,16,24,0" Padding="16,12" CornerRadius="8" BorderThickness="1"
-                        Background="{DynamicResource SystemFillColorCriticalBackgroundBrush}"
+                <!-- Server problem banner (NCALayer holds the port, no TLS certificate, ...) with its fix -->
+                <Border x:Name="ServerBanner" Grid.Row="0" Margin="24,16,24,0" Padding="16,12" CornerRadius="8" BorderThickness="1"
                         BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
                         Visibility="{Binding ServerError, Converter={StaticResource NullToVisibilityConverter}}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="{DynamicResource SystemFillColorCriticalBackgroundBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsNcaLayerConflict}" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource SystemFillColorCautionBackgroundBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <ui:SymbolIcon Symbol="ErrorCircle24" Filled="True" FontSize="18" Margin="0,1,12,0" VerticalAlignment="Top"
-                                       Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
+                        <ui:SymbolIcon FontSize="18" Margin="0,1,12,0" VerticalAlignment="Top" Filled="True">
+                            <ui:SymbolIcon.Style>
+                                <Style TargetType="ui:SymbolIcon">
+                                    <Setter Property="Symbol" Value="ErrorCircle24" />
+                                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsNcaLayerConflict}" Value="True">
+                                            <Setter Property="Symbol" Value="Warning24" />
+                                            <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:SymbolIcon.Style>
+                        </ui:SymbolIcon>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="Сервер подписи не запущен — сайты не увидят NativeNCA" FontWeight="SemiBold"
+                            <TextBlock Text="{Binding ServerErrorTitle, StringFormat='{}{0} — сайты не увидят NativeNCA'}" FontWeight="SemiBold"
                                        TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
                             <TextBlock Text="{Binding ServerError}" Margin="0,2,0,0" FontSize="13" TextWrapping="Wrap"
                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                            <WrapPanel Margin="0,12,0,0">
+                                <ui:Button Margin="0,0,8,0" Appearance="Primary" Content="Закрыть NCALayer"
+                                           Icon="{ui:SymbolIcon Dismiss24}" Click="OnCloseNcaLayerClick"
+                                           Visibility="{Binding IsNcaLayerConflict, Converter={StaticResource BoolToVisibility}}" />
+                                <ui:Button Margin="0,0,8,0" Content="Отключить автозапуск NCALayer"
+                                           Icon="{ui:SymbolIcon Power24}" Click="OnDisableNcaLayerAutostartClick">
+                                    <ui:Button.Style>
+                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsNcaLayerConflict}" Value="True" />
+                                                        <Condition Binding="{Binding IsNcaLayerAutostartEnabled}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:Button.Style>
+                                </ui:Button>
+                                <ui:Button Margin="0,0,8,0" Appearance="Primary" Content="Настроить сертификат"
+                                           Icon="{ui:SymbolIcon Certificate24}" Click="OnInstallTlsCertificateClick"
+                                           Visibility="{Binding IsCertificateError, Converter={StaticResource BoolToVisibility}}" />
+                                <ui:Button Content="Повторить" Icon="{ui:SymbolIcon ArrowSync24}"
+                                           Command="{Binding RetryServerCommand}" />
+                            </WrapPanel>
                         </StackPanel>
-                        <ui:Button Grid.Column="2" Margin="16,0,0,0" VerticalAlignment="Center"
-                                   Content="Повторить" Icon="{ui:SymbolIcon ArrowSync24}"
-                                   Command="{Binding RetryServerCommand}" />
                     </Grid>
                 </Border>
 
@@ -592,6 +637,41 @@
                                             </TextBlock>
                                         </StackPanel>
                                     </Border>
+                                </StackPanel>
+                            </ui:CardControl>
+
+                            <ui:CardControl Style="{StaticResource SettingsCard}" Icon="{ui:SymbolIcon Certificate24}">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Сертификат для браузеров" Style="{StaticResource SettingsTitleText}" />
+                                        <TextBlock Text="{Binding TlsDescription}" Style="{StaticResource SettingsDescriptionText}" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Style="{StaticResource Pill}" Margin="0,0,12,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="8" Height="8" Margin="0,1,6,0" VerticalAlignment="Center">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding TlsSource}" Value="{x:Static sec:TlsCertificateSource.Own}">
+                                                                <Setter Property="Fill" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding TlsSource}" Value="{x:Static sec:TlsCertificateSource.NcaLayer}">
+                                                                <Setter Property="Fill" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <TextBlock Text="{Binding TlsStatusText}" Style="{StaticResource PillText}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <ui:Button Content="Удалить" MinWidth="110" Click="OnRemoveTlsCertificateClick"
+                                               Visibility="{Binding IsOwnTlsCertificate, Converter={StaticResource BoolToVisibility}}" />
+                                    <ui:Button Content="Установить" MinWidth="110" Appearance="Primary" Click="OnInstallTlsCertificateClick"
+                                               Visibility="{Binding IsOwnTlsCertificate, Converter={StaticResource BoolToVisibility}, ConverterParameter=Invert}" />
                                 </StackPanel>
                             </ui:CardControl>
                         </StackPanel>

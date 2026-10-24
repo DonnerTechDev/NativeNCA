@@ -43,14 +43,23 @@ public partial class App : Application
 
         var vault = new SecureVaultService();
         var promptService = new WpfUserPromptService(vault, new ConsentCache());
-        _server = new NativeNcaServer(vault, new TlsCertificateService(), promptService);
+        var tls = new TlsCertificateService();
+        _server = new NativeNcaServer(vault, tls, promptService);
 
-        var settingsVm = new SettingsViewModel(vault) { RetryServerAction = () => _server.Start() };
+        var settingsVm = new SettingsViewModel(vault, tls)
+        {
+            RetryServerAction = () => _server.Start(),
+            RestartServerAction = () => _server.Restart()
+        };
 
         _server.StateChanged += (_, _) => Dispatcher.BeginInvoke(() =>
         {
             settingsVm.IsServerRunning = _server.IsRunning;
             settingsVm.ServerError = _server.StartError;
+            settingsVm.ServerErrorTitle = _server.StartErrorTitle;
+            settingsVm.ServerErrorKind = _server.StartErrorKind;
+            if (_server.StartErrorKind == ServerErrorKind.NcaLayerRunning)
+                settingsVm.RefreshNcaLayerAutostart();
         });
         // Server problems are shown as a banner in the main window, so bring it up.
         promptService.NotificationRequested += (_, _) => ShowMainWindow();

@@ -2,12 +2,15 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NativeNCA.Core.Security;
+using NativeNCA.Core.Server;
+using NativeNCA.Core.Services;
 
 namespace NativeNCA.Core.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
     private readonly SecureVaultService _vault;
+    private readonly TlsCertificateService? _tls;
     private bool _isLoading;
 
     public ObservableCollection<KeyItemViewModel> Keys { get; } = new();
@@ -42,10 +45,51 @@ public partial class SettingsViewModel : ObservableObject
     private string? _serverError;
 
     [ObservableProperty]
+    private string? _serverErrorTitle;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNcaLayerConflict), nameof(IsCertificateError))]
+    private ServerErrorKind _serverErrorKind;
+
+    [ObservableProperty]
     private bool _isServerRunning;
 
     /// <summary>Set by the host application: tries to start the server again.</summary>
     public Action? RetryServerAction { get; set; }
+
+    /// <summary>Set by the host application: restarts the server so it picks up a new certificate.</summary>
+    public Action? RestartServerAction { get; set; }
+
+    public bool IsNcaLayerConflict => ServerErrorKind == ServerErrorKind.NcaLayerRunning;
+
+    public bool IsCertificateError => ServerErrorKind == ServerErrorKind.Certificate;
+
+    /// <summary>NCALayer starts with Windows (an enabled Run entry or Startup shortcut was found).</summary>
+    [ObservableProperty]
+    private bool _isNcaLayerAutostartEnabled;
+
+    /// <summary>Certificate browsers get: own, NCALayer's shared one, or none.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsOwnTlsCertificate), nameof(TlsStatusText), nameof(TlsDescription))]
+    private TlsCertificateSource _tlsSource;
+
+    public bool IsOwnTlsCertificate => TlsSource == TlsCertificateSource.Own;
+
+    public string TlsStatusText => TlsSource switch
+    {
+        TlsCertificateSource.Own => "Установлен",
+        TlsCertificateSource.NcaLayer => "Сертификат NCALayer",
+        _ => "Не установлен"
+    };
+
+    public string TlsDescription => TlsSource switch
+    {
+        TlsCertificateSource.Own =>
+            "Собственный сертификат этого компьютера. Действует только для 127.0.0.1 и localhost, его корневой ключ уничтожен",
+        TlsCertificateSource.NcaLayer =>
+            "Сейчас используется общий сертификат NCALayer. Установите собственный — так безопаснее, и NCALayer больше не понадобится",
+        _ => "Без сертификата браузеры не смогут подключиться к NativeNCA"
+    };
 
     /// <summary>Protected vault is currently open (a Windows Hello verification is still valid).</summary>
     [ObservableProperty]
@@ -68,9 +112,10 @@ public partial class SettingsViewModel : ObservableObject
 
     public bool HasKeys => Keys.Count > 0;
 
-    public SettingsViewModel(SecureVaultService vault)
+    public SettingsViewModel(SecureVaultService vault, TlsCertificateService? tls = null)
     {
         _vault = vault;
+        _tls = tls;
         Keys.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasKeys));
         LoadSettings();
         RefreshKeys();
@@ -81,6 +126,7 @@ public partial class SettingsViewModel : ObservableObject
         _vault.LockStateChanged += (_, _) => Refresh();
         _lockStateTimer = new Timer(_ => Refresh(), null, TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(15));
         UpdateLockState();
+        RefreshTlsStatus();
     }
 
     private void UpdateLockState()
@@ -136,6 +182,85 @@ public partial class SettingsViewModel : ObservableObject
     {
         if (_isLoading) return;
         _vault.SaveSettings(new VaultSettings(RequireWindowsHello, AutoStartWithWindows, SessionCacheMinutes, UseTimestamp));
+    }
+
+    // ===================== Browser certificate =====================
+
+    public void RefreshTlsStatus()
+    {
+        if (_tls != null) TlsSource = _tls.GetAvailableSource();
+    }
+
+    /// <summary>First run: explain and offer the own certificate, unless it is set up or the user said no.</summary>
+    public bool ShouldOfferTlsSetup => _tls != null && TlsSource != TlsCertificateSource.Own && !_tls.IsSetupDeclined;
+
+    public void DeclineTlsSetup()
+    {
+        if (_tls != null) _tls.IsSetupDeclined = true;
+    }
+
+    /// <summary>
+    /// Creates the own certificate and adds its root to Windows (Windows asks to confirm).
+    /// Throws <see cref="OperationCanceledException"/> if the user declines that prompt.
+    /// </summary>
+    public async Task InstallTlsCertificateAsync()
+    {
+        if (_tls == null) return;
+        try
+        {
+            await Task.Run(() => _tls.InstallOwnCertificate(OwnerWindowHandle));
+        }
+        catch (OperationCanceledException)
+        {
+            // Do not offer it again on every start; the settings row and the banner still can.
+            _tls.IsSetupDeclined = true;
+            throw;
+        }
+        finally
+        {
+            RefreshTlsStatus();
+        }
+
+        RestartServerAction?.Invoke();
+        // Firefox reads the Windows roots only at start-up; Chrome and Edge pick the root up at once.
+        StatusMessage = "Сертификат установлен. Если Firefox был открыт, перезапустите его";
+    }
+
+    public async Task RemoveTlsCertificateAsync()
+    {
+        if (_tls == null) return;
+        try
+        {
+            await Task.Run(() => _tls.RemoveOwnCertificate(OwnerWindowHandle));
+        }
+        finally
+        {
+            RefreshTlsStatus();
+        }
+
+        RestartServerAction?.Invoke();
+        StatusMessage = "Сертификат NativeNCA удалён из Windows";
+    }
+
+    // ===================== Original NCALayer =====================
+
+    public void RefreshNcaLayerAutostart() =>
+        IsNcaLayerAutostartEnabled = NcaLayerService.FindAutostartEntries().Count > 0;
+
+    /// <summary>Terminates NCALayer and starts the server on the freed port. False if the port stayed busy.</summary>
+    public async Task<bool> CloseNcaLayerAsync()
+    {
+        bool freed = await NcaLayerService.CloseAsync(NativeNcaServer.WssPort, TimeSpan.FromSeconds(10));
+        RetryServerAction?.Invoke();
+        return freed;
+    }
+
+    /// <summary>Turns NCALayer's autostart off. Returns false if a machine-wide entry needs administrator rights.</summary>
+    public bool DisableNcaLayerAutostart()
+    {
+        var notChanged = NcaLayerService.DisableAutostart(NcaLayerService.FindAutostartEntries());
+        RefreshNcaLayerAutostart();
+        return notChanged.Count == 0;
     }
 
     // ===================== Windows Hello vault protection =====================
