@@ -112,6 +112,10 @@ public partial class SettingsViewModel : ObservableObject
 
     public bool HasKeys => Keys.Count > 0;
 
+    /// <summary>Why the vault cannot be changed (written by a newer NativeNCA), or null.</summary>
+    public string? VaultReadOnlyMessage =>
+        _vault.IsReadOnly ? new VaultFormatTooNewException(_vault.FormatVersion).Message : null;
+
     public SettingsViewModel(SecureVaultService vault, TlsCertificateService? tls = null)
     {
         _vault = vault;
@@ -181,6 +185,11 @@ public partial class SettingsViewModel : ObservableObject
     private void AutoSave()
     {
         if (_isLoading) return;
+        if (_vault.IsReadOnly)
+        {
+            StatusMessage = "Ошибка: параметры не сохранены — хранилище записано более новой версией NativeNCA";
+            return;
+        }
         _vault.SaveSettings(new VaultSettings(RequireWindowsHello, AutoStartWithWindows, SessionCacheMinutes, UseTimestamp));
     }
 

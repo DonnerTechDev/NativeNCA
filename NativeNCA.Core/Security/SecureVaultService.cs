@@ -21,6 +21,9 @@ public class SecureVaultService
     private static readonly byte[] HelloEnvelopeMagic = { 0x00, 0x4E, 0x4E, 0x48, 0x01, 0xA5, 0x5A, 0x00 };
     private const int NonceSize = 12, TagSize = 16;
 
+    /// <summary>Newest <see cref="VaultDatabase.FormatVersion"/> this build reads and writes.</summary>
+    public const int SupportedFormatVersion = 1;
+
     private readonly string _keysDir;
     private readonly string _avatarsDir;
     private readonly string _dbPath;
@@ -47,6 +50,23 @@ public class SecureVaultService
     }
 
     public event EventHandler? Changed;
+
+    /// <summary>
+    /// The vault was written by a newer NativeNCA (for example before a rollback). This build may misread
+    /// parts it does not know, so it never writes: every change throws <see cref="VaultFormatTooNewException"/>.
+    /// </summary>
+    public bool IsReadOnly { get; private set; }
+
+    /// <summary>Format of the vault on disk.</summary>
+    public int FormatVersion
+    {
+        get { lock (_lock) return _database.FormatVersion; }
+    }
+
+    private void EnsureWritable()
+    {
+        if (IsReadOnly) throw new VaultFormatTooNewException(_database.FormatVersion);
+    }
 
     /// <summary>Raised when the vault is unlocked with Windows Hello or locked again.</summary>
     public event EventHandler? LockStateChanged;
@@ -93,6 +113,7 @@ public class SecureVaultService
 
     public void SaveSettings(VaultSettings settings)
     {
+        EnsureWritable();
         lock (_lock)
         {
             _database.RequireWindowsHelloForSigning = settings.RequireWindowsHelloForSigning;
@@ -151,6 +172,7 @@ public class SecureVaultService
     /// </summary>
     public Task EnableHelloProtectionAsync(IntPtr ownerWindow) => Task.Run(() =>
     {
+        EnsureWritable();
         if (IsHelloProtected) return;
         if (!_protector.IsAvailable)
             throw new InvalidOperationException("Windows Hello не настроен на этом устройстве");
@@ -173,6 +195,7 @@ public class SecureVaultService
     /// <summary>Unlocks (one Hello prompt), then stores everything with DPAPI only and deletes the Hello key.</summary>
     public async Task DisableHelloProtectionAsync(IntPtr ownerWindow)
     {
+        EnsureWritable();
         if (!IsHelloProtected) return;
         await UnlockAsync(ownerWindow, "NativeNCA: отключение защиты хранилища Windows Hello");
 
@@ -223,6 +246,7 @@ public class SecureVaultService
     /// <exception cref="WrongPasswordException"/>
     public VaultKeyItem AddKey(string p12FilePath, string password, string? customName = null, bool savePassword = false)
     {
+        EnsureWritable();
         if (!File.Exists(p12FilePath))
             throw new FileNotFoundException("Файл ключа не найден", p12FilePath);
 
@@ -281,6 +305,7 @@ public class SecureVaultService
 
     public void UpdateKey(Guid id, string name, bool savePassword, string? newPasswordToSave = null)
     {
+        EnsureWritable();
         lock (_lock)
         {
             var key = _database.Keys.FirstOrDefault(k => k.Id == id);
@@ -314,6 +339,7 @@ public class SecureVaultService
     {
         if (png.Length > MaxAvatarBytes || !png.AsSpan().StartsWith(PngSignature))
             throw new ArgumentException("Ожидается изображение PNG размером до 2 МБ", nameof(png));
+        EnsureWritable();
 
         lock (_lock)
         {
@@ -329,6 +355,7 @@ public class SecureVaultService
 
     public void RemoveAvatar(Guid id)
     {
+        EnsureWritable();
         lock (_lock)
         {
             var key = _database.Keys.FirstOrDefault(k => k.Id == id);
@@ -349,6 +376,7 @@ public class SecureVaultService
 
     public void RemoveKey(Guid id)
     {
+        EnsureWritable();
         lock (_lock)
         {
             var key = _database.Keys.FirstOrDefault(k => k.Id == id);
@@ -397,6 +425,7 @@ public class SecureVaultService
 
     public void MarkKeyUsed(Guid id)
     {
+        if (IsReadOnly) return; // only a convenience: signing must still work
         lock (_lock)
         {
             var key = _database.Keys.FirstOrDefault(k => k.Id == id);
@@ -426,6 +455,7 @@ public class SecureVaultService
     /// <exception cref="WrongPasswordException"/>
     public void ChangeKeyPassword(Guid id, string currentPassword, string newPassword)
     {
+        EnsureWritable();
         var key = GetKey(id) ?? throw new InvalidOperationException("Ключ не найден");
 
         byte[] updated = Pkcs12Writer.ChangePassword(DecryptKeyFile(key), currentPassword, newPassword);
@@ -495,11 +525,26 @@ public class SecureVaultService
     {
         lock (_lock)
         {
+            IsReadOnly = false;
             if (File.Exists(_dbPath))
             {
+                string json = File.ReadAllText(_dbPath);
+
+                // Look at the format before anything else: a newer vault may not even deserialize here,
+                // and it must then stay untouched rather than be replaced by an empty one.
+                int format = ReadFormatVersion(json);
+                if (format > SupportedFormatVersion)
+                {
+                    IsReadOnly = true;
+                    try { _database = JsonSerializer.Deserialize<VaultDatabase>(json) ?? new VaultDatabase(); }
+                    catch { _database = new VaultDatabase { Keys = new() }; }
+                    _database.FormatVersion = format;
+                    return;
+                }
+
                 try
                 {
-                    _database = JsonSerializer.Deserialize<VaultDatabase>(File.ReadAllText(_dbPath)) ?? new VaultDatabase();
+                    _database = JsonSerializer.Deserialize<VaultDatabase>(json) ?? new VaultDatabase();
                 }
                 catch
                 {
@@ -514,7 +559,24 @@ public class SecureVaultService
                 PersistDatabase();
             }
 
+            if (_database.FormatVersion < 1) _database.FormatVersion = 1;
             RefreshCertificateMetadata();
+        }
+    }
+
+    /// <summary>FormatVersion from vault.json, 1 when absent or unreadable (vaults from before the field existed).</summary>
+    private static int ReadFormatVersion(string json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return doc.RootElement.ValueKind == JsonValueKind.Object &&
+                   doc.RootElement.TryGetProperty(nameof(VaultDatabase.FormatVersion), out var v) &&
+                   v.TryGetInt32(out int format) ? format : 1;
+        }
+        catch (JsonException)
+        {
+            return 1;
         }
     }
 
@@ -550,6 +612,7 @@ public class SecureVaultService
 
     private void PersistDatabase()
     {
+        EnsureWritable();
         string json = JsonSerializer.Serialize(_database, new JsonSerializerOptions { WriteIndented = true });
         WriteAtomically(_dbPath, Encoding.UTF8.GetBytes(json));
         Changed?.Invoke(this, EventArgs.Empty);
@@ -561,6 +624,14 @@ public class SecureVaultService
         File.WriteAllBytes(temp, content);
         File.Move(temp, path, overwrite: true);
     }
+}
+
+/// <summary>The vault on disk has a newer format than this build understands; it is not changed.</summary>
+public sealed class VaultFormatTooNewException(int formatVersion) : InvalidOperationException(
+    $"Хранилище ключей записано более новой версией NativeNCA (формат {formatVersion}). Эта версия не меняет его, " +
+    "чтобы не повредить данные. Обновите NativeNCA, чтобы снова изменять ключи и параметры.")
+{
+    public int FormatVersion { get; } = formatVersion;
 }
 
 public sealed record VaultSettings(

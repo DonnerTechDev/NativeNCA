@@ -33,6 +33,13 @@ public class VaultKeyItem
 
 public class VaultDatabase
 {
+    /// <summary>
+    /// Layout of vault.json and the key files. Absent in vaults written before it existed, which are format 1.
+    /// Bump it (and <see cref="Security.SecureVaultService.SupportedFormatVersion"/>) only for a change an older
+    /// NativeNCA would misread or lose data on: an older build that finds a newer format opens the vault read-only.
+    /// </summary>
+    public int FormatVersion { get; set; } = 1;
+
     public List<VaultKeyItem> Keys { get; set; } = new();
     public bool RequireWindowsHelloForSigning { get; set; } = true;
     public bool AutoStartWithWindows { get; set; } = true;
