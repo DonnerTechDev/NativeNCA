@@ -39,13 +39,15 @@ public partial class MainWindow : FluentWindow
 
     // ===================== Lifetime & tray =====================
 
-    /// <summary>
-    /// The notification area shows 16 px icons scaled by the system DPI (24 px at 150%).
-    /// Pick the .ico frame of exactly that size; otherwise Windows stretches the first (16 px) frame and it looks blurry.
-    /// </summary>
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern uint GetDpiForSystem();
 
+    /// <summary>
+    /// The notification area shows 16 px icons scaled by the system DPI (24 px at 150%).
+    /// WPF-UI's tray converter always takes the first frame of a multi-frame icon (16 px) and treats the
+    /// pixels as premultiplied, so hand it a plain bitmap of exactly the right size in Pbgra32;
+    /// otherwise Windows stretches the 16 px frame and the icon looks blurry.
+    /// </summary>
     private static ImageSource LoadTrayIcon()
     {
         int wanted = (int)Math.Round(16 * GetDpiForSystem() / 96.0);
@@ -55,9 +57,21 @@ public partial class MainWindow : FluentWindow
             System.Windows.Media.Imaging.BitmapCreateOptions.None,
             System.Windows.Media.Imaging.BitmapCacheOption.OnLoad);
 
-        return decoder.Frames
-            .OrderBy(f => f.PixelWidth >= wanted ? f.PixelWidth - wanted : 1000 + wanted - f.PixelWidth)
-            .First();
+        // Smallest frame that is at least the wanted size (every common DPI has an exact frame).
+        System.Windows.Media.Imaging.BitmapSource frame = decoder.Frames
+            .Where(f => f.PixelWidth >= wanted)
+            .OrderBy(f => f.PixelWidth)
+            .FirstOrDefault() ?? decoder.Frames.OrderByDescending(f => f.PixelWidth).First();
+
+        if (frame.PixelWidth != wanted)
+        {
+            double scale = (double)wanted / frame.PixelWidth;
+            frame = new System.Windows.Media.Imaging.TransformedBitmap(frame, new ScaleTransform(scale, scale));
+        }
+
+        var bitmap = new System.Windows.Media.Imaging.FormatConvertedBitmap(frame, PixelFormats.Pbgra32, null, 0);
+        bitmap.Freeze();
+        return bitmap;
     }
 
     private bool _isExiting;
