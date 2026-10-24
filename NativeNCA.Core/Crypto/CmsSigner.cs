@@ -113,10 +113,10 @@ public static class CmsVerifier
 
             var signerInfo = SignerInfo.GetInstance(signedData.SignerInfos[0]);
             if (signerInfo.SignerID.ID is not IssuerAndSerialNumber isn)
-                return new(false, null, "Неподдерживаемый идентификатор подписанта");
+                return new(false, null, "Unsupported signer identifier");
 
             var signer = certs.FirstOrDefault(c => c.SerialNumber.Equals(isn.SerialNumber.Value) && c.IssuerDN.Equivalent(isn.Issuer));
-            if (signer == null) return new(false, null, "Сертификат подписанта не найден");
+            if (signer == null) return new(false, null, "Signer certificate not found");
 
             string sigAlg = signerInfo.SignatureAlgorithm.Algorithm.Id;
             Func<byte[], byte[]> hash = sigAlg == KzOids.Gost2015Signature512 ? Gost2015.Hash : SHA256.HashData;
@@ -133,15 +133,15 @@ public static class CmsVerifier
                         md = Asn1OctetString.GetInstance(attr.AttrValues[0]).GetOctets();
                 }
 
-                if (md == null) return new(false, signer, "Нет атрибута messageDigest");
+                if (md == null) return new(false, signer, "No messageDigest attribute");
                 if (content != null && !md.AsSpan().SequenceEqual(hash(content)))
-                    return new(false, signer, "Хеш содержимого не совпадает");
+                    return new(false, signer, "Content hash does not match");
 
                 signedBytes = signerInfo.SignedAttrs.GetEncoded(Asn1Encodable.Der);
             }
             else
             {
-                if (content == null) return new(false, signer, "Нет подписанных данных");
+                if (content == null) return new(false, signer, "No signed content");
                 signedBytes = content;
             }
 
@@ -151,7 +151,7 @@ public static class CmsVerifier
                 _ => VerifyRsa(signer, signedBytes, signature)
             };
 
-            if (!ok) return new(false, signer, "Подпись недействительна");
+            if (!ok) return new(false, signer, "Signature is not valid");
 
             DateTime? timestamp = null;
             if (signerInfo.UnsignedAttrs != null)
@@ -162,7 +162,7 @@ public static class CmsVerifier
                     if (!attr.AttrType.Equals(PkcsObjectIdentifiers.IdAASignatureTimeStampToken)) continue;
 
                     if (VerifyTimestamp(attr.AttrValues[0], signature) is not { } time)
-                        return new(false, signer, "Метка времени недействительна");
+                        return new(false, signer, "Time stamp is not valid");
                     timestamp = time;
                 }
             }

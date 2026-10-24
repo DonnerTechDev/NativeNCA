@@ -1,5 +1,6 @@
 using NativeNCA.Core.ViewModels;
 using Wpf.Ui.Controls;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.App.Views.Dialogs;
 
@@ -15,7 +16,7 @@ public partial class ChangePasswordDialog : ContentDialog
         _viewModel = viewModel;
         _key = key;
 
-        KeyNameText.Text = $"Ключ «{key.Name}» будет перешифрован новым паролем. Запомните его — восстановить пароль невозможно.";
+        KeyNameText.Text = Loc.Format(Strings.ChangePassword_Intro, key.Name);
         VaultHint.Visibility = key.IsPasswordSaved ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
         Loaded += (_, _) => CurrentPasswordInput.Focus();
     }
@@ -33,20 +34,20 @@ public partial class ChangePasswordDialog : ContentDialog
 
         if (string.IsNullOrEmpty(current) || string.IsNullOrEmpty(next))
         {
-            ShowError("Заполните текущий и новый пароль");
+            ShowError(Strings.ChangePassword_FillBoth);
             return;
         }
 
         if (next != ConfirmPasswordInput.Password)
         {
-            ShowError("Новые пароли не совпадают");
+            ShowError(Strings.ChangePassword_Mismatch);
             ConfirmPasswordInput.Focus();
             return;
         }
 
         if (next == current)
         {
-            ShowError("Новый пароль совпадает с текущим");
+            ShowError(Strings.ChangePassword_Same);
             return;
         }
 

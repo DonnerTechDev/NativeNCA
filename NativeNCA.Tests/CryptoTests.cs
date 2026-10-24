@@ -39,7 +39,7 @@ public class GostOracleTests
         var cert = new Org.BouncyCastle.X509.X509CertificateParser().ReadCertificate(sd.Certificates[0].GetEncoded());
         var info = CertificateInfo.From(cert);
 
-        Assert.Equal("ГОСТ", info.Algorithm);
+        Assert.Equal(CertificateInfo.GostAlgorithm, info.Algorithm);
         Assert.Equal("000740000728", info.Bin);
         Assert.Equal("NCALayer", info.CommonName);
     }

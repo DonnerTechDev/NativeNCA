@@ -14,4 +14,19 @@
     <InternalsVisibleTo Include="NativeNCA.Tests" />
   </ItemGroup>
 
+  <!--
+    User-visible text. Strings.resx is Russian (the neutral language), Strings.kk.resx and Strings.en.resx are the
+    translations. The build generates the public Strings class, so keys are checked by the compiler.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Update="Localization\Strings.resx">
+      <StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>NativeNCA.Core.Localization</StronglyTypedNamespace>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Strings.*.resx" DependentUpon="Strings.resx" />
+  </ItemGroup>
+
 </Project>

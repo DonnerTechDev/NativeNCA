@@ -5,6 +5,7 @@ using System.Security.Cryptography.Xml;
 using System.Xml;
 using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
 using X509CertificateParser = Org.BouncyCastle.X509.X509CertificateParser;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Crypto;
 
@@ -33,15 +34,15 @@ public static class XmlDsigSigner
         doc.LoadXml(xml);
 
         var parent = SelectElement(doc, signatureParentXPath) ?? doc.DocumentElement
-            ?? throw new InvalidDataException("Пустой XML-документ");
+            ?? throw new InvalidDataException(Strings.Xml_Empty);
 
         string referenceUri = "";
         if (!string.IsNullOrWhiteSpace(tbsElementXPath))
         {
-            var tbs = SelectElement(doc, tbsElementXPath) ?? throw new InvalidDataException($"Элемент {tbsElementXPath} не найден");
+            var tbs = SelectElement(doc, tbsElementXPath) ?? throw new InvalidDataException(Loc.Format(Strings.Xml_ElementNotFound, tbsElementXPath));
             string id = tbs.GetAttribute("Id") is { Length: > 0 } a ? a : tbs.GetAttribute("id");
             if (string.IsNullOrEmpty(id))
-                throw new NotSupportedException("Подписываемый элемент должен иметь атрибут Id");
+                throw new NotSupportedException(Strings.Xml_NoId);
             referenceUri = "#" + id;
         }
 

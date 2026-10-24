@@ -7,6 +7,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Crypto;
 
@@ -55,8 +56,8 @@ public abstract class SigningKey
             KzOids.Gost2015PublicKey => new Gost2015SigningKey(contents),
             KzOids.RsaEncryption => new RsaSigningKey(contents),
             KzOids.Gost2004PublicKey => throw new NotSupportedException(
-                "Ключи ГОСТ 34.310-2004 больше не выпускаются и не поддерживаются. Получите новый ключ в НУЦ РК."),
-            _ => throw new NotSupportedException($"Неподдерживаемый алгоритм ключа ({keyAlgorithm})")
+                Strings.Crypto_LegacyGost),
+            _ => throw new NotSupportedException(Loc.Format(Strings.Crypto_UnsupportedAlgorithm, keyAlgorithm))
         };
     }
 }
@@ -94,7 +95,7 @@ public sealed class RsaSigningKey : SigningKey
         _publicKey = (RsaKeyParameters)contents.Certificate.GetPublicKey();
 
         if (!_privateKey.Modulus.Equals(_publicKey.Modulus))
-            throw new InvalidDataException("Закрытый ключ RSA не соответствует сертификату");
+            throw new InvalidDataException(Strings.Crypto_RsaKeyMismatch);
     }
 
     public override KeyAlgorithmKind Kind => KeyAlgorithmKind.Rsa;

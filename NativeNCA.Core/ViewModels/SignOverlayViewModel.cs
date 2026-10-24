@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using NativeNCA.Core.Crypto;
 using NativeNCA.Core.Models;
 using NativeNCA.Core.Security;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.ViewModels;
 
@@ -39,9 +40,9 @@ public partial class SignOverlayViewModel : ObservableObject
     public IntPtr OwnerWindowHandle { get; set; }
 
     public string OriginUrl => _request.Origin;
-    public string OriginDomain => ExtractDomain(_request.Origin);
-    public string ActionDescription => _request.Description;
-    public string DataPreview => _request.DataToSignPreview;
+    public string OriginDomain => string.IsNullOrEmpty(_request.Origin) ? Strings.Overlay_UnknownOrigin : ExtractDomain(_request.Origin);
+    public string ActionDescription => _request.Description.ToString();
+    public string DataPreview => _request.DataToSignPreview.ToString();
     public bool IsAuthRequest => _request.RequiredUsage == KeyUsageFilter.Auth;
     public bool IsSelectionOnly => !_request.RequiresPrivateKey;
     public bool IsSecureOrigin => _request.Origin.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
@@ -61,6 +62,25 @@ public partial class SignOverlayViewModel : ObservableObject
         _settings = vault.GetSettings();
 
         LoadKeys();
+
+        LocalizationSource.Instance.CultureChanged += OnCultureChanged;
+        _tcs.Task.ContinueWith(_ => LocalizationSource.Instance.CultureChanged -= OnCultureChanged, TaskScheduler.Default);
+    }
+
+    /// <summary>Error messages are kept as <see cref="LocText"/> so they follow a language switch too.</summary>
+    private LocText? _error;
+
+    private void SetError(LocText? error)
+    {
+        _error = error;
+        ErrorMessage = error?.ToString();
+    }
+
+    private void OnCultureChanged(object? sender, EventArgs e)
+    {
+        foreach (var key in MatchingKeys) key.RefreshTexts();
+        if (_error != null) ErrorMessage = _error.ToString();
+        OnPropertyChanged(string.Empty);
     }
 
     private void LoadKeys()
@@ -89,7 +109,7 @@ public partial class SignOverlayViewModel : ObservableObject
     {
         IsPasswordRequired = value != null && !IsSelectionOnly && !value.IsPasswordSaved;
         ManualPassword = string.Empty;
-        ErrorMessage = null;
+        SetError(null);
     }
 
     [RelayCommand]
@@ -97,7 +117,7 @@ public partial class SignOverlayViewModel : ObservableObject
     {
         if (SelectedKey == null)
         {
-            ErrorMessage = "Выберите ключ для продолжения";
+            SetError(new LocText(() => Strings.Overlay_SelectKey));
             return;
         }
 
@@ -111,16 +131,16 @@ public partial class SignOverlayViewModel : ObservableObject
 
         if (IsPasswordRequired && string.IsNullOrEmpty(ManualPassword))
         {
-            ErrorMessage = "Введите пароль от ключа";
+            SetError(new LocText(() => Strings.Overlay_EnterPassword));
             return;
         }
 
         IsProcessing = true;
-        ErrorMessage = null;
+        SetError(null);
 
         try
         {
-            string reason = $"NativeNCA: подтвердите использование ключа «{item.Name}» для {OriginDomain}";
+            string reason = Loc.Format(Strings.Hello_ConfirmKeyUse, item.Name, OriginDomain);
 
             if (_settings.IsHelloProtected)
             {
@@ -131,7 +151,7 @@ public partial class SignOverlayViewModel : ObservableObject
                 }
                 catch (OperationCanceledException)
                 {
-                    ErrorMessage = "Подтверждение Windows Hello отменено";
+                    SetError(new LocText(() => Strings.Hello_Canceled));
                     return;
                 }
             }
@@ -145,7 +165,7 @@ public partial class SignOverlayViewModel : ObservableObject
 
                     case HelloResult.NotAvailable when !IsPasswordRequired:
                         // Never let a stored password be used without any user verification.
-                        RequireManualPassword("Windows Hello недоступен — введите пароль от ключа вручную");
+                        RequireManualPassword(new LocText(() => Strings.Overlay_HelloUnavailable));
                         return;
 
                     case HelloResult.NotAvailable:
@@ -153,11 +173,11 @@ public partial class SignOverlayViewModel : ObservableObject
                         break;
 
                     case HelloResult.Canceled:
-                        ErrorMessage = "Подтверждение Windows Hello отменено";
+                        SetError(new LocText(() => Strings.Hello_Canceled));
                         return;
 
                     default:
-                        ErrorMessage = "Не удалось выполнить проверку Windows Hello";
+                        SetError(new LocText(() => Strings.Overlay_HelloFailed));
                         return;
                 }
             }
@@ -168,7 +188,7 @@ public partial class SignOverlayViewModel : ObservableObject
             string? password = usingSavedPassword ? _vault.GetSavedPassword(item) : ManualPassword;
             if (password == null)
             {
-                RequireManualPassword("Не удалось прочитать сохранённый пароль — введите его вручную");
+                RequireManualPassword(new LocText(() => Strings.Overlay_SavedPasswordUnreadable));
                 return;
             }
 
@@ -180,10 +200,10 @@ public partial class SignOverlayViewModel : ObservableObject
             catch (WrongPasswordException)
             {
                 if (usingSavedPassword)
-                    RequireManualPassword("Сохранённый пароль не подошёл — введите пароль от ключа");
+                    RequireManualPassword(new LocText(() => Strings.Overlay_SavedPasswordWrong));
                 else
                 {
-                    ErrorMessage = "Неверный пароль от ключа";
+                    SetError(new LocText(() => Strings.Error_WrongPassword));
                     ManualPassword = string.Empty;
                 }
                 return;
@@ -193,7 +213,7 @@ public partial class SignOverlayViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
+            SetError(LocText.Raw(ex.Message));
         }
         finally
         {
@@ -204,11 +224,11 @@ public partial class SignOverlayViewModel : ObservableObject
     [RelayCommand]
     public void Cancel() => _tcs.TrySetResult(SigningPromptResult.Cancelled);
 
-    private void RequireManualPassword(string message)
+    private void RequireManualPassword(LocText message)
     {
         IsPasswordRequired = true;
         ManualPassword = string.Empty;
-        ErrorMessage = message;
+        SetError(message);
     }
 
     private static string ExtractDomain(string origin) =>

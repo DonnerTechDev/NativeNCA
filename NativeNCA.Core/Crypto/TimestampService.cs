@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Tsp;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Crypto;
 
@@ -48,7 +49,7 @@ public sealed class NcaTimestampService : ITimestampProvider
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
         {
-            throw new TimestampException("Не удалось получить метку времени от НУЦ РК — проверьте подключение к интернету", ex);
+            throw new TimestampException(Strings.Tsa_Unreachable, ex);
         }
 
         try
@@ -56,11 +57,11 @@ public sealed class NcaTimestampService : ITimestampProvider
             var tsr = new TimeStampResponse(body);
             tsr.Validate(request);
             return tsr.TimeStampToken?.GetEncoded()
-                   ?? throw new TimestampException($"Сервер меток времени отказал: {tsr.GetStatusString()}");
+                   ?? throw new TimestampException(Loc.Format(Strings.Tsa_Rejected, tsr.GetStatusString()));
         }
         catch (TspException ex)
         {
-            throw new TimestampException("Сервер меток времени вернул некорректный ответ", ex);
+            throw new TimestampException(Strings.Tsa_BadResponse, ex);
         }
     }
 }

@@ -14,6 +14,7 @@ using Wpf.Ui;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using TextBlock = System.Windows.Controls.TextBlock;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.App.Views;
 
@@ -183,7 +184,7 @@ public partial class MainWindow : FluentWindow
     {
         if (e.PropertyName == nameof(SettingsViewModel.StatusMessage) && !string.IsNullOrEmpty(_viewModel.StatusMessage))
         {
-            ShowToast(_viewModel.StatusMessage);
+            ShowToast(_viewModel.StatusMessage, _viewModel.IsStatusError);
             // Reset so that the same message shows again next time.
             _viewModel.StatusMessage = null;
         }
@@ -215,14 +216,14 @@ public partial class MainWindow : FluentWindow
         }, System.Windows.Threading.DispatcherPriority.DataBind);
     }
 
-    public void ShowError(string message) => ShowToast(message.StartsWith("Ошибка", StringComparison.Ordinal) ? message : "Ошибка: " + message, isError: true);
+    public void ShowError(string message) => ShowToast(message, isError: true);
 
     // ===================== Updates =====================
 
     private void ShowUpdateNotification(ReleaseInfo release)
     {
-        _trayNotification.Show($"Доступна NativeNCA {release.Version}",
-            $"У вас версия {_updates.CurrentVersion}. Нажмите, чтобы открыть NativeNCA и обновить");
+        _trayNotification.Show(Loc.Format(Strings.Tray_UpdateTitle, release.Version),
+            Loc.Format(Strings.Tray_UpdateText, _updates.CurrentVersion));
     }
 
     private void OnOpenSettingsFromBannerClick(object sender, RoutedEventArgs e)
@@ -240,20 +241,18 @@ public partial class MainWindow : FluentWindow
     {
         var dialog = new ContentDialog(DialogHost)
         {
-            Title = "Установить NativeNCA?",
+            Title = Strings.Install_DialogTitle,
             Content = new TextBlock
             {
-                Text = "Эта копия запущена без установки, поэтому обновить её автоматически нельзя. Установите NativeNCA — " +
-                       "он появится в меню «Пуск», а обновление можно будет поставить сразу после запуска.\n\n" +
-                       "Или скачайте новую версию вручную со страницы релиза.",
+                Text = Strings.Install_DialogText,
                 TextWrapping = TextWrapping.Wrap,
                 MaxWidth = 440,
                 Style = (Style)FindResource("SecondaryText"),
                 FontSize = 13
             },
-            PrimaryButtonText = "Установить",
-            SecondaryButtonText = "Страница релиза",
-            CloseButtonText = "Отмена",
+            PrimaryButtonText = Strings.Common_Install,
+            SecondaryButtonText = Strings.Install_ReleasePage,
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -274,19 +273,17 @@ public partial class MainWindow : FluentWindow
 
         var dialog = new ContentDialog(DialogHost)
         {
-            Title = $"Вернуть версию {previous}?",
+            Title = Loc.Format(Strings.Rollback_DialogTitle, previous),
             Content = new TextBlock
             {
-                Text = $"NativeNCA перезапустится в версии {previous}. Ключи и параметры сохранятся. " +
-                       $"Версия {_updates.CurrentVersion} больше не будет предлагаться автоматически — " +
-                       "её можно будет снова установить кнопкой «Проверить обновления».",
+                Text = Loc.Format(Strings.Rollback_DialogText, previous, _updates.CurrentVersion),
                 TextWrapping = TextWrapping.Wrap,
                 MaxWidth = 440,
                 Style = (Style)FindResource("SecondaryText"),
                 FontSize = 13
             },
-            PrimaryButtonText = "Вернуть",
-            CloseButtonText = "Отмена",
+            PrimaryButtonText = Strings.Settings_Rollback,
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -374,7 +371,7 @@ public partial class MainWindow : FluentWindow
         }
         catch (Exception ex)
         {
-            ShowToast("Ошибка: " + ex.Message);
+            ShowError(ex.Message);
         }
     }
 
@@ -391,14 +388,14 @@ public partial class MainWindow : FluentWindow
         var input = new Wpf.Ui.Controls.TextBox
         {
             Text = key.Name,
-            PlaceholderText = "Например: «Личный eGov»",
+            PlaceholderText = Strings.Rename_Placeholder,
             MaxLength = 64,
             ClearButtonEnabled = true
         };
 
         var dialog = new ContentDialog(DialogHost)
         {
-            Title = "Переименовать ключ",
+            Title = Strings.Rename_DialogTitle,
             Content = new StackPanel
             {
                 Width = 400,
@@ -406,7 +403,7 @@ public partial class MainWindow : FluentWindow
                 {
                     new TextBlock
                     {
-                        Text = "Название видно только вам — в списке ключей и в окне подтверждения подписи.",
+                        Text = Strings.Rename_Hint,
                         TextWrapping = TextWrapping.Wrap,
                         Margin = new Thickness(0, 0, 0, 16),
                         Style = (Style)FindResource("SecondaryText"),
@@ -415,8 +412,8 @@ public partial class MainWindow : FluentWindow
                     input
                 }
             },
-            PrimaryButtonText = "Сохранить",
-            CloseButtonText = "Отмена",
+            PrimaryButtonText = Strings.Common_Save,
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Primary
         };
         dialog.Loaded += (_, _) => { input.Focus(); input.SelectAll(); };
@@ -431,19 +428,18 @@ public partial class MainWindow : FluentWindow
 
         var dialog = new ContentDialog(DialogHost)
         {
-            Title = $"Удалить «{key.Name}»?",
+            Title = Loc.Format(Strings.DeleteKey_DialogTitle, key.Name),
             Content = new TextBlock
             {
-                Text = "Зашифрованная копия ключа и сохранённый пароль будут удалены из хранилища NativeNCA. " +
-                       "Исходный файл .p12 на диске останется — при необходимости ключ можно будет добавить заново.",
+                Text = Strings.DeleteKey_DialogText,
                 TextWrapping = TextWrapping.Wrap,
                 MaxWidth = 420,
                 Style = (Style)FindResource("SecondaryText"),
                 FontSize = 13
             },
-            PrimaryButtonText = "Удалить",
+            PrimaryButtonText = Strings.Common_Delete,
             PrimaryButtonAppearance = ControlAppearance.Danger,
-            CloseButtonText = "Отмена",
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Close
         };
 
@@ -464,7 +460,7 @@ public partial class MainWindow : FluentWindow
         }
         catch (Exception ex)
         {
-            ShowToast("Ошибка: " + AddKeyDialog.FriendlyError(ex));
+            ShowError(AddKeyDialog.FriendlyError(ex));
         }
         finally
         {
@@ -480,21 +476,21 @@ public partial class MainWindow : FluentWindow
     {
         var password = new Wpf.Ui.Controls.PasswordBox
         {
-            PlaceholderText = "Пароль от ключа",
+            PlaceholderText = Strings.Common_KeyPassword,
             Icon = new SymbolIcon(SymbolRegular.Password24)
         };
         var error = new InfoBar
         {
             Severity = InfoBarSeverity.Error,
             IsClosable = false,
-            Title = "Неверный пароль",
-            Message = "Проверьте раскладку клавиатуры и попробуйте ещё раз",
+            Title = Strings.SavePassword_WrongTitle,
+            Message = Strings.SavePassword_WrongMessage,
             Margin = new Thickness(0, 12, 0, 0)
         };
 
         var dialog = new ContentDialog(DialogHost)
         {
-            Title = "Сохранить пароль в Vault",
+            Title = Strings.SavePassword_DialogTitle,
             Content = new StackPanel
             {
                 Width = 400,
@@ -502,7 +498,7 @@ public partial class MainWindow : FluentWindow
                 {
                     new TextBlock
                     {
-                        Text = $"Введите пароль от ключа «{key.Name}». Он будет проверен и сохранён в зашифрованном виде.",
+                        Text = Loc.Format(Strings.SavePassword_DialogText, key.Name),
                         TextWrapping = TextWrapping.Wrap,
                         Margin = new Thickness(0, 0, 0, 16),
                         Style = (Style)FindResource("SecondaryText"),
@@ -512,8 +508,8 @@ public partial class MainWindow : FluentWindow
                     error
                 }
             },
-            PrimaryButtonText = "Сохранить",
-            CloseButtonText = "Отмена",
+            PrimaryButtonText = Strings.Common_Save,
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Primary
         };
         dialog.Loaded += (_, _) => password.Focus();
@@ -528,9 +524,9 @@ public partial class MainWindow : FluentWindow
             }
             catch (Exception ex)
             {
-                error.Title = ex is OperationCanceledException ? "Windows Hello" : "Неверный пароль";
+                error.Title = ex is OperationCanceledException ? "Windows Hello" : Strings.SavePassword_WrongTitle;
                 error.Message = ex is InvalidOperationException
-                    ? "Проверьте раскладку клавиатуры и попробуйте ещё раз"
+                    ? Strings.SavePassword_WrongMessage
                     : AddKeyDialog.FriendlyError(ex);
                 error.IsOpen = true;
             }
@@ -546,21 +542,17 @@ public partial class MainWindow : FluentWindow
             {
                 var confirm = new ContentDialog(DialogHost)
                 {
-                    Title = "Защитить хранилище Windows Hello?",
+                    Title = Strings.HelloVault_DialogTitle,
                     Content = new TextBlock
                     {
-                        Text = "Ключи и сохранённые пароли будут дополнительно зашифрованы ключом Windows Hello, " +
-                               "который хранится в TPM и не покидает этот компьютер. Для подписи и изменений " +
-                               "в хранилище понадобится лицо, отпечаток или PIN-код.\n\n" +
-                               "Важно: если сбросить PIN-код или переустановить Windows Hello, расшифровать хранилище " +
-                               "будет нельзя. Сохраните исходные файлы .p12 и пароли от них — тогда ключи можно добавить заново.",
+                        Text = Strings.HelloVault_DialogText,
                         TextWrapping = TextWrapping.Wrap,
                         MaxWidth = 440,
                         Style = (Style)FindResource("SecondaryText"),
                         FontSize = 13
                     },
-                    PrimaryButtonText = "Включить защиту",
-                    CloseButtonText = "Отмена",
+                    PrimaryButtonText = Strings.HelloVault_Enable,
+                    CloseButtonText = Strings.Common_Cancel,
                     DefaultButton = ContentDialogButton.Primary
                 };
 
@@ -574,7 +566,7 @@ public partial class MainWindow : FluentWindow
         }
         catch (Exception ex)
         {
-            ShowToast("Ошибка: " + AddKeyDialog.FriendlyError(ex));
+            ShowError(AddKeyDialog.FriendlyError(ex));
         }
         finally
         {
@@ -587,7 +579,7 @@ public partial class MainWindow : FluentWindow
         if (sender is FrameworkElement { Tag: string text } && !string.IsNullOrWhiteSpace(text))
         {
             Clipboard.SetText(text);
-            ShowToast($"Скопировано: {text}");
+            ShowToast(Loc.Format(Strings.Common_Copied, text), isError: false);
         }
     }
 
@@ -620,11 +612,11 @@ public partial class MainWindow : FluentWindow
         }
         catch (OperationCanceledException)
         {
-            ShowToast("Сертификат не установлен: в окне Windows выбран ответ «Нет»", isError: true);
+            ShowError(Strings.Tls_InstallDeclined);
         }
         catch (Exception ex)
         {
-            ShowToast("Ошибка: " + ex.Message);
+            ShowError(ex.Message);
         }
     }
 
@@ -632,21 +624,18 @@ public partial class MainWindow : FluentWindow
     {
         var dialog = new ContentDialog(DialogHost)
         {
-            Title = "Удалить сертификат NativeNCA?",
+            Title = Strings.TlsRemove_DialogTitle,
             Content = new TextBlock
             {
-                Text = "Корневой сертификат будет удалён из Windows, а сертификат сервера — с диска. " +
-                       "Windows попросит подтвердить удаление.\n\n" +
-                       "Без него браузеры смогут подключиться к NativeNCA, только если на компьютере установлен NCALayer. " +
-                       "Собственный сертификат можно снова установить в любой момент.",
+                Text = Strings.TlsRemove_DialogText,
                 TextWrapping = TextWrapping.Wrap,
                 MaxWidth = 440,
                 Style = (Style)FindResource("SecondaryText"),
                 FontSize = 13
             },
-            PrimaryButtonText = "Удалить",
+            PrimaryButtonText = Strings.Common_Delete,
             PrimaryButtonAppearance = ControlAppearance.Danger,
-            CloseButtonText = "Отмена",
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Close
         };
 
@@ -658,11 +647,11 @@ public partial class MainWindow : FluentWindow
         }
         catch (OperationCanceledException)
         {
-            ShowToast("Сертификат не удалён: в окне Windows выбран ответ «Нет»", isError: true);
+            ShowError(Strings.Tls_RemoveDeclined);
         }
         catch (Exception ex)
         {
-            ShowToast("Ошибка: " + ex.Message);
+            ShowError(ex.Message);
         }
     }
 
@@ -672,7 +661,7 @@ public partial class MainWindow : FluentWindow
     {
         var alsoAutostart = new CheckBox
         {
-            Content = "Также отключить автозапуск NCALayer",
+            Content = Strings.CloseNcaLayer_AlsoAutostart,
             IsChecked = true,
             Margin = new Thickness(0, 16, 0, 0),
             Visibility = _viewModel.IsNcaLayerAutostartEnabled ? Visibility.Visible : Visibility.Collapsed
@@ -680,7 +669,7 @@ public partial class MainWindow : FluentWindow
 
         var dialog = new ContentDialog(DialogHost)
         {
-            Title = "Закрыть NCALayer?",
+            Title = Strings.CloseNcaLayer_DialogTitle,
             Content = new StackPanel
             {
                 Width = 420,
@@ -688,8 +677,7 @@ public partial class MainWindow : FluentWindow
                 {
                     new TextBlock
                     {
-                        Text = "NCALayer будет завершён, и NativeNCA начнёт принимать запросы сайтов на порту 13579. " +
-                               "Если NCALayer сейчас что-то подписывает, операция прервётся.",
+                        Text = Strings.CloseNcaLayer_DialogText,
                         TextWrapping = TextWrapping.Wrap,
                         Style = (Style)FindResource("SecondaryText"),
                         FontSize = 13
@@ -697,8 +685,8 @@ public partial class MainWindow : FluentWindow
                     alsoAutostart
                 }
             },
-            PrimaryButtonText = "Закрыть NCALayer",
-            CloseButtonText = "Отмена",
+            PrimaryButtonText = Strings.Server_CloseNcaLayer,
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -708,27 +696,26 @@ public partial class MainWindow : FluentWindow
             DisableNcaLayerAutostart(quiet: true);
 
         if (await _viewModel.CloseNcaLayerAsync())
-            ShowToast("NCALayer закрыт — NativeNCA принимает запросы сайтов");
+            ShowToast(Strings.NcaLayer_Closed, isError: false);
         else
-            ShowToast("Ошибка: NCALayer не закрылся. Закройте его через значок в трее (Выход) и нажмите «Повторить»");
+            ShowError(Strings.NcaLayer_CloseFailed);
     }
 
     private async void OnDisableNcaLayerAutostartClick(object sender, RoutedEventArgs e)
     {
         var dialog = new ContentDialog(DialogHost)
         {
-            Title = "Отключить автозапуск NCALayer?",
+            Title = Strings.DisableAutostart_DialogTitle,
             Content = new TextBlock
             {
-                Text = "NCALayer перестанет запускаться при входе в Windows и занимать порт 13579. Сама программа " +
-                       "не удаляется: её можно запустить вручную или снова включить в «Параметры Windows → Приложения → Автозагрузка».",
+                Text = Strings.DisableAutostart_DialogText,
                 TextWrapping = TextWrapping.Wrap,
                 MaxWidth = 440,
                 Style = (Style)FindResource("SecondaryText"),
                 FontSize = 13
             },
-            PrimaryButtonText = "Отключить",
-            CloseButtonText = "Отмена",
+            PrimaryButtonText = Strings.DisableAutostart_Confirm,
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -740,22 +727,20 @@ public partial class MainWindow : FluentWindow
     {
         if (_viewModel.DisableNcaLayerAutostart())
         {
-            if (!quiet) ShowToast("Автозапуск NCALayer отключён");
+            if (!quiet) ShowToast(Strings.NcaLayer_AutostartDisabled, isError: false);
             return;
         }
 
         // Installed for all users: StartupApproved under HKLM needs administrator rights, Windows Settings has them.
-        ShowToast("Автозапуск NCALayer для всех пользователей отключается в параметрах Windows — отключите NCALayer в открывшемся списке", isError: true);
+        ShowToast(Strings.NcaLayer_AutostartNeedsSettings, isError: true);
         try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("ms-settings:startupapps") { UseShellExecute = true }); }
         catch { /* Settings unavailable: the toast still explains where to go */ }
     }
 
-    private void ShowToast(string message) => ShowToast(message, message.StartsWith("Ошибка", StringComparison.OrdinalIgnoreCase));
-
     private void ShowToast(string message, bool isError)
     {
         _snackbar.Show(
-            isError ? "Ошибка" : "NativeNCA",
+            isError ? Strings.Common_Error : "NativeNCA",
             message,
             isError ? ControlAppearance.Danger : ControlAppearance.Secondary,
             new SymbolIcon(isError ? SymbolRegular.ErrorCircle24 : SymbolRegular.CheckmarkCircle24),

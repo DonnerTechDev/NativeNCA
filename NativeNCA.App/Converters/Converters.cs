@@ -84,23 +84,3 @@ public class ImagePathToSourceConverter : IValueConverter
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
 }
-
-/// <summary>
-/// Session cache minutes → human readable label for the settings ComboBox.
-/// </summary>
-public class CacheMinutesToTextConverter : IValueConverter
-{
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value is int minutes
-            ? minutes switch
-            {
-                0 => "Не запоминать",
-                60 => "1 час",
-                _ => $"{minutes} минут"
-            }
-            : string.Empty;
-    }
-
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
-}

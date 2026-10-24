@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NativeNCA.Core.Updates;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.ViewModels;
 
@@ -41,6 +42,9 @@ public partial class UpdateViewModel : ObservableObject
         _context = SynchronizationContext.Current;
         _autoCheck = store.Load().AutoCheck;
         RefreshPreviousVersion();
+
+        // Every text here is computed or kept as LocText, so a language switch only needs a refresh.
+        LocalizationSource.Instance.CultureChanged += (_, _) => OnPropertyChanged(string.Empty);
     }
 
     public AppVersion CurrentVersion { get; }
@@ -72,7 +76,10 @@ public partial class UpdateViewModel : ObservableObject
 
     /// <summary>Settings row text under the version: result of the last check.</summary>
     [ObservableProperty]
-    private string _checkStatusText = "Обновления ещё не проверялись";
+    [NotifyPropertyChangedFor(nameof(CheckStatusText))]
+    private LocText _checkStatus = new(() => Strings.Update_NotChecked);
+
+    public string CheckStatusText => CheckStatus.ToString();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsUpdateAvailable), nameof(AvailableVersionText), nameof(UpdateBannerTitle),
@@ -85,11 +92,10 @@ public partial class UpdateViewModel : ObservableObject
 
     public string AvailableVersionText => AvailableRelease?.Version.ToString() ?? string.Empty;
 
-    public string UpdateBannerTitle => $"Доступна версия {AvailableVersionText}";
+    public string UpdateBannerTitle => Loc.Format(Strings.Update_BannerTitle, AvailableVersionText);
 
-    public string UpdateBannerText => IsInstalledCopy
-        ? $"У вас версия {CurrentVersion}. Перед установкой NativeNCA проверит подпись разработчика; ключи и параметры сохранятся."
-        : $"У вас версия {CurrentVersion}. Эта копия NativeNCA не установлена, поэтому обновить её автоматически нельзя.";
+    public string UpdateBannerText => Loc.Format(
+        IsInstalledCopy ? Strings.Update_BannerTextInstalled : Strings.Update_BannerTextPortable, CurrentVersion);
 
     public string ReleaseNotesUrl => (AvailableRelease?.HtmlUrl ?? GitHubReleaseClient.ReleasesPageUrl).AbsoluteUri;
 
@@ -119,7 +125,7 @@ public partial class UpdateViewModel : ObservableObject
     {
         if (_client == null || IsChecking || IsDownloading) return;
         IsChecking = true;
-        if (manual) CheckStatusText = "Проверка обновлений…";
+        if (manual) CheckStatus = new LocText(() => Strings.Update_Checking);
 
         try
         {
@@ -131,7 +137,7 @@ public partial class UpdateViewModel : ObservableObject
         catch (Exception)
         {
             // Unexpected answers (bad JSON etc.) are as quiet as being offline.
-            if (manual) CheckStatusText = "Не удалось проверить обновления. Попробуйте позже";
+            if (manual) CheckStatus = new LocText(() => Strings.Update_CheckFailed);
         }
         finally
         {
@@ -141,14 +147,15 @@ public partial class UpdateViewModel : ObservableObject
 
     private void ApplyCheckResult(ReleaseInfo? release, bool manual)
     {
-        string checkedAt = $"Проверено {DateTime.Now:HH:mm}";
+        var now = DateTime.Now;
+        var checkedAt = new LocText(() => Loc.Format(Strings.Update_CheckedAt, Loc.Time(now)));
 
         if (release == null)
         {
             if (_client!.RateLimitedUntil is { } until && until > DateTimeOffset.UtcNow)
-                CheckStatusText = $"GitHub временно ограничил проверки. Попробуйте после {until.ToLocalTime():HH:mm}";
+                CheckStatus = new LocText(() => Loc.Format(Strings.Update_RateLimited, Loc.Time(until.LocalDateTime)));
             else if (manual || AvailableRelease == null)
-                CheckStatusText = "Не удалось проверить обновления — нет подключения к GitHub";
+                CheckStatus = new LocText(() => Strings.Update_Offline);
             return;
         }
 
@@ -156,7 +163,7 @@ public partial class UpdateViewModel : ObservableObject
         {
             AvailableRelease = null;
             _availablePackage = null;
-            CheckStatusText = $"Установлена последняя версия · {checkedAt}";
+            CheckStatus = new LocText(() => Loc.Format(Strings.Update_UpToDate, checkedAt));
             return;
         }
 
@@ -166,15 +173,15 @@ public partial class UpdateViewModel : ObservableObject
             // An unsigned or incomplete release is never offered.
             AvailableRelease = null;
             _availablePackage = null;
-            CheckStatusText = $"Версия {release.Version} вышла, но ещё не готова для автоматического обновления · {checkedAt}";
+            CheckStatus = new LocText(() => Loc.Format(Strings.Update_NotReady, release.Version, checkedAt));
             return;
         }
 
         var state = _store.Load();
         bool skipped = state.SkippedVersion == release.Version.ToString();
-        CheckStatusText = skipped && !_showSkipped
-            ? $"Доступна версия {release.Version} (вы вернулись с неё на предыдущую) · {checkedAt}"
-            : $"Доступна версия {release.Version} · {checkedAt}";
+        CheckStatus = skipped && !_showSkipped
+            ? new LocText(() => Loc.Format(Strings.Update_AvailableSkipped, release.Version, checkedAt))
+            : new LocText(() => Loc.Format(Strings.Update_AvailableStatus, release.Version, checkedAt));
 
         _availablePackage = package;
         AvailableRelease = skipped && !_showSkipped ? null : release;
@@ -201,11 +208,17 @@ public partial class UpdateViewModel : ObservableObject
     private bool _isDownloadIndeterminate;
 
     [ObservableProperty]
-    private string _downloadText = string.Empty;
+    [NotifyPropertyChangedFor(nameof(DownloadText))]
+    private LocText? _downloadStatus;
+
+    public string DownloadText => DownloadStatus?.ToString() ?? string.Empty;
 
     /// <summary>Error from the last update attempt, shown in the banner.</summary>
     [ObservableProperty]
-    private string? _updateError;
+    [NotifyPropertyChangedFor(nameof(UpdateError))]
+    private LocText? _updateErrorText;
+
+    public string? UpdateError => UpdateErrorText?.ToString();
 
     [RelayCommand(CanExecute = nameof(CanUpdateNow))]
     private Task UpdateNow() => UpdateAsync();
@@ -221,11 +234,11 @@ public partial class UpdateViewModel : ObservableObject
         }
         if (_availablePackage is not { } package || _downloader == null || HandOff == null) return;
 
-        UpdateError = null;
+        UpdateErrorText = null;
         IsDownloading = true;
         IsDownloadIndeterminate = true;
         DownloadFraction = 0;
-        DownloadText = "Подготовка загрузки…";
+        DownloadStatus = new LocText(() => Strings.Update_Preparing);
         _downloadCts = new CancellationTokenSource();
 
         try
@@ -234,22 +247,22 @@ public partial class UpdateViewModel : ObservableObject
             {
                 IsDownloadIndeterminate = p.TotalBytes <= 0;
                 DownloadFraction = p.Fraction;
-                DownloadText = p.TotalBytes > 0
-                    ? $"Загрузка {FormatMegabytes(p.BytesReceived)} из {FormatMegabytes(p.TotalBytes)} МБ · {p.Fraction:P0}"
-                    : $"Загрузка {FormatMegabytes(p.BytesReceived)} МБ";
+                DownloadStatus = p.TotalBytes > 0
+                    ? new LocText(() => Loc.Format(Strings.Update_Downloading, FormatMegabytes(p.BytesReceived), FormatMegabytes(p.TotalBytes), p.Fraction))
+                    : new LocText(() => Loc.Format(Strings.Update_DownloadingUnknown, FormatMegabytes(p.BytesReceived)));
             });
 
             await _downloader.DownloadAndStageAsync(package, CurrentVersion, Installation.NewExePath, progress, _downloadCts.Token);
 
             IsDownloadIndeterminate = true;
-            DownloadText = "Проверка подписи пройдена. Перезапуск NativeNCA…";
+            DownloadStatus = new LocText(() => Strings.Update_Restarting);
             await Task.Run(() => Installation.SwapInNewVersion(CurrentVersion));
 
             if (!await HandOff(Installation.ExePath, $"{UpdatedFromArgument} {CurrentVersion}"))
             {
                 Installation.UndoSwap();
                 Installation.CleanUp();
-                UpdateError = $"Версия {package.Release.Version} не запустилась. Оставлена текущая версия {CurrentVersion}";
+                UpdateErrorText = new LocText(() => Loc.Format(Strings.Update_DidNotStart, package.Release.Version, CurrentVersion));
             }
         }
         catch (OperationCanceledException) when (_downloadCts.IsCancellationRequested)
@@ -259,12 +272,12 @@ public partial class UpdateViewModel : ObservableObject
         catch (UpdateRejectedException ex)
         {
             Installation.CleanUp();
-            UpdateError = ex.Message;
+            UpdateErrorText = LocText.Raw(ex.Message);
         }
         catch (Exception ex)
         {
             Installation.CleanUp();
-            UpdateError = "Не удалось обновить NativeNCA: " + ex.Message;
+            UpdateErrorText = new LocText(() => Loc.Format(Strings.Update_Failed, ex.Message));
         }
         finally
         {
@@ -278,16 +291,19 @@ public partial class UpdateViewModel : ObservableObject
     [RelayCommand]
     private void CancelDownload() => _downloadCts?.Cancel();
 
-    private static string FormatMegabytes(long bytes) => (bytes / 1024d / 1024d).ToString("0.0");
+    private static string FormatMegabytes(long bytes) => (bytes / 1024d / 1024d).ToString("0.0", Loc.FormatCulture);
 
     // ===================== After an update / rollback =====================
 
     /// <summary>Closable banner after <c>--updated-from</c> or <c>--rolled-back-from</c>.</summary>
     [ObservableProperty]
-    private string? _restartBannerText;
+    [NotifyPropertyChangedFor(nameof(RestartBannerText))]
+    private LocText? _restartBanner;
+
+    public string? RestartBannerText => RestartBanner?.ToString();
 
     [RelayCommand]
-    private void DismissRestartBanner() => RestartBannerText = null;
+    private void DismissRestartBanner() => RestartBanner = null;
 
     /// <summary>Reads the hand-over argument this process was started with.</summary>
     public void ApplyStartupArguments(IReadOnlyList<string> args)
@@ -297,18 +313,16 @@ public partial class UpdateViewModel : ObservableObject
 
         if (updatedFrom != null)
         {
-            RestartBannerText = $"NativeNCA обновлён до версии {CurrentVersion}. Если что-то стало работать не так, " +
-                                "предыдущую версию можно вернуть в параметрах.";
+            RestartBanner = new LocText(() => Loc.Format(Strings.Update_UpdatedBanner, CurrentVersion));
             _store.Update(s => s.SkippedVersion = null);
         }
         else if (rolledBackFrom != null)
         {
-            RestartBannerText = $"Возвращена версия {CurrentVersion}. Версия {rolledBackFrom} больше не будет предлагаться " +
-                                "автоматически — её можно установить из параметров кнопкой «Проверить обновления».";
+            RestartBanner = new LocText(() => Loc.Format(Strings.Update_RolledBackBanner, CurrentVersion, rolledBackFrom));
         }
         else if (args.Any(a => string.Equals(a, InstalledArgument, StringComparison.OrdinalIgnoreCase)))
         {
-            RestartBannerText = $"NativeNCA {CurrentVersion} установлен. Он есть в меню «Пуск», а обновления будут приходить сами.";
+            RestartBanner = new LocText(() => Loc.Format(Strings.Update_InstalledBanner, CurrentVersion));
         }
     }
 
@@ -334,7 +348,7 @@ public partial class UpdateViewModel : ObservableObject
 
     public bool HasPreviousVersion => IsInstalledCopy && PreviousVersion != null;
 
-    public string RollbackTitle => $"Вернуть предыдущую версию ({PreviousVersion})";
+    public string RollbackTitle => Loc.Format(Strings.Settings_RollbackTitle, PreviousVersion);
 
     public void RefreshPreviousVersion() => PreviousVersion = IsInstalledCopy ? Installation.GetPreviousVersion() : null;
 
@@ -359,12 +373,12 @@ public partial class UpdateViewModel : ObservableObject
             {
                 Installation.UndoRollback(previous);
                 _store.Update(s => s.SkippedVersion = null);
-                RollbackError = $"Версия {previous} не запустилась. Оставлена текущая версия {CurrentVersion}";
+                RollbackError = Loc.Format(Strings.Update_DidNotStart, previous, CurrentVersion);
             }
         }
         catch (Exception ex)
         {
-            RollbackError = "Не удалось вернуть предыдущую версию: " + ex.Message;
+            RollbackError = Loc.Format(Strings.Rollback_Failed, ex.Message);
         }
         finally
         {

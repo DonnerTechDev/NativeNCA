@@ -1,7 +1,8 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                    xmlns:conv="clr-namespace:NativeNCA.App.Converters">
+                    xmlns:conv="clr-namespace:NativeNCA.App.Converters"
+                    xmlns:l="clr-namespace:NativeNCA.App.Localization">
 
     <!-- ===================== Converters ===================== -->
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -9,7 +10,6 @@
     <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
     <conv:NotEmptyToBoolConverter x:Key="NotEmptyToBool" />
     <conv:InverseBoolConverter x:Key="InverseBool" />
-    <conv:CacheMinutesToTextConverter x:Key="CacheMinutesToText" />
     <conv:ImagePathToSourceConverter x:Key="ImagePathToSource" />
 
     <FontFamily x:Key="MonoFontFamily">Cascadia Mono, Consolas, Courier New</FontFamily>
@@ -157,11 +157,11 @@
     <!-- "Пароль в Vault" pill, visible only when the password is stored -->
     <ControlTemplate x:Key="SavedPasswordPill" TargetType="ContentControl">
         <Border x:Name="Root" Style="{StaticResource Pill}" Visibility="Collapsed"
-                ToolTip="Пароль хранится в защищённом хранилище Windows (DPAPI)">
+                ToolTip="{l:Loc Key_SavedPasswordPillTooltip}">
             <StackPanel Orientation="Horizontal">
                 <ui:SymbolIcon Symbol="LockClosed16" FontSize="12" Margin="0,0,4,0"
                                Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
-                <TextBlock Text="Пароль в Vault" Style="{StaticResource PillText}" />
+                <TextBlock Text="{l:Loc Key_SavedPasswordPill}" Style="{StaticResource PillText}" />
             </StackPanel>
         </Border>
         <ControlTemplate.Triggers>

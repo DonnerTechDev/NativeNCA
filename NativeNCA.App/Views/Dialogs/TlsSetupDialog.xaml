@@ -3,9 +3,10 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                   xmlns:local="clr-namespace:NativeNCA.App.Views.Dialogs"
-                  Title="Сертификат для браузеров"
-                  PrimaryButtonText="Продолжить"
-                  CloseButtonText="Не сейчас"
+                  xmlns:l="clr-namespace:NativeNCA.App.Localization"
+                  Title="{l:Loc Settings_TlsTitle}"
+                  PrimaryButtonText="{l:Loc TlsSetup_Continue}"
+                  CloseButtonText="{l:Loc TlsSetup_NotNow}"
                   DefaultButton="Primary"
                   DialogMaxWidth="560">
 
@@ -23,7 +24,7 @@
 
     <StackPanel Width="460">
         <TextBlock TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
-                   Text="Сайты обращаются к NativeNCA по защищённому адресу wss://127.0.0.1:13579. Чтобы браузеры доверяли этому соединению, NativeNCA создаст сертификат для этого компьютера и добавит его корневой сертификат в Windows." />
+                   Text="{l:Loc TlsSetup_Intro}" />
 
         <Grid Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
@@ -32,9 +33,9 @@
             </Grid.ColumnDefinitions>
             <ui:SymbolIcon Symbol="Desktop24" Style="{StaticResource PointIcon}" />
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Только для этого компьютера" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                <TextBlock Text="{l:Loc TlsSetup_OnlyThisPcTitle}" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
                 <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
-                           Text="Сертификат действует лишь для адресов 127.0.0.1 и localhost. Подтвердить им какой-либо сайт или программу невозможно." />
+                           Text="{l:Loc TlsSetup_OnlyThisPcText}" />
             </StackPanel>
         </Grid>
 
@@ -45,9 +46,9 @@
             </Grid.ColumnDefinitions>
             <ui:SymbolIcon Symbol="ShieldKeyhole24" Style="{StaticResource PointIcon}" />
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Ключ корневого сертификата уничтожается" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                <TextBlock Text="{l:Loc TlsSetup_RootKeyTitle}" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
                 <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
-                           Text="Он нужен один раз, чтобы подписать сертификат NativeNCA, и сразу удаляется. Выпустить им что-то ещё больше нельзя." />
+                           Text="{l:Loc TlsSetup_RootKeyText}" />
             </StackPanel>
         </Grid>
 
@@ -58,9 +59,9 @@
             </Grid.ColumnDefinitions>
             <ui:SymbolIcon Symbol="Delete24" Style="{StaticResource PointIcon}" />
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Можно удалить в любой момент" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                <TextBlock Text="{l:Loc TlsSetup_RemovableTitle}" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
                 <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
-                           Text="В параметрах NativeNCA, строка «Сертификат для браузеров». NCALayer для работы больше не понадобится." />
+                           Text="{l:Loc TlsSetup_RemovableText}" />
             </StackPanel>
         </Grid>
 
@@ -75,7 +76,7 @@
                 <ui:SymbolIcon Symbol="Info24" Filled="True" FontSize="16" Margin="0,1,10,0" VerticalAlignment="Top"
                                Foreground="{DynamicResource SystemFillColorAttentionBrush}" />
                 <TextBlock Grid.Column="1" TextWrapping="Wrap" FontSize="13" Style="{StaticResource PrimaryText}"
-                           Text="Затем Windows покажет предупреждение системы безопасности об установке сертификата «NativeNCA Localhost Root». Нажмите «Да»." />
+                           Text="{l:Loc TlsSetup_WindowsPrompt}" />
             </Grid>
         </Border>
     </StackPanel>

@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Security;
 
@@ -112,8 +113,7 @@ public class TlsCertificateService
 
         ActiveSource = TlsCertificateSource.None;
         throw new TlsCertificateMissingException(
-            "Нет сертификата, которому доверяют браузеры. Нажмите «Настроить сертификат» — NativeNCA создаст " +
-            "собственный сертификат для этого компьютера.");
+            Strings.Tls_MissingMessage);
     }
 
     // ===================== Own certificate =====================

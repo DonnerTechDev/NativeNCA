@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Security;
 
@@ -53,22 +54,22 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
     {
         DeleteKey();
 
-        Check(NCryptOpenStorageProvider(out var provider, ProviderName, 0), "открыть хранилище ключей Windows Hello");
+        Check(NCryptOpenStorageProvider(out var provider, ProviderName, 0), Strings.Hello_OpenProviderFailed);
         try
         {
-            Check(NCryptCreatePersistedKey(provider, out var key, "RSA", KeyName, 0, 0), "создать ключ Windows Hello");
+            Check(NCryptCreatePersistedKey(provider, out var key, "RSA", KeyName, 0, 0), Strings.Hello_CreateKeyFailed);
             try
             {
                 SetInt(key, "Length", 2048);
                 SetInt(key, "Key Usage", NcryptAllowAllUsages);
                 SetWindow(key, ownerWindow);
-                SetString(key, "Use Context", "NativeNCA: создание ключа защиты хранилища");
+                SetString(key, "Use Context", Strings.Hello_CreateKey);
 
                 // Shows the Windows Hello prompt.
                 int status = NCryptFinalizeKey(key, 0);
                 if (IsCancellation(status))
-                    throw new OperationCanceledException("Создание ключа Windows Hello отменено");
-                Check(status, "создать ключ Windows Hello");
+                    throw new OperationCanceledException(Strings.Hello_CreateCanceled);
+                Check(status, Strings.Hello_CreateKeyFailed);
             }
             finally
             {
@@ -86,9 +87,9 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
         // Encrypt with an imported copy of the public key so no Hello UI is involved.
         byte[] publicBlob = WithKey(key =>
         {
-            Check(NCryptExportKey(key, IntPtr.Zero, "RSAPUBLICBLOB", IntPtr.Zero, null, 0, out int size, 0), "прочитать открытый ключ");
+            Check(NCryptExportKey(key, IntPtr.Zero, "RSAPUBLICBLOB", IntPtr.Zero, null, 0, out int size, 0), Strings.Hello_ReadPublicKeyFailed);
             var blob = new byte[size];
-            Check(NCryptExportKey(key, IntPtr.Zero, "RSAPUBLICBLOB", IntPtr.Zero, blob, size, out size, 0), "прочитать открытый ключ");
+            Check(NCryptExportKey(key, IntPtr.Zero, "RSAPUBLICBLOB", IntPtr.Zero, blob, size, out size, 0), Strings.Hello_ReadPublicKeyFailed);
             return blob[..size];
         });
 
@@ -106,8 +107,8 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
         var output = new byte[wrapped.Length];
         int status = NCryptDecrypt(key, wrapped, wrapped.Length, IntPtr.Zero, output, output.Length, out int written, NcryptPadPkcs1Flag);
         if (IsCancellation(status))
-            throw new OperationCanceledException("Подтверждение Windows Hello отменено");
-        Check(status, "расшифровать ключ хранилища");
+            throw new OperationCanceledException(Strings.Hello_Canceled);
+        Check(status, Strings.Hello_DecryptFailed);
         return output[..written];
     });
 
@@ -130,12 +131,12 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
 
     private static T WithKey<T>(Func<IntPtr, T> action)
     {
-        Check(NCryptOpenStorageProvider(out var provider, ProviderName, 0), "открыть хранилище ключей Windows Hello");
+        Check(NCryptOpenStorageProvider(out var provider, ProviderName, 0), Strings.Hello_OpenProviderFailed);
         try
         {
             int status = NCryptOpenKey(provider, out var key, KeyName, 0, 0);
             if (status is NteNoKey or NteBadKeyset) throw new VaultKeyLostException();
-            Check(status, "открыть ключ Windows Hello");
+            Check(status, Strings.Hello_OpenKeyFailed);
             try
             {
                 return action(key);
@@ -162,26 +163,26 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
     private static bool IsCancellation(int status) =>
         status is unchecked((int)0x80090036) or unchecked((int)0x800704C7);
 
-    private static void Check(int status, string action)
+    private static void Check(int status, string message)
     {
         if (status != 0)
-            throw new CryptographicException($"Не удалось {action} (0x{status:X8})") { HResult = status };
+            throw new CryptographicException($"{message} (0x{status:X8})") { HResult = status };
     }
 
     private static void SetInt(IntPtr handle, string property, int value) =>
-        Check(NCryptSetProperty(handle, property, BitConverter.GetBytes(value), 4, 0), $"задать свойство «{property}»");
+        Check(NCryptSetProperty(handle, property, BitConverter.GetBytes(value), 4, 0), Loc.Format(Strings.Hello_SetPropertyFailed, property));
 
     private static void SetString(IntPtr handle, string property, string value)
     {
         byte[] bytes = Encoding.Unicode.GetBytes(value + "\0");
-        Check(NCryptSetProperty(handle, property, bytes, bytes.Length, 0), $"задать свойство «{property}»");
+        Check(NCryptSetProperty(handle, property, bytes, bytes.Length, 0), Loc.Format(Strings.Hello_SetPropertyFailed, property));
     }
 
     private static void SetWindow(IntPtr handle, IntPtr window)
     {
         if (window == IntPtr.Zero) return;
         byte[] bytes = IntPtr.Size == 8 ? BitConverter.GetBytes(window.ToInt64()) : BitConverter.GetBytes(window.ToInt32());
-        Check(NCryptSetProperty(handle, "HWND Handle", bytes, bytes.Length, 0), "привязать окно Windows Hello");
+        Check(NCryptSetProperty(handle, "HWND Handle", bytes, bytes.Length, 0), Strings.Hello_BindWindowFailed);
     }
 
     [DllImport("ncrypt.dll", CharSet = CharSet.Unicode)]
@@ -213,9 +214,7 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
 }
 
 /// <summary>The Windows Hello key protecting the vault no longer exists (e.g. PIN was reset).</summary>
-public class VaultKeyLostException() : Exception(
-    "Ключ Windows Hello, защищавший хранилище, больше не существует (например, после сброса PIN-кода). " +
-    "Удалите ключи из NativeNCA и добавьте их заново из исходных файлов .p12.");
+public class VaultKeyLostException() : Exception(Strings.Hello_KeyLost);
 
 /// <summary>The vault is protected by Windows Hello and has not been unlocked yet.</summary>
-public class VaultLockedException() : Exception("Хранилище заблокировано — требуется подтверждение Windows Hello");
+public class VaultLockedException() : Exception(Strings.Vault_LockedError);

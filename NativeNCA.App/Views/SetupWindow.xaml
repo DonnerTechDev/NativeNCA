@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        Title="Установка NativeNCA"
+        xmlns:l="clr-namespace:NativeNCA.App.Localization"
+        Title="{l:Loc Setup_WindowTitle}"
         Icon="pack://application:,,,/NativeNCA;component/Assets/app.ico"
         Width="520"
         SizeToContent="Height"
@@ -72,9 +73,9 @@
                     </Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="Person24" Style="{StaticResource PointIcon}" />
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="Для вашей учётной записи" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                        <TextBlock Text="{l:Loc Setup_AccountTitle}" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
                         <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
-                                   Text="Права администратора не нужны. NativeNCA появится в меню «Пуск» и в списке установленных приложений Windows." />
+                                   Text="{l:Loc Setup_AccountText}" />
                     </StackPanel>
                 </Grid>
 
@@ -85,9 +86,9 @@
                     </Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="ArrowSync24" Style="{StaticResource PointIcon}" />
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="Обновляется сам" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                        <TextBlock Text="{l:Loc Setup_UpdatesTitle}" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
                         <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
-                                   Text="Новые версии приходят с GitHub и устанавливаются, только если подписаны разработчиком. Предыдущую версию можно вернуть в параметрах." />
+                                   Text="{l:Loc Setup_UpdatesText}" />
                     </StackPanel>
                 </Grid>
 
@@ -98,9 +99,9 @@
                     </Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="ShieldLock24" Style="{StaticResource PointIcon}" />
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="Ключи остаются на месте" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
+                        <TextBlock Text="{l:Loc Setup_KeysTitle}" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
                         <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
-                                   Text="Хранилище ключей и параметры лежат в вашем профиле Windows. Установка и обновления их не меняют." />
+                                   Text="{l:Loc Setup_KeysText}" />
                     </StackPanel>
                 </Grid>
             </StackPanel>
@@ -108,15 +109,15 @@
             <!-- ============ Uninstall ============ -->
             <StackPanel x:Name="UninstallContent" Margin="0,20,0,0" Visibility="Collapsed">
                 <TextBlock TextWrapping="Wrap" FontSize="13" Style="{StaticResource SecondaryText}"
-                           Text="NativeNCA будет закрыт, а программа, ярлык в меню «Пуск» и автозапуск — удалены. Сайты перестанут видеть NativeNCA, пока вы не установите его снова или не запустите NCALayer." />
+                           Text="{l:Loc Setup_UninstallText}" />
 
                 <Border Margin="0,20,0,0" Padding="16,12" CornerRadius="8" BorderThickness="1"
                         Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
                     <StackPanel>
-                        <CheckBox x:Name="RemoveDataCheckBox" Content="Также удалить ключи и сертификат для браузеров" />
+                        <CheckBox x:Name="RemoveDataCheckBox" Content="{l:Loc Setup_RemoveData}" />
                         <TextBlock Margin="39,4,0,0" TextWrapping="Wrap" FontSize="12" Style="{StaticResource SecondaryText}"
-                                   Text="Зашифрованные копии ключей, сохранённые пароли и параметры будут удалены, а корневой сертификат NativeNCA — убран из Windows. Исходные файлы .p12 на диске не затрагиваются. Если не отмечать, всё сохранится до следующей установки." />
+                                   Text="{l:Loc Setup_RemoveDataText}" />
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -173,7 +174,7 @@
                 </ui:Button>
 
                 <ui:Button x:Name="CloseButton" Grid.Column="2" Margin="8,0,0,0" MinWidth="110" Height="36"
-                           Content="Отмена" IsCancel="True" Click="OnCloseClick" Visibility="Collapsed" />
+                           Content="{l:Loc Common_Cancel}" IsCancel="True" Click="OnCloseClick" Visibility="Collapsed" />
             </Grid>
         </Border>
     </Grid>

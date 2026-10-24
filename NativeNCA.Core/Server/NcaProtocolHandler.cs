@@ -5,6 +5,7 @@ using NativeNCA.Core.Crypto;
 using NativeNCA.Core.Models;
 using NativeNCA.Core.Security;
 using NativeNCA.Core.Services;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Server;
 
@@ -61,8 +62,8 @@ public class NcaProtocolHandler
             {
                 CommonUtilsModule => await HandleCommonUtilsAsync(method, args as JsonArray ?? new JsonArray(), origin, ct),
                 BasicsModule when method == "sign" => await HandleBasicsSignAsync(args as JsonObject ?? new JsonObject(), origin, ct),
-                BasicsModule => BasicsError("unsupported.method", $"Метод {method} не поддерживается"),
-                _ => CommonError($"Модуль {module} не поддерживается NativeNCA")
+                BasicsModule => BasicsError("unsupported.method", $"Метод {method} не поддерживается"), // NoLoc: protocol message
+                _ => CommonError($"Модуль {module} не поддерживается NativeNCA") // NoLoc: protocol message
             };
         }
         catch (OperationCanceledException)
@@ -94,8 +95,8 @@ public class NcaProtocolHandler
                 {
                     Origin = origin,
                     Method = method,
-                    Description = "Предоставление сертификата",
-                    DataToSignPreview = "Сайт запрашивает сведения о вашем сертификате: ФИО, ИИН, срок действия. Закрытый ключ не используется.",
+                    Description = new LocText(() => Strings.Request_ShareCertificate),
+                    DataToSignPreview = new LocText(() => Strings.Request_ShareCertificatePreview),
                     RequiredUsage = KeyUsageFilter.Any,
                     RequiresPrivateKey = false
                 }, ct);
@@ -114,7 +115,7 @@ public class NcaProtocolHandler
 
                 bool tsa = _vault.GetSettings().UseTimestamp;
 
-                return await SignAsync(origin, method, "Подписание документа (CMS)", DescribeBinary(data), usage, ct,
+                return await SignAsync(origin, method, new LocText(() => Strings.Request_SignCms), new LocText(() => DescribeBinary(data)), usage, ct,
                     key => FinishCmsAsync(CmsSigner.Sign(key, data, attached), tsa, ct));
             }
 
@@ -125,18 +126,19 @@ public class NcaProtocolHandler
 
                 bool tsa = _vault.GetSettings().UseTimestamp;
 
-                return await SignAsync(origin, method, "Подписание хеша документа", $"Хеш: {Convert.ToBase64String(hash)}", usage, ct,
+                return await SignAsync(origin, method, new LocText(() => Strings.Request_SignHash),
+                    new LocText(() => Loc.Format(Strings.Request_HashPreview, Convert.ToBase64String(hash))), usage, ct,
                     key => FinishCmsAsync(CmsSigner.SignDigest(key, hash), tsa, ct));
             }
 
             case "signXml":
             {
                 var usage = ParseKeyType(Arg(args, 1));
-                string xml = Arg(args, 2) ?? throw new ArgumentException("Пустые данные XML");
+                string xml = Arg(args, 2) ?? throw new ArgumentException("Пустые данные XML"); // NoLoc: protocol message
                 string? tbs = NullIfEmpty(Arg(args, 3));
                 string? parent = NullIfEmpty(Arg(args, 4));
 
-                return await SignAsync(origin, method, "Подписание XML-документа", Truncate(xml), usage, ct,
+                return await SignAsync(origin, method, new LocText(() => Strings.Request_SignXml), LocText.Raw(Truncate(xml)), usage, ct,
                     key => Task.FromResult(XmlDsigSigner.Sign(key, xml, tbs, parent)));
             }
 
@@ -144,25 +146,25 @@ public class NcaProtocolHandler
             {
                 var usage = ParseKeyType(Arg(args, 1));
                 var xmls = (args.Count > 2 ? args[2] as JsonArray : null)?.Select(n => n!.GetValue<string>()).ToList()
-                           ?? throw new ArgumentException("Пустой список XML");
+                           ?? throw new ArgumentException("Пустой список XML"); // NoLoc: protocol message
                 string? tbs = NullIfEmpty(Arg(args, 3));
                 string? parent = NullIfEmpty(Arg(args, 4));
 
-                return await SignManyAsync(origin, method, $"Подписание XML-документов ({xmls.Count})",
-                    Truncate(string.Join("\n\n", xmls)), usage, ct,
+                return await SignManyAsync(origin, method, new LocText(() => Loc.Format(Strings.Request_SignXmls, xmls.Count)),
+                    LocText.Raw(Truncate(string.Join("\n\n", xmls))), usage, ct,
                     key => Task.FromResult<JsonNode>(new JsonArray(xmls.Select(x => (JsonNode)XmlDsigSigner.Sign(key, x, tbs, parent)).ToArray())));
             }
 
             case "createCMSSignatureFromFile":
             case "createCAdESFromFile":
-                return CommonError("Подписание файлов с диска не поддерживается. Используйте подписание данных в base64.");
+                return CommonError("Подписание файлов с диска не поддерживается. Используйте подписание данных в base64."); // NoLoc: protocol message
 
             default:
-                return CommonError($"Неизвестный метод {method}");
+                return CommonError($"Неизвестный метод {method}"); // NoLoc: protocol message
         }
     }
 
-    private async Task<string> SignAsync(string origin, string method, string description, string preview,
+    private async Task<string> SignAsync(string origin, string method, LocText description, LocText preview,
         KeyUsageFilter usage, CancellationToken ct, Func<SigningKey, Task<string>> sign)
     {
         var result = await PromptAsync(new SigningPromptRequest
@@ -178,7 +180,7 @@ public class NcaProtocolHandler
         return CommonOk(signed);
     }
 
-    private async Task<string> SignManyAsync(string origin, string method, string description, string preview,
+    private async Task<string> SignManyAsync(string origin, string method, LocText description, LocText preview,
         KeyUsageFilter usage, CancellationToken ct, Func<SigningKey, Task<JsonNode>> sign)
     {
         var result = await PromptAsync(new SigningPromptRequest
@@ -201,7 +203,7 @@ public class NcaProtocolHandler
         if (args["allowedStorages"] is JsonArray storages && storages.Count > 0 &&
             !storages.Any(s => string.Equals(s?.GetValue<string>(), "PKCS12", StringComparison.OrdinalIgnoreCase)))
         {
-            return BasicsError("storage.unsupported", "Сайт требует аппаратный носитель (токен или ID-карту), он не поддерживается NativeNCA");
+            return BasicsError("storage.unsupported", "Сайт требует аппаратный носитель (токен или ID-карту), он не поддерживается NativeNCA"); // NoLoc: protocol message
         }
 
         string format = args["format"]?.GetValue<string>()?.ToLowerInvariant() ?? "cms";
@@ -218,7 +220,7 @@ public class NcaProtocolHandler
         {
             JsonArray arr => arr.Select(n => n?.GetValue<string>() ?? string.Empty).ToList(),
             JsonValue v => new List<string> { v.GetValue<string>() },
-            _ => throw new ArgumentException("Нет данных для подписи")
+            _ => throw new ArgumentException("Нет данных для подписи") // NoLoc: protocol message
         };
 
         var usage = KeyUsageFilter.Any;
@@ -229,18 +231,19 @@ public class NcaProtocolHandler
             else if (oids.Contains(KzOids.EkuEmailProtection) && !oids.Contains(KzOids.EkuClientAuth)) usage = KeyUsageFilter.Sign;
         }
 
-        string preview = format == "xml"
-            ? Truncate(string.Join("\n\n", items))
+        var preview = new LocText(() => Truncate(format == "xml"
+            ? string.Join("\n\n", items)
             : digested
-                ? $"Хеш: {string.Join(", ", items)}"
-                : string.Join("\n\n", items.Select(i => DescribeBinary(decode ? Convert.FromBase64String(i) : Encoding.UTF8.GetBytes(i))));
+                ? Loc.Format(Strings.Request_HashPreview, string.Join(", ", items))
+                : string.Join("\n\n", items.Select(i => DescribeBinary(decode ? Convert.FromBase64String(i) : Encoding.UTF8.GetBytes(i))))));
 
         var result = await PromptAsync(new SigningPromptRequest
         {
             Origin = origin,
             Method = "basics.sign",
-            Description = items.Count > 1 ? $"Подписание документов ({items.Count})" : format == "xml" ? "Подписание XML-документа" : "Подписание документа",
-            DataToSignPreview = Truncate(preview),
+            Description = new LocText(() => items.Count > 1 ? Loc.Format(Strings.Request_SignDocuments, items.Count)
+                : format == "xml" ? Strings.Request_SignXml : Strings.Request_SignDocument),
+            DataToSignPreview = preview,
             RequiredUsage = usage,
             RequiredIin = signerParams?["iin"]?.GetValue<string>(),
             RequiredBin = signerParams?["bin"]?.GetValue<string>()
@@ -353,7 +356,7 @@ public class NcaProtocolHandler
         }
 
         string sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(data))[..16];
-        return $"Двоичные данные, {data.Length:N0} байт · SHA-256 {sha}…";
+        return Loc.Plural(data.Length, Strings.Request_BinaryPreview_Plural, sha);
     }
 
     // commonUtils responses

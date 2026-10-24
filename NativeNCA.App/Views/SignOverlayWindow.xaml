@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:l="clr-namespace:NativeNCA.App.Localization"
         xmlns:vm="clr-namespace:NativeNCA.Core.ViewModels;assembly=NativeNCA.Core"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:SignOverlayViewModel}"
-        Title="NativeNCA — подтверждение операции"
+        Title="{l:Loc Overlay_WindowTitle}"
         Icon="pack://application:,,,/NativeNCA;component/Assets/app.ico"
         Width="480"
         SizeToContent="Height"
@@ -45,7 +46,7 @@
                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Style="{StaticResource PrimaryText}" />
                     <TextBlock Margin="0,1,0,0" Style="{StaticResource SecondaryText}">
-                        <Run Text="{Binding FullName, Mode=OneWay}" /><Run Text="  ·  ИИН " /><Run Text="{Binding Iin, Mode=OneWay}" />
+                        <Run Text="{Binding FullName, Mode=OneWay}" /><Run Text="{l:Loc Overlay_IinPrefix}" /><Run Text="{Binding Iin, Mode=OneWay}" />
                     </TextBlock>
                     <WrapPanel Margin="0,6,0,0" Orientation="Horizontal">
                         <ContentControl Template="{StaticResource KeyStatusBadge}" Margin="0,0,10,0" Focusable="False" />
@@ -83,18 +84,18 @@
         </Style>
 
         <Style x:Key="ApproveText" TargetType="TextBlock">
-            <Setter Property="Text" Value="Подтвердить через Windows Hello" />
+            <Setter Property="Text" Value="{l:Loc Overlay_ApproveHello}" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Foreground" Value="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding WillAskWindowsHello}" Value="False">
-                    <Setter Property="Text" Value="Подписать" />
+                    <Setter Property="Text" Value="{l:Loc Overlay_ApproveSign}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsSelectionOnly}" Value="True">
-                    <Setter Property="Text" Value="Предоставить сертификат" />
+                    <Setter Property="Text" Value="{l:Loc Overlay_ApproveSelect}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsProcessing}" Value="True">
-                    <Setter Property="Text" Value="Ожидание подтверждения…" />
+                    <Setter Property="Text" Value="{l:Loc Overlay_Waiting}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -151,7 +152,7 @@
                     <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="{Binding ActionDescription}" FontSize="20" FontWeight="SemiBold"
                                    TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <TextBlock Margin="0,2,0,0" Text="Сайт запрашивает доступ к вашей ЭЦП"
+                        <TextBlock Margin="0,2,0,0" Text="{l:Loc Overlay_Subtitle}"
                                    Style="{StaticResource SecondaryText}" FontSize="13" />
                     </StackPanel>
                 </Grid>
@@ -206,7 +207,7 @@
                                         <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsSecureOrigin}" Value="False">
-                                                <Setter Property="Text" Value="Небезопасно" />
+                                                <Setter Property="Text" Value="{l:Loc Overlay_NotSecure}" />
                                                 <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -218,7 +219,7 @@
                 </Border>
 
                 <!-- ============ Data preview ============ -->
-                <TextBlock Text="Содержимое запроса" Margin="2,16,0,6" Style="{StaticResource SecondaryText}" />
+                <TextBlock Text="{l:Loc Overlay_RequestContent}" Margin="2,16,0,6" Style="{StaticResource SecondaryText}" />
                 <Border CornerRadius="8" BorderThickness="1" Padding="12,8"
                         Background="{DynamicResource ControlFillColorDefaultBrush}"
                         BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
@@ -230,7 +231,7 @@
                 </Border>
 
                 <!-- ============ Key selector ============ -->
-                <TextBlock Text="Ключ" Margin="2,16,0,6" Style="{StaticResource SecondaryText}" />
+                <TextBlock Text="{l:Loc Overlay_Key}" Margin="2,16,0,6" Style="{StaticResource SecondaryText}" />
 
                 <ListBox x:Name="KeysList"
                          ItemsSource="{Binding MatchingKeys}"
@@ -241,8 +242,8 @@
                          MaxHeight="232"
                          Visibility="{Binding HasKeys, Converter={StaticResource BoolToVisibility}}" />
 
-                <ui:InfoBar Title="Нет подходящих ключей"
-                            Message="Добавьте действующий ключ ЭЦП в окне NativeNCA и повторите операцию на сайте."
+                <ui:InfoBar Title="{l:Loc Overlay_NoKeysTitle}"
+                            Message="{l:Loc Overlay_NoKeysMessage}"
                             Severity="Warning" IsClosable="False"
                             IsOpen="{Binding HasKeys, Converter={StaticResource InverseBool}}" />
 
@@ -251,7 +252,7 @@
                             Visibility="{Binding IsPasswordRequired, Converter={StaticResource BoolToVisibility}}">
                     <ui:PasswordBox x:Name="PasswordInput"
                                     Password="{Binding ManualPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    PlaceholderText="Пароль от ключа"
+                                    PlaceholderText="{l:Loc Common_KeyPassword}"
                                     Icon="{ui:SymbolIcon Password24}" />
                 </StackPanel>
 
@@ -273,11 +274,11 @@
                     </StackPanel.Style>
                     <ui:SymbolIcon Symbol="ShieldCheckmark16" FontSize="14" Margin="0,0,6,0"
                                    Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
-                    <TextBlock Text="Пароль будет взят из защищённого хранилища" Style="{StaticResource SecondaryText}" />
+                    <TextBlock Text="{l:Loc Overlay_PasswordFromVault}" Style="{StaticResource SecondaryText}" />
                 </StackPanel>
 
                 <!-- ============ Error ============ -->
-                <ui:InfoBar Margin="0,12,0,0" Title="Не удалось подтвердить"
+                <ui:InfoBar Margin="0,12,0,0" Title="{l:Loc Overlay_ErrorTitle}"
                             Message="{Binding ErrorMessage}"
                             Severity="Error" IsClosable="False"
                             IsOpen="{Binding ErrorMessage, Converter={StaticResource NotEmptyToBool}}" />
@@ -312,7 +313,7 @@
                 </ui:Button>
 
                 <ui:Button Grid.Column="2"
-                           Content="Отмена"
+                           Content="{l:Loc Common_Cancel}"
                            Command="{Binding CancelCommand}"
                            IsCancel="True"
                            HorizontalAlignment="Stretch"

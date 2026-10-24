@@ -6,6 +6,7 @@ using NativeNCA.Core.Models;
 using NativeNCA.Core.Security;
 using NativeNCA.Core.Updates;
 using NativeNCA.Core.ViewModels;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Tests;
 
@@ -401,6 +402,7 @@ public class InstallationSwapTests : IDisposable
     }
 }
 
+[Collection(LocalizationCollection.Name)]
 public class VaultFormatTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), "nnca_format_" + Guid.NewGuid().ToString("N"));
@@ -483,7 +485,8 @@ public class VaultFormatTests : IDisposable
 
         Assert.NotNull(vm.VaultReadOnlyMessage);
         vm.UseTimestamp = !vm.UseTimestamp; // must not throw
-        Assert.StartsWith("Ошибка", vm.StatusMessage);
+        Assert.True(vm.IsStatusError);
+        Assert.Equal(Strings.Status_SettingsNotSaved, vm.StatusMessage);
     }
 }
 
@@ -499,6 +502,7 @@ internal sealed class FakeGitHub(Func<HttpRequestMessage, HttpResponseMessage> r
     }
 }
 
+[Collection(LocalizationCollection.Name)]
 public class UpdateCheckTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), "nnca_check_" + Guid.NewGuid().ToString("N"));
@@ -552,7 +556,7 @@ public class UpdateCheckTests : IDisposable
         var vm = MakeViewModel("0.2.0", new FakeGitHub(_ => Json(ReleaseSelectionTests.ReleaseJson("v0.2.0"))));
         await vm.CheckAsync(manual: true);
         Assert.False(vm.IsUpdateAvailable);
-        Assert.StartsWith("Установлена последняя версия", vm.CheckStatusText);
+        Assert.StartsWith(Strings.Update_UpToDate.Split('{')[0], vm.CheckStatusText);
     }
 
     [Fact]

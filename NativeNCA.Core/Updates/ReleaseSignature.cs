@@ -21,7 +21,7 @@ public static class ReleaseSignature
     /// <summary>The exact bytes that are signed.</summary>
     public static byte[] BuildMessage(AppVersion version, string architecture, ReadOnlySpan<byte> zipSha256)
     {
-        if (zipSha256.Length != 32) throw new ArgumentException("Ожидается SHA-256", nameof(zipSha256));
+        if (zipSha256.Length != 32) throw new ArgumentException("SHA-256 expected", nameof(zipSha256));
         string text =
             "NativeNCA release signature v1\n" +
             $"version: {version}\n" +
@@ -35,7 +35,7 @@ public static class ReleaseSignature
     {
         using var ecdsa = ECDsa.Create();
         ecdsa.ImportFromPem(privateKeyPem);
-        if (ecdsa.KeySize != 256) throw new CryptographicException("Ключ подписи релизов должен быть ECDSA P-256");
+        if (ecdsa.KeySize != 256) throw new CryptographicException("The release signing key must be ECDSA P-256");
         byte[] signature = ecdsa.SignData(BuildMessage(version, architecture, zipSha256), HashAlgorithmName.SHA256,
             DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
         return Convert.ToBase64String(signature);

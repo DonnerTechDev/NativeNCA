@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using Wpf.Ui.Controls;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.App.Views.Dialogs;
 
@@ -51,7 +52,7 @@ public partial class AvatarCropDialog : ContentDialog
         {
             if (_source == null)
             {
-                ShowError("Сначала выберите фото");
+                ShowError(Strings.Avatar_SelectFirst);
                 return;
             }
             ResultPng = RenderCrop();
@@ -66,8 +67,8 @@ public partial class AvatarCropDialog : ContentDialog
     {
         var dialog = new OpenFileDialog
         {
-            Title = "Выберите фото для ключа",
-            Filter = "Изображения|" + string.Join(";", ImageExtensions.Select(x => "*" + x)) + "|Все файлы|*.*"
+            Title = Strings.Avatar_FileDialogTitle,
+            Filter = Strings.Avatar_FilterImages + "|" + string.Join(";", ImageExtensions.Select(x => "*" + x)) + "|" + Strings.Avatar_FilterAll + "|*.*"
         };
 
         if (dialog.ShowDialog(Window.GetWindow(this)) == true)
@@ -105,7 +106,7 @@ public partial class AvatarCropDialog : ContentDialog
         }
         catch (Exception)
         {
-            ShowError("Формат не поддерживается или файл повреждён");
+            ShowError(Strings.Avatar_Unsupported);
             return;
         }
 

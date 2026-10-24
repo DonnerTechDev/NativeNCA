@@ -1,0 +1,1125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Common_Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Common_Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Common_Install" xml:space="preserve">
+    <value>Установить</value>
+  </data>
+  <data name="Common_Retry" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
+  <data name="Common_Copied" xml:space="preserve">
+    <value>Скопировано: {0}</value>
+  </data>
+  <data name="Common_KeyPassword" xml:space="preserve">
+    <value>Пароль от ключа</value>
+  </data>
+  <data name="Common_Version" xml:space="preserve">
+    <value>Версия {0}</value>
+  </data>
+  <data name="Tray_Tooltip" xml:space="preserve">
+    <value>NativeNCA — готов к подписанию</value>
+  </data>
+  <data name="Tray_Open" xml:space="preserve">
+    <value>Открыть NativeNCA</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="Tray_UpdateTitle" xml:space="preserve">
+    <value>Доступна NativeNCA {0}</value>
+  </data>
+  <data name="Tray_UpdateText" xml:space="preserve">
+    <value>У вас версия {0}. Нажмите, чтобы открыть NativeNCA и обновить</value>
+  </data>
+  <data name="Main_Title" xml:space="preserve">
+    <value>NativeNCA · ЭЦП Казахстана</value>
+  </data>
+  <data name="Keys_Title" xml:space="preserve">
+    <value>Мои ключи</value>
+  </data>
+  <data name="Keys_EncryptedNote" xml:space="preserve">
+    <value>Зашифрованы в хранилище Windows (DPAPI)</value>
+  </data>
+  <data name="Keys_Empty" xml:space="preserve">
+    <value>Здесь появятся ваши ключи ЭЦП.</value>
+  </data>
+  <data name="Keys_Add" xml:space="preserve">
+    <value>Добавить ключ</value>
+  </data>
+  <data name="Key_PasswordSavedTooltip" xml:space="preserve">
+    <value>Пароль хранится в защищённом хранилище</value>
+  </data>
+  <data name="Key_SignTooltip" xml:space="preserve">
+    <value>Ключ для подписи (SIGN)</value>
+  </data>
+  <data name="Key_AuthTooltip" xml:space="preserve">
+    <value>Ключ для входа (AUTH)</value>
+  </data>
+  <data name="Key_BothTooltip" xml:space="preserve">
+    <value>Ключ для входа и подписи</value>
+  </data>
+  <data name="Key_SavedPasswordPill" xml:space="preserve">
+    <value>Пароль в Vault</value>
+  </data>
+  <data name="Key_SavedPasswordPillTooltip" xml:space="preserve">
+    <value>Пароль хранится в защищённом хранилище Windows (DPAPI)</value>
+  </data>
+  <data name="Key_Individual" xml:space="preserve">
+    <value>Физическое лицо</value>
+  </data>
+  <data name="Key_Usage_Both" xml:space="preserve">
+    <value>Вход и подпись</value>
+  </data>
+  <data name="Key_Usage_Auth" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Key_Usage_Sign" xml:space="preserve">
+    <value>Подпись</value>
+  </data>
+  <data name="Key_Purpose_Both" xml:space="preserve">
+    <value>Вход и подпись (AUTH + SIGN)</value>
+  </data>
+  <data name="Key_Purpose_Auth" xml:space="preserve">
+    <value>Вход (AUTH)</value>
+  </data>
+  <data name="Key_Purpose_Sign" xml:space="preserve">
+    <value>Подпись (SIGN)</value>
+  </data>
+  <data name="Key_Status_Active" xml:space="preserve">
+    <value>Активен</value>
+  </data>
+  <data name="Key_Status_Expired" xml:space="preserve">
+    <value>Истёк {0}</value>
+  </data>
+  <data name="Key_Status_ExpiresIn_Plural" xml:space="preserve">
+    <value>Истекает через {0} день|Истекает через {0} дня|Истекает через {0} дней</value>
+  </data>
+  <data name="Key_Algorithm_Gost" xml:space="preserve">
+    <value>ГОСТ</value>
+  </data>
+  <data name="Key_ChangePhoto" xml:space="preserve">
+    <value>Изменить фото ключа</value>
+  </data>
+  <data name="Key_Rename" xml:space="preserve">
+    <value>Переименовать</value>
+  </data>
+  <data name="Key_ExpiringTitle" xml:space="preserve">
+    <value>Срок действия скоро закончится</value>
+  </data>
+  <data name="Key_ExpiringMessage" xml:space="preserve">
+    <value>Перевыпустите ключ на pki.gov.kz заранее, чтобы не потерять доступ к eGov и банкам.</value>
+  </data>
+  <data name="Key_ExpiredTitle" xml:space="preserve">
+    <value>Сертификат истёк</value>
+  </data>
+  <data name="Key_ExpiredMessage" xml:space="preserve">
+    <value>Этот ключ больше нельзя использовать для подписи. Получите новый ключ в НУЦ РК.</value>
+  </data>
+  <data name="Key_CertificateSection" xml:space="preserve">
+    <value>Сертификат</value>
+  </data>
+  <data name="Key_Owner" xml:space="preserve">
+    <value>Владелец</value>
+  </data>
+  <data name="Key_Iin" xml:space="preserve">
+    <value>ИИН</value>
+  </data>
+  <data name="Key_CopyIin" xml:space="preserve">
+    <value>Скопировать ИИН</value>
+  </data>
+  <data name="Key_Bin" xml:space="preserve">
+    <value>БИН</value>
+  </data>
+  <data name="Key_CopyBin" xml:space="preserve">
+    <value>Скопировать БИН</value>
+  </data>
+  <data name="Key_Organization" xml:space="preserve">
+    <value>Организация</value>
+  </data>
+  <data name="Key_Validity" xml:space="preserve">
+    <value>Срок действия</value>
+  </data>
+  <data name="Key_Purpose" xml:space="preserve">
+    <value>Назначение</value>
+  </data>
+  <data name="Key_Issuer" xml:space="preserve">
+    <value>Издатель</value>
+  </data>
+  <data name="Key_SecuritySection" xml:space="preserve">
+    <value>Безопасность</value>
+  </data>
+  <data name="Key_SavePasswordTitle" xml:space="preserve">
+    <value>Сохранить пароль в защищённом хранилище</value>
+  </data>
+  <data name="Key_SavePasswordDescription" xml:space="preserve">
+    <value>Пароль шифруется Windows DPAPI — при подписании останется только подтверждение Windows Hello</value>
+  </data>
+  <data name="Key_PasswordTitle" xml:space="preserve">
+    <value>Пароль ключа</value>
+  </data>
+  <data name="Key_PasswordDescription" xml:space="preserve">
+    <value>Перешифровать ключ новым паролем. Исходный файл .p12 на диске не изменится</value>
+  </data>
+  <data name="Key_ChangePassword" xml:space="preserve">
+    <value>Сменить пароль</value>
+  </data>
+  <data name="Key_DeleteTitle" xml:space="preserve">
+    <value>Удалить ключ из хранилища</value>
+  </data>
+  <data name="Key_DeleteDescription" xml:space="preserve">
+    <value>Зашифрованная копия и сохранённый пароль будут удалены без возможности восстановления</value>
+  </data>
+  <data name="Server_BannerTitle" xml:space="preserve">
+    <value>{0} — сайты не увидят NativeNCA</value>
+  </data>
+  <data name="Server_CloseNcaLayer" xml:space="preserve">
+    <value>Закрыть NCALayer</value>
+  </data>
+  <data name="Server_DisableNcaLayerAutostart" xml:space="preserve">
+    <value>Отключить автозапуск NCALayer</value>
+  </data>
+  <data name="Server_SetUpCertificate" xml:space="preserve">
+    <value>Настроить сертификат</value>
+  </data>
+  <data name="Vault_ReadOnlyTitle" xml:space="preserve">
+    <value>Хранилище ключей открыто только для чтения</value>
+  </data>
+  <data name="Update_Install" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="Update_WhatsNew" xml:space="preserve">
+    <value>Что нового</value>
+  </data>
+  <data name="Update_OpenSettings" xml:space="preserve">
+    <value>Открыть параметры</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Параметры</value>
+  </data>
+  <data name="Settings_SigningSection" xml:space="preserve">
+    <value>Подписание</value>
+  </data>
+  <data name="Settings_HelloEveryTimeTitle" xml:space="preserve">
+    <value>Windows Hello при каждом подписании</value>
+  </data>
+  <data name="Settings_HelloEveryTimeDescription" xml:space="preserve">
+    <value>Подтверждение лицом, отпечатком пальца или PIN-кодом перед использованием ключа</value>
+  </data>
+  <data name="Settings_HelloMissingTitle" xml:space="preserve">
+    <value>Windows Hello не настроен</value>
+  </data>
+  <data name="Settings_HelloMissingMessage" xml:space="preserve">
+    <value>На этом устройстве нет PIN-кода или биометрии — подтверждение будет пропускаться. Настройте Windows Hello в «Параметры → Учётные записи → Варианты входа».</value>
+  </data>
+  <data name="Settings_RememberTitle" xml:space="preserve">
+    <value>Запоминать подтверждение</value>
+  </data>
+  <data name="Settings_RememberDescription" xml:space="preserve">
+    <value>Не запрашивать Windows Hello повторно для того же сайта в течение выбранного времени</value>
+  </data>
+  <data name="Settings_RememberNever" xml:space="preserve">
+    <value>Не запоминать</value>
+  </data>
+  <data name="Settings_RememberMinutes_Plural" xml:space="preserve">
+    <value>{0} минута|{0} минуты|{0} минут</value>
+  </data>
+  <data name="Settings_RememberHour" xml:space="preserve">
+    <value>1 час</value>
+  </data>
+  <data name="Settings_TimestampTitle" xml:space="preserve">
+    <value>Метка времени НУЦ (CAdES-T)</value>
+  </data>
+  <data name="Settings_TimestampDescription" xml:space="preserve">
+    <value>Сервер НУЦ подтверждает время подписания — подпись остаётся проверяемой и после окончания срока сертификата. Нужен интернет</value>
+  </data>
+  <data name="Settings_VaultSection" xml:space="preserve">
+    <value>Хранилище</value>
+  </data>
+  <data name="Settings_HelloVaultTitle" xml:space="preserve">
+    <value>Защитить хранилище Windows Hello</value>
+  </data>
+  <data name="Settings_HelloVaultDescription" xml:space="preserve">
+    <value>Ключи и пароли дополнительно шифруются ключом Windows Hello из TPM. Без лица, отпечатка или PIN-кода их не расшифрует даже программа, запущенная от вашего имени</value>
+  </data>
+  <data name="Settings_Lock" xml:space="preserve">
+    <value>Заблокировать</value>
+  </data>
+  <data name="Vault_UnlockedFor_Plural" xml:space="preserve">
+    <value>Открыто ещё {0} минуту — подпись пройдёт без запроса Windows Hello|Открыто ещё {0} минуты — подпись пройдёт без запроса Windows Hello|Открыто ещё {0} минут — подпись пройдёт без запроса Windows Hello</value>
+  </data>
+  <data name="Vault_LockedState" xml:space="preserve">
+    <value>Заблокировано — для подписи понадобится Windows Hello</value>
+  </data>
+  <data name="Settings_UpdatesSection" xml:space="preserve">
+    <value>Обновления</value>
+  </data>
+  <data name="Update_CheckNow" xml:space="preserve">
+    <value>Проверить обновления</value>
+  </data>
+  <data name="Settings_AutoCheckTitle" xml:space="preserve">
+    <value>Автоматически проверять обновления</value>
+  </data>
+  <data name="Settings_AutoCheckDescription" xml:space="preserve">
+    <value>Раз в несколько часов NativeNCA узнаёт на GitHub о новой версии и сообщает о ней. Устанавливаются только версии с подписью разработчика</value>
+  </data>
+  <data name="Settings_RollbackTitle" xml:space="preserve">
+    <value>Вернуть предыдущую версию ({0})</value>
+  </data>
+  <data name="Settings_RollbackDescription" xml:space="preserve">
+    <value>Если после обновления что-то стало работать не так. Ключи и параметры сохранятся</value>
+  </data>
+  <data name="Settings_Rollback" xml:space="preserve">
+    <value>Вернуть</value>
+  </data>
+  <data name="Settings_InstallTitle" xml:space="preserve">
+    <value>Установить NativeNCA</value>
+  </data>
+  <data name="Settings_InstallDescription" xml:space="preserve">
+    <value>Эта копия запущена без установки и не обновляется сама. Установленная NativeNCA есть в меню «Пуск» и получает обновления</value>
+  </data>
+  <data name="Settings_SystemSection" xml:space="preserve">
+    <value>Система</value>
+  </data>
+  <data name="Settings_LanguageTitle" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="Settings_LanguageDescription" xml:space="preserve">
+    <value>Язык интерфейса NativeNCA. Меняется сразу</value>
+  </data>
+  <data name="Language_System" xml:space="preserve">
+    <value>Как в Windows</value>
+  </data>
+  <data name="Language_Kazakh" xml:space="preserve">
+    <value>Қазақша</value>
+  </data>
+  <data name="Language_Russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="Language_English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Settings_AutostartTitle" xml:space="preserve">
+    <value>Запускать вместе с Windows</value>
+  </data>
+  <data name="Settings_AutostartDescription" xml:space="preserve">
+    <value>NativeNCA будет готов к подписанию сразу после входа в систему</value>
+  </data>
+  <data name="Settings_ServerTitle" xml:space="preserve">
+    <value>Локальный сервер</value>
+  </data>
+  <data name="Settings_ServerDescription" xml:space="preserve">
+    <value>Совместим с протоколом NCALayer — сайты работают без изменений</value>
+  </data>
+  <data name="Server_Running" xml:space="preserve">
+    <value>Работает</value>
+  </data>
+  <data name="Server_Stopped" xml:space="preserve">
+    <value>Остановлен</value>
+  </data>
+  <data name="Settings_TlsTitle" xml:space="preserve">
+    <value>Сертификат для браузеров</value>
+  </data>
+  <data name="Tls_StatusOwn" xml:space="preserve">
+    <value>Установлен</value>
+  </data>
+  <data name="Tls_StatusNcaLayer" xml:space="preserve">
+    <value>Сертификат NCALayer</value>
+  </data>
+  <data name="Tls_StatusNone" xml:space="preserve">
+    <value>Не установлен</value>
+  </data>
+  <data name="Tls_DescriptionOwn" xml:space="preserve">
+    <value>Собственный сертификат этого компьютера. Действует только для 127.0.0.1 и localhost, его корневой ключ уничтожен</value>
+  </data>
+  <data name="Tls_DescriptionNcaLayer" xml:space="preserve">
+    <value>Сейчас используется общий сертификат NCALayer. Установите собственный — так безопаснее, и NCALayer больше не понадобится</value>
+  </data>
+  <data name="Tls_DescriptionNone" xml:space="preserve">
+    <value>Без сертификата браузеры не смогут подключиться к NativeNCA</value>
+  </data>
+  <data name="Settings_UninstallTitle" xml:space="preserve">
+    <value>Удалить NativeNCA</value>
+  </data>
+  <data name="Settings_UninstallDescription" xml:space="preserve">
+    <value>Программа будет удалена с этого компьютера. Ключи и параметры можно сохранить или удалить вместе с ней</value>
+  </data>
+  <data name="Settings_Uninstall" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Добро пожаловать в NativeNCA</value>
+  </data>
+  <data name="Welcome_Text" xml:space="preserve">
+    <value>Добавьте ключ ЭЦП, и при подписании на eGov или в банке появится окно подтверждения через Windows Hello.</value>
+  </data>
+  <data name="Status_SettingsNotSaved" xml:space="preserve">
+    <value>Параметры не сохранены — хранилище записано более новой версией NativeNCA</value>
+  </data>
+  <data name="Status_TlsInstalled" xml:space="preserve">
+    <value>Сертификат установлен. Если Firefox был открыт, перезапустите его</value>
+  </data>
+  <data name="Status_TlsRemoved" xml:space="preserve">
+    <value>Сертификат NativeNCA удалён из Windows</value>
+  </data>
+  <data name="Status_HelloEnabled" xml:space="preserve">
+    <value>Хранилище защищено Windows Hello</value>
+  </data>
+  <data name="Status_HelloDisabled" xml:space="preserve">
+    <value>Защита Windows Hello отключена — используется только DPAPI</value>
+  </data>
+  <data name="Status_VaultLocked" xml:space="preserve">
+    <value>Хранилище заблокировано</value>
+  </data>
+  <data name="Status_KeyDeleted" xml:space="preserve">
+    <value>Ключ удалён из хранилища</value>
+  </data>
+  <data name="Status_KeyAdded" xml:space="preserve">
+    <value>Ключ добавлен в хранилище</value>
+  </data>
+  <data name="Status_PasswordChanged" xml:space="preserve">
+    <value>Пароль ключа изменён</value>
+  </data>
+  <data name="Status_PhotoUpdated" xml:space="preserve">
+    <value>Фото ключа обновлено</value>
+  </data>
+  <data name="Status_PhotoRemoved" xml:space="preserve">
+    <value>Фото ключа удалено</value>
+  </data>
+  <data name="Status_KeyRenamed" xml:space="preserve">
+    <value>Название ключа обновлено</value>
+  </data>
+  <data name="Status_PasswordSaved" xml:space="preserve">
+    <value>Пароль сохранён в защищённом хранилище</value>
+  </data>
+  <data name="Status_PasswordForgotten" xml:space="preserve">
+    <value>Сохранённый пароль удалён из хранилища</value>
+  </data>
+  <data name="Error_KeyNotFound" xml:space="preserve">
+    <value>Ключ не найден</value>
+  </data>
+  <data name="Error_WrongPassword" xml:space="preserve">
+    <value>Неверный пароль от ключа</value>
+  </data>
+  <data name="Hello_AddKey" xml:space="preserve">
+    <value>NativeNCA: добавление ключа в хранилище</value>
+  </data>
+  <data name="Hello_ChangePassword" xml:space="preserve">
+    <value>NativeNCA: смена пароля ключа</value>
+  </data>
+  <data name="Hello_SavePassword" xml:space="preserve">
+    <value>NativeNCA: сохранение пароля ключа</value>
+  </data>
+  <data name="Hello_DisableProtection" xml:space="preserve">
+    <value>NativeNCA: отключение защиты хранилища Windows Hello</value>
+  </data>
+  <data name="Hello_CreateKey" xml:space="preserve">
+    <value>NativeNCA: создание ключа защиты хранилища</value>
+  </data>
+  <data name="Hello_ConfirmKeyUse" xml:space="preserve">
+    <value>NativeNCA: подтвердите использование ключа «{0}» для {1}</value>
+  </data>
+  <data name="Hello_Canceled" xml:space="preserve">
+    <value>Подтверждение Windows Hello отменено</value>
+  </data>
+  <data name="Hello_CreateCanceled" xml:space="preserve">
+    <value>Создание ключа Windows Hello отменено</value>
+  </data>
+  <data name="Hello_OpenProviderFailed" xml:space="preserve">
+    <value>Не удалось открыть хранилище ключей Windows Hello</value>
+  </data>
+  <data name="Hello_CreateKeyFailed" xml:space="preserve">
+    <value>Не удалось создать ключ Windows Hello</value>
+  </data>
+  <data name="Hello_OpenKeyFailed" xml:space="preserve">
+    <value>Не удалось открыть ключ Windows Hello</value>
+  </data>
+  <data name="Hello_ReadPublicKeyFailed" xml:space="preserve">
+    <value>Не удалось прочитать открытый ключ Windows Hello</value>
+  </data>
+  <data name="Hello_DecryptFailed" xml:space="preserve">
+    <value>Не удалось расшифровать ключ хранилища</value>
+  </data>
+  <data name="Hello_SetPropertyFailed" xml:space="preserve">
+    <value>Не удалось задать свойство ключа Windows Hello «{0}»</value>
+  </data>
+  <data name="Hello_BindWindowFailed" xml:space="preserve">
+    <value>Не удалось привязать окно Windows Hello</value>
+  </data>
+  <data name="Hello_KeyLost" xml:space="preserve">
+    <value>Ключ Windows Hello, защищавший хранилище, больше не существует (например, после сброса PIN-кода). Удалите ключи из NativeNCA и добавьте их заново из исходных файлов .p12.</value>
+  </data>
+  <data name="Vault_LockedError" xml:space="preserve">
+    <value>Хранилище заблокировано — требуется подтверждение Windows Hello</value>
+  </data>
+  <data name="Vault_KeyCorrupted" xml:space="preserve">
+    <value>Ключ хранилища повреждён</value>
+  </data>
+  <data name="Vault_HelloNotSetUp" xml:space="preserve">
+    <value>Windows Hello не настроен на этом устройстве</value>
+  </data>
+  <data name="Vault_KeyFileNotFound" xml:space="preserve">
+    <value>Файл ключа не найден</value>
+  </data>
+  <data name="Vault_KeyAlreadyAdded" xml:space="preserve">
+    <value>Этот ключ уже есть в хранилище</value>
+  </data>
+  <data name="Vault_BadAvatar" xml:space="preserve">
+    <value>Ожидается изображение PNG размером до 2 МБ</value>
+  </data>
+  <data name="Vault_EncryptedFileMissing" xml:space="preserve">
+    <value>Файл ключа в защищённом хранилище не найден</value>
+  </data>
+  <data name="Vault_FormatTooNew" xml:space="preserve">
+    <value>Хранилище ключей записано более новой версией NativeNCA (формат {0}). Эта версия не меняет его, чтобы не повредить данные. Обновите NativeNCA, чтобы снова изменять ключи и параметры.</value>
+  </data>
+  <data name="Overlay_WindowTitle" xml:space="preserve">
+    <value>NativeNCA — подтверждение операции</value>
+  </data>
+  <data name="Overlay_ApproveHello" xml:space="preserve">
+    <value>Подтвердить через Windows Hello</value>
+  </data>
+  <data name="Overlay_ApproveSign" xml:space="preserve">
+    <value>Подписать</value>
+  </data>
+  <data name="Overlay_ApproveSelect" xml:space="preserve">
+    <value>Предоставить сертификат</value>
+  </data>
+  <data name="Overlay_Waiting" xml:space="preserve">
+    <value>Ожидание подтверждения…</value>
+  </data>
+  <data name="Overlay_Subtitle" xml:space="preserve">
+    <value>Сайт запрашивает доступ к вашей ЭЦП</value>
+  </data>
+  <data name="Overlay_NotSecure" xml:space="preserve">
+    <value>Небезопасно</value>
+  </data>
+  <data name="Overlay_RequestContent" xml:space="preserve">
+    <value>Содержимое запроса</value>
+  </data>
+  <data name="Overlay_Key" xml:space="preserve">
+    <value>Ключ</value>
+  </data>
+  <data name="Overlay_IinPrefix" xml:space="preserve">
+    <value>  ·  ИИН </value>
+  </data>
+  <data name="Overlay_NoKeysTitle" xml:space="preserve">
+    <value>Нет подходящих ключей</value>
+  </data>
+  <data name="Overlay_NoKeysMessage" xml:space="preserve">
+    <value>Добавьте действующий ключ ЭЦП в окне NativeNCA и повторите операцию на сайте.</value>
+  </data>
+  <data name="Overlay_PasswordFromVault" xml:space="preserve">
+    <value>Пароль будет взят из защищённого хранилища</value>
+  </data>
+  <data name="Overlay_ErrorTitle" xml:space="preserve">
+    <value>Не удалось подтвердить</value>
+  </data>
+  <data name="Overlay_UnknownOrigin" xml:space="preserve">
+    <value>Неизвестный источник</value>
+  </data>
+  <data name="Overlay_SelectKey" xml:space="preserve">
+    <value>Выберите ключ, чтобы продолжить</value>
+  </data>
+  <data name="Overlay_EnterPassword" xml:space="preserve">
+    <value>Введите пароль от ключа</value>
+  </data>
+  <data name="Overlay_HelloUnavailable" xml:space="preserve">
+    <value>Windows Hello недоступен — введите пароль от ключа вручную</value>
+  </data>
+  <data name="Overlay_HelloFailed" xml:space="preserve">
+    <value>Не удалось выполнить проверку Windows Hello</value>
+  </data>
+  <data name="Overlay_SavedPasswordUnreadable" xml:space="preserve">
+    <value>Не удалось прочитать сохранённый пароль — введите его вручную</value>
+  </data>
+  <data name="Overlay_SavedPasswordWrong" xml:space="preserve">
+    <value>Сохранённый пароль не подошёл — введите пароль от ключа</value>
+  </data>
+  <data name="Request_ShareCertificate" xml:space="preserve">
+    <value>Предоставление сертификата</value>
+  </data>
+  <data name="Request_ShareCertificatePreview" xml:space="preserve">
+    <value>Сайт запрашивает сведения о вашем сертификате: ФИО, ИИН, срок действия. Закрытый ключ не используется.</value>
+  </data>
+  <data name="Request_SignCms" xml:space="preserve">
+    <value>Подписание документа (CMS)</value>
+  </data>
+  <data name="Request_SignHash" xml:space="preserve">
+    <value>Подписание хеша документа</value>
+  </data>
+  <data name="Request_SignXml" xml:space="preserve">
+    <value>Подписание XML-документа</value>
+  </data>
+  <data name="Request_SignXmls" xml:space="preserve">
+    <value>Подписание XML-документов ({0})</value>
+  </data>
+  <data name="Request_SignDocument" xml:space="preserve">
+    <value>Подписание документа</value>
+  </data>
+  <data name="Request_SignDocuments" xml:space="preserve">
+    <value>Подписание документов ({0})</value>
+  </data>
+  <data name="Request_HashPreview" xml:space="preserve">
+    <value>Хеш: {0}</value>
+  </data>
+  <data name="Request_BinaryPreview_Plural" xml:space="preserve">
+    <value>Двоичные данные, {0:N0} байт · SHA-256 {1}…|Двоичные данные, {0:N0} байта · SHA-256 {1}…|Двоичные данные, {0:N0} байт · SHA-256 {1}…</value>
+  </data>
+  <data name="Server_NoCertificateTitle" xml:space="preserve">
+    <value>Нет сертификата для браузеров</value>
+  </data>
+  <data name="Server_CertificateErrorTitle" xml:space="preserve">
+    <value>Ошибка сертификата TLS</value>
+  </data>
+  <data name="Server_NcaLayerTitle" xml:space="preserve">
+    <value>Запущен NCALayer</value>
+  </data>
+  <data name="Server_NcaLayerMessage" xml:space="preserve">
+    <value>Оригинальный NCALayer занимает порт 13579, который сайты используют для подписи. Две программы не могут работать одновременно — закройте NCALayer, и NativeNCA запустится сам.</value>
+  </data>
+  <data name="Server_PortBusyTitle" xml:space="preserve">
+    <value>Порт 13579 занят</value>
+  </data>
+  <data name="Server_PortBusyMessage" xml:space="preserve">
+    <value>Закройте программу, которая занимает порт, и нажмите «Повторить».</value>
+  </data>
+  <data name="Server_PortBusyOwner" xml:space="preserve">
+    <value>Его использует {0}.</value>
+  </data>
+  <data name="Server_PortOpenFailedTitle" xml:space="preserve">
+    <value>Не удалось открыть порт 13579</value>
+  </data>
+  <data name="Tls_MissingMessage" xml:space="preserve">
+    <value>Нет сертификата, которому доверяют браузеры. Нажмите «Настроить сертификат» — NativeNCA создаст собственный сертификат для этого компьютера.</value>
+  </data>
+  <data name="Install_DialogTitle" xml:space="preserve">
+    <value>Установить NativeNCA?</value>
+  </data>
+  <data name="Install_DialogText" xml:space="preserve">
+    <value>Эта копия запущена без установки, поэтому обновить её автоматически нельзя. Установите NativeNCA — он появится в меню «Пуск», а обновление можно будет поставить сразу после запуска.
+
+Или скачайте новую версию вручную со страницы релиза.</value>
+  </data>
+  <data name="Install_ReleasePage" xml:space="preserve">
+    <value>Страница релиза</value>
+  </data>
+  <data name="Rollback_DialogTitle" xml:space="preserve">
+    <value>Вернуть версию {0}?</value>
+  </data>
+  <data name="Rollback_DialogText" xml:space="preserve">
+    <value>NativeNCA перезапустится в версии {0}. Ключи и параметры сохранятся. Версия {1} больше не будет предлагаться автоматически — её можно будет снова установить кнопкой «Проверить обновления».</value>
+  </data>
+  <data name="Rename_DialogTitle" xml:space="preserve">
+    <value>Переименовать ключ</value>
+  </data>
+  <data name="Rename_Placeholder" xml:space="preserve">
+    <value>Например: «Личный eGov»</value>
+  </data>
+  <data name="Rename_Hint" xml:space="preserve">
+    <value>Название видно только вам — в списке ключей и в окне подтверждения подписи.</value>
+  </data>
+  <data name="DeleteKey_DialogTitle" xml:space="preserve">
+    <value>Удалить «{0}»?</value>
+  </data>
+  <data name="DeleteKey_DialogText" xml:space="preserve">
+    <value>Зашифрованная копия ключа и сохранённый пароль будут удалены из хранилища NativeNCA. Исходный файл .p12 на диске останется — при необходимости ключ можно будет добавить заново.</value>
+  </data>
+  <data name="SavePassword_DialogTitle" xml:space="preserve">
+    <value>Сохранить пароль в Vault</value>
+  </data>
+  <data name="SavePassword_DialogText" xml:space="preserve">
+    <value>Введите пароль от ключа «{0}». Он будет проверен и сохранён в зашифрованном виде.</value>
+  </data>
+  <data name="SavePassword_WrongTitle" xml:space="preserve">
+    <value>Неверный пароль</value>
+  </data>
+  <data name="SavePassword_WrongMessage" xml:space="preserve">
+    <value>Проверьте раскладку клавиатуры и попробуйте ещё раз</value>
+  </data>
+  <data name="HelloVault_DialogTitle" xml:space="preserve">
+    <value>Защитить хранилище Windows Hello?</value>
+  </data>
+  <data name="HelloVault_DialogText" xml:space="preserve">
+    <value>Ключи и сохранённые пароли будут дополнительно зашифрованы ключом Windows Hello, который хранится в TPM и не покидает этот компьютер. Для подписи и изменений в хранилище понадобится лицо, отпечаток или PIN-код.
+
+Важно: если сбросить PIN-код или переустановить Windows Hello, расшифровать хранилище будет нельзя. Сохраните исходные файлы .p12 и пароли от них — тогда ключи можно добавить заново.</value>
+  </data>
+  <data name="HelloVault_Enable" xml:space="preserve">
+    <value>Включить защиту</value>
+  </data>
+  <data name="Tls_InstallDeclined" xml:space="preserve">
+    <value>Сертификат не установлен: в окне Windows выбран ответ «Нет»</value>
+  </data>
+  <data name="Tls_RemoveDeclined" xml:space="preserve">
+    <value>Сертификат не удалён: в окне Windows выбран ответ «Нет»</value>
+  </data>
+  <data name="TlsRemove_DialogTitle" xml:space="preserve">
+    <value>Удалить сертификат NativeNCA?</value>
+  </data>
+  <data name="TlsRemove_DialogText" xml:space="preserve">
+    <value>Корневой сертификат будет удалён из Windows, а сертификат сервера — с диска. Windows попросит подтвердить удаление.
+
+Без него браузеры смогут подключиться к NativeNCA, только если на компьютере установлен NCALayer. Собственный сертификат можно снова установить в любой момент.</value>
+  </data>
+  <data name="CloseNcaLayer_DialogTitle" xml:space="preserve">
+    <value>Закрыть NCALayer?</value>
+  </data>
+  <data name="CloseNcaLayer_DialogText" xml:space="preserve">
+    <value>NCALayer будет завершён, и NativeNCA начнёт принимать запросы сайтов на порту 13579. Если NCALayer сейчас что-то подписывает, операция прервётся.</value>
+  </data>
+  <data name="CloseNcaLayer_AlsoAutostart" xml:space="preserve">
+    <value>Также отключить автозапуск NCALayer</value>
+  </data>
+  <data name="NcaLayer_Closed" xml:space="preserve">
+    <value>NCALayer закрыт — NativeNCA принимает запросы сайтов</value>
+  </data>
+  <data name="NcaLayer_CloseFailed" xml:space="preserve">
+    <value>NCALayer не закрылся. Закройте его через значок в трее (Выход) и нажмите «Повторить»</value>
+  </data>
+  <data name="DisableAutostart_DialogTitle" xml:space="preserve">
+    <value>Отключить автозапуск NCALayer?</value>
+  </data>
+  <data name="DisableAutostart_DialogText" xml:space="preserve">
+    <value>NCALayer перестанет запускаться при входе в Windows и занимать порт 13579. Сама программа не удаляется: её можно запустить вручную или снова включить в «Параметры Windows → Приложения → Автозагрузка».</value>
+  </data>
+  <data name="DisableAutostart_Confirm" xml:space="preserve">
+    <value>Отключить</value>
+  </data>
+  <data name="NcaLayer_AutostartDisabled" xml:space="preserve">
+    <value>Автозапуск NCALayer отключён</value>
+  </data>
+  <data name="NcaLayer_AutostartNeedsSettings" xml:space="preserve">
+    <value>Автозапуск NCALayer для всех пользователей отключается в параметрах Windows — отключите NCALayer в открывшемся списке</value>
+  </data>
+  <data name="Setup_CloseRunningFailed" xml:space="preserve">
+    <value>Не удалось закрыть запущенный NativeNCA. Закройте его через значок в трее и повторите</value>
+  </data>
+  <data name="Install_Failed" xml:space="preserve">
+    <value>Не удалось установить NativeNCA: {0}</value>
+  </data>
+  <data name="Install_NotStarted" xml:space="preserve">
+    <value>NativeNCA установлен, но не запустился. Запустите его из меню «Пуск»</value>
+  </data>
+  <data name="Uninstall_StartFailed" xml:space="preserve">
+    <value>Не удалось запустить удаление: {0}</value>
+  </data>
+  <data name="Uninstall_RootLeft" xml:space="preserve">
+    <value>Корневой сертификат NativeNCA остался в Windows: в окне подтверждения был выбран ответ «Нет». Его можно удалить в оснастке certmgr.msc, раздел «Доверенные корневые центры сертификации».</value>
+  </data>
+  <data name="Uninstall_DataLeft" xml:space="preserve">
+    <value>Часть данных удалить не удалось ({0}). Удалите папку {1} вручную.</value>
+  </data>
+  <data name="Setup_WindowTitle" xml:space="preserve">
+    <value>Установка NativeNCA</value>
+  </data>
+  <data name="Setup_UninstallWindowTitle" xml:space="preserve">
+    <value>Удаление NativeNCA</value>
+  </data>
+  <data name="Setup_AccountTitle" xml:space="preserve">
+    <value>Для вашей учётной записи</value>
+  </data>
+  <data name="Setup_AccountText" xml:space="preserve">
+    <value>Права администратора не нужны. NativeNCA появится в меню «Пуск» и в списке установленных приложений Windows.</value>
+  </data>
+  <data name="Setup_UpdatesTitle" xml:space="preserve">
+    <value>Обновляется сам</value>
+  </data>
+  <data name="Setup_UpdatesText" xml:space="preserve">
+    <value>Новые версии приходят с GitHub и устанавливаются, только если подписаны разработчиком. Предыдущую версию можно вернуть в параметрах.</value>
+  </data>
+  <data name="Setup_KeysTitle" xml:space="preserve">
+    <value>Ключи остаются на месте</value>
+  </data>
+  <data name="Setup_KeysText" xml:space="preserve">
+    <value>Хранилище ключей и параметры лежат в вашем профиле Windows. Установка и обновления их не меняют.</value>
+  </data>
+  <data name="Setup_UninstallText" xml:space="preserve">
+    <value>NativeNCA будет закрыт, а программа, ярлык в меню «Пуск» и автозапуск — удалены. Сайты перестанут видеть NativeNCA, пока вы не установите его снова или не запустите NCALayer.</value>
+  </data>
+  <data name="Setup_RemoveData" xml:space="preserve">
+    <value>Также удалить ключи и сертификат для браузеров</value>
+  </data>
+  <data name="Setup_RemoveDataText" xml:space="preserve">
+    <value>Зашифрованные копии ключей, сохранённые пароли и параметры будут удалены, а корневой сертификат NativeNCA — убран из Windows. Исходные файлы .p12 на диске не затрагиваются. Если не отмечать, всё сохранится до следующей установки.</value>
+  </data>
+  <data name="Setup_RunWithoutInstalling" xml:space="preserve">
+    <value>Запустить без установки</value>
+  </data>
+  <data name="Setup_AlreadyInstalledTitle" xml:space="preserve">
+    <value>NativeNCA уже установлен</value>
+  </data>
+  <data name="Setup_InstalledVersion" xml:space="preserve">
+    <value>На этом компьютере установлена версия {0}</value>
+  </data>
+  <data name="Setup_SameVersion" xml:space="preserve">
+    <value>Эта же версия уже установлена. Откройте её — она обновляется сама.</value>
+  </data>
+  <data name="Setup_NewerInstalled" xml:space="preserve">
+    <value>Установлена более новая версия, чем эта копия ({0}). Откройте установленную, а эту копию можно удалить.</value>
+  </data>
+  <data name="Setup_OpenInstalled" xml:space="preserve">
+    <value>Открыть установленную</value>
+  </data>
+  <data name="Setup_InstallTitle" xml:space="preserve">
+    <value>Установить NativeNCA</value>
+  </data>
+  <data name="Setup_InstallSubtitle" xml:space="preserve">
+    <value>Версия {0} · подпись ЭЦП НУЦ РК на сайтах без NCALayer</value>
+  </data>
+  <data name="Setup_ReplaceInstalled" xml:space="preserve">
+    <value>Установлена версия {0}. Она будет заменена версией {1}; вернуть её можно будет в параметрах.</value>
+  </data>
+  <data name="Setup_UninstallTitle" xml:space="preserve">
+    <value>Удалить NativeNCA?</value>
+  </data>
+  <data name="Setup_UninstalledTitle" xml:space="preserve">
+    <value>NativeNCA удалён</value>
+  </data>
+  <data name="Setup_UninstalledSubtitle" xml:space="preserve">
+    <value>Программа удалена с этого компьютера</value>
+  </data>
+  <data name="Setup_DataKept" xml:space="preserve">
+    <value>Ключи и параметры остались в вашем профиле Windows и появятся снова, если установить NativeNCA ещё раз.</value>
+  </data>
+  <data name="Setup_ShortcutDescription" xml:space="preserve">
+    <value>Подпись ЭЦП НУЦ РК на сайтах — замена NCALayer</value>
+  </data>
+  <data name="Setup_InvalidPath" xml:space="preserve">
+    <value>Недопустимый путь установки</value>
+  </data>
+  <data name="Install_NewVersionMissing" xml:space="preserve">
+    <value>Новая версия не найдена</value>
+  </data>
+  <data name="Install_NotInstalled" xml:space="preserve">
+    <value>NativeNCA не установлен</value>
+  </data>
+  <data name="Install_PreviousMissing" xml:space="preserve">
+    <value>Предыдущая версия не найдена</value>
+  </data>
+  <data name="AddKey_Title" xml:space="preserve">
+    <value>Добавить ключ ЭЦП</value>
+  </data>
+  <data name="AddKey_Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="AddKey_Intro" xml:space="preserve">
+    <value>Файл будет зашифрован Windows DPAPI и скопирован в защищённое хранилище NativeNCA. Расшифровать его сможет только ваша учётная запись на этом компьютере.</value>
+  </data>
+  <data name="AddKey_FileLabel" xml:space="preserve">
+    <value>Файл ключа</value>
+  </data>
+  <data name="AddKey_FilePrompt" xml:space="preserve">
+    <value>Выберите файл .p12 или перетащите сюда</value>
+  </data>
+  <data name="AddKey_FileHint" xml:space="preserve">
+    <value>Обычно AUTH_RSA256_… или GOST512_… от НУЦ РК</value>
+  </data>
+  <data name="AddKey_Browse" xml:space="preserve">
+    <value>Обзор…</value>
+  </data>
+  <data name="AddKey_NameLabel" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="AddKey_NamePlaceholder" xml:space="preserve">
+    <value>Например: «Личный eGov» или «ИП Иванов»</value>
+  </data>
+  <data name="AddKey_PasswordPlaceholder" xml:space="preserve">
+    <value>Пароль, заданный при получении ключа</value>
+  </data>
+  <data name="AddKey_SavePassword" xml:space="preserve">
+    <value>Сохранить пароль в защищённом Vault</value>
+  </data>
+  <data name="AddKey_SavePasswordHint" xml:space="preserve">
+    <value>Пароль не придётся вводить при подписании — достаточно подтвердить Windows Hello.</value>
+  </data>
+  <data name="AddKey_ErrorTitle" xml:space="preserve">
+    <value>Не удалось добавить ключ</value>
+  </data>
+  <data name="AddKey_ChooseFile" xml:space="preserve">
+    <value>Выберите файл ключа .p12</value>
+  </data>
+  <data name="AddKey_WrongPasswordOrDamaged" xml:space="preserve">
+    <value>Неверный пароль или файл ключа повреждён</value>
+  </data>
+  <data name="AddKey_FileFilter" xml:space="preserve">
+    <value>Ключи ЭЦП (*.p12;*.pfx)|*.p12;*.pfx|Все файлы (*.*)|*.*</value>
+  </data>
+  <data name="AddKey_FileDialogTitle" xml:space="preserve">
+    <value>Выберите файл ключа ЭЦП</value>
+  </data>
+  <data name="ChangePassword_Title" xml:space="preserve">
+    <value>Сменить пароль ключа</value>
+  </data>
+  <data name="ChangePassword_Intro" xml:space="preserve">
+    <value>Ключ «{0}» будет перешифрован новым паролем. Запомните его — восстановить пароль невозможно.</value>
+  </data>
+  <data name="ChangePassword_Current" xml:space="preserve">
+    <value>Текущий пароль</value>
+  </data>
+  <data name="ChangePassword_New" xml:space="preserve">
+    <value>Новый пароль</value>
+  </data>
+  <data name="ChangePassword_Repeat" xml:space="preserve">
+    <value>Повторите новый пароль</value>
+  </data>
+  <data name="ChangePassword_RepeatPlaceholder" xml:space="preserve">
+    <value>Ещё раз</value>
+  </data>
+  <data name="ChangePassword_VaultHint" xml:space="preserve">
+    <value>Сохранённый в Vault пароль обновится автоматически</value>
+  </data>
+  <data name="ChangePassword_ErrorTitle" xml:space="preserve">
+    <value>Не удалось сменить пароль</value>
+  </data>
+  <data name="ChangePassword_FillBoth" xml:space="preserve">
+    <value>Заполните текущий и новый пароль</value>
+  </data>
+  <data name="ChangePassword_Mismatch" xml:space="preserve">
+    <value>Новые пароли не совпадают</value>
+  </data>
+  <data name="ChangePassword_Same" xml:space="preserve">
+    <value>Новый пароль совпадает с текущим</value>
+  </data>
+  <data name="Avatar_Title" xml:space="preserve">
+    <value>Фото ключа</value>
+  </data>
+  <data name="Avatar_Intro" xml:space="preserve">
+    <value>Фото поможет сразу узнать ключ в списке и в окне подписи.</value>
+  </data>
+  <data name="Avatar_DropHere" xml:space="preserve">
+    <value>Перетащите фото сюда</value>
+  </data>
+  <data name="Avatar_ChooseFile" xml:space="preserve">
+    <value>Выбрать файл…</value>
+  </data>
+  <data name="Avatar_Zoom" xml:space="preserve">
+    <value>Масштаб</value>
+  </data>
+  <data name="Avatar_OtherPhoto" xml:space="preserve">
+    <value>Другое фото…</value>
+  </data>
+  <data name="Avatar_Remove" xml:space="preserve">
+    <value>Удалить фото</value>
+  </data>
+  <data name="Avatar_ErrorTitle" xml:space="preserve">
+    <value>Не удалось открыть изображение</value>
+  </data>
+  <data name="Avatar_SelectFirst" xml:space="preserve">
+    <value>Сначала выберите фото</value>
+  </data>
+  <data name="Avatar_FileDialogTitle" xml:space="preserve">
+    <value>Выберите фото для ключа</value>
+  </data>
+  <data name="Avatar_FilterImages" xml:space="preserve">
+    <value>Изображения</value>
+  </data>
+  <data name="Avatar_FilterAll" xml:space="preserve">
+    <value>Все файлы</value>
+  </data>
+  <data name="Avatar_Unsupported" xml:space="preserve">
+    <value>Формат не поддерживается или файл повреждён</value>
+  </data>
+  <data name="TlsSetup_Continue" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="TlsSetup_NotNow" xml:space="preserve">
+    <value>Не сейчас</value>
+  </data>
+  <data name="TlsSetup_Intro" xml:space="preserve">
+    <value>Сайты обращаются к NativeNCA по защищённому адресу wss://127.0.0.1:13579. Чтобы браузеры доверяли этому соединению, NativeNCA создаст сертификат для этого компьютера и добавит его корневой сертификат в Windows.</value>
+  </data>
+  <data name="TlsSetup_OnlyThisPcTitle" xml:space="preserve">
+    <value>Только для этого компьютера</value>
+  </data>
+  <data name="TlsSetup_OnlyThisPcText" xml:space="preserve">
+    <value>Сертификат действует лишь для адресов 127.0.0.1 и localhost. Подтвердить им какой-либо сайт или программу невозможно.</value>
+  </data>
+  <data name="TlsSetup_RootKeyTitle" xml:space="preserve">
+    <value>Ключ корневого сертификата уничтожается</value>
+  </data>
+  <data name="TlsSetup_RootKeyText" xml:space="preserve">
+    <value>Он нужен один раз, чтобы подписать сертификат NativeNCA, и сразу удаляется. Выпустить им что-то ещё больше нельзя.</value>
+  </data>
+  <data name="TlsSetup_RemovableTitle" xml:space="preserve">
+    <value>Можно удалить в любой момент</value>
+  </data>
+  <data name="TlsSetup_RemovableText" xml:space="preserve">
+    <value>В параметрах NativeNCA, строка «Сертификат для браузеров». NCALayer для работы больше не понадобится.</value>
+  </data>
+  <data name="TlsSetup_WindowsPrompt" xml:space="preserve">
+    <value>Затем Windows покажет предупреждение системы безопасности об установке сертификата «NativeNCA Localhost Root». Нажмите «Да».</value>
+  </data>
+  <data name="Update_NotChecked" xml:space="preserve">
+    <value>Обновления ещё не проверялись</value>
+  </data>
+  <data name="Update_Checking" xml:space="preserve">
+    <value>Проверка обновлений…</value>
+  </data>
+  <data name="Update_CheckFailed" xml:space="preserve">
+    <value>Не удалось проверить обновления. Попробуйте позже</value>
+  </data>
+  <data name="Update_CheckedAt" xml:space="preserve">
+    <value>Проверено в {0}</value>
+  </data>
+  <data name="Update_RateLimited" xml:space="preserve">
+    <value>GitHub временно ограничил проверки. Попробуйте после {0}</value>
+  </data>
+  <data name="Update_Offline" xml:space="preserve">
+    <value>Не удалось проверить обновления — нет подключения к GitHub</value>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>Установлена последняя версия · {0}</value>
+  </data>
+  <data name="Update_NotReady" xml:space="preserve">
+    <value>Версия {0} вышла, но ещё не готова для автоматического обновления · {1}</value>
+  </data>
+  <data name="Update_AvailableSkipped" xml:space="preserve">
+    <value>Доступна версия {0} (вы вернулись с неё на предыдущую) · {1}</value>
+  </data>
+  <data name="Update_AvailableStatus" xml:space="preserve">
+    <value>Доступна версия {0} · {1}</value>
+  </data>
+  <data name="Update_BannerTitle" xml:space="preserve">
+    <value>Доступна версия {0}</value>
+  </data>
+  <data name="Update_BannerTextInstalled" xml:space="preserve">
+    <value>У вас версия {0}. Перед установкой NativeNCA проверит подпись разработчика; ключи и параметры сохранятся.</value>
+  </data>
+  <data name="Update_BannerTextPortable" xml:space="preserve">
+    <value>У вас версия {0}. Эта копия NativeNCA не установлена, поэтому обновить её автоматически нельзя.</value>
+  </data>
+  <data name="Update_Preparing" xml:space="preserve">
+    <value>Подготовка загрузки…</value>
+  </data>
+  <data name="Update_Downloading" xml:space="preserve">
+    <value>Загрузка: {0} из {1} МБ · {2:P0}</value>
+  </data>
+  <data name="Update_DownloadingUnknown" xml:space="preserve">
+    <value>Загрузка: {0} МБ</value>
+  </data>
+  <data name="Update_Restarting" xml:space="preserve">
+    <value>Подпись проверена. Перезапуск NativeNCA…</value>
+  </data>
+  <data name="Update_DidNotStart" xml:space="preserve">
+    <value>Версия {0} не запустилась. Оставлена текущая версия {1}</value>
+  </data>
+  <data name="Update_Failed" xml:space="preserve">
+    <value>Не удалось обновить NativeNCA: {0}</value>
+  </data>
+  <data name="Update_UpdatedBanner" xml:space="preserve">
+    <value>NativeNCA обновлён до версии {0}. Если что-то стало работать не так, предыдущую версию можно вернуть в параметрах.</value>
+  </data>
+  <data name="Update_RolledBackBanner" xml:space="preserve">
+    <value>Возвращена версия {0}. Версия {1} больше не будет предлагаться автоматически — её можно установить из параметров кнопкой «Проверить обновления».</value>
+  </data>
+  <data name="Update_InstalledBanner" xml:space="preserve">
+    <value>NativeNCA {0} установлен. Он есть в меню «Пуск», а обновления будут приходить сами.</value>
+  </data>
+  <data name="Rollback_Failed" xml:space="preserve">
+    <value>Не удалось вернуть предыдущую версию: {0}</value>
+  </data>
+  <data name="Update_NotNewer" xml:space="preserve">
+    <value>Версия {0} не новее установленной {1}</value>
+  </data>
+  <data name="Update_TooLarge" xml:space="preserve">
+    <value>Файл обновления слишком большой</value>
+  </data>
+  <data name="Update_BadSignature" xml:space="preserve">
+    <value>Подпись обновления недействительна. Обновление не установлено</value>
+  </data>
+  <data name="Update_NoExe" xml:space="preserve">
+    <value>В архиве обновления нет NativeNCA.exe</value>
+  </data>
+  <data name="Update_VersionMismatch" xml:space="preserve">
+    <value>Версия файла ({0}) не совпадает с версией обновления {1}</value>
+  </data>
+  <data name="Update_UnknownVersion" xml:space="preserve">
+    <value>неизвестна</value>
+  </data>
+  <data name="Update_WrongHost" xml:space="preserve">
+    <value>Обновление загружается только с GitHub по HTTPS, а не с {0}</value>
+  </data>
+  <data name="Update_NoResponse" xml:space="preserve">
+    <value>GitHub не отвечает</value>
+  </data>
+  <data name="Update_TooManyRedirects" xml:space="preserve">
+    <value>Слишком много перенаправлений при загрузке обновления</value>
+  </data>
+  <data name="Update_SignatureTooLarge" xml:space="preserve">
+    <value>Файл подписи обновления слишком большой</value>
+  </data>
+  <data name="Update_Interrupted" xml:space="preserve">
+    <value>Загрузка обновления прервалась: нет ответа от сервера</value>
+  </data>
+  <data name="Update_Incomplete" xml:space="preserve">
+    <value>Файл обновления загружен не полностью</value>
+  </data>
+  <data name="Crypto_GostKeySize" xml:space="preserve">
+    <value>Поддерживаются только ключи ГОСТ 2015 512 бит (длина ключа {0} бит)</value>
+  </data>
+  <data name="Crypto_GostKeyMismatch" xml:space="preserve">
+    <value>Закрытый ключ ГОСТ не соответствует сертификату или имеет неизвестный формат</value>
+  </data>
+  <data name="Crypto_Pkcs12Format" xml:space="preserve">
+    <value>Неподдерживаемый формат PKCS#12 (ожидался data)</value>
+  </data>
+  <data name="Crypto_Pkcs12NoKey" xml:space="preserve">
+    <value>В файле PKCS#12 не найден закрытый ключ</value>
+  </data>
+  <data name="Crypto_Pkcs12NoCertificate" xml:space="preserve">
+    <value>В файле PKCS#12 не найден сертификат</value>
+  </data>
+  <data name="Crypto_LegacyGost" xml:space="preserve">
+    <value>Ключи ГОСТ 34.310-2004 больше не выпускаются и не поддерживаются. Получите новый ключ в НУЦ РК.</value>
+  </data>
+  <data name="Crypto_UnsupportedAlgorithm" xml:space="preserve">
+    <value>Неподдерживаемый алгоритм ключа ({0})</value>
+  </data>
+  <data name="Crypto_RsaKeyMismatch" xml:space="preserve">
+    <value>Закрытый ключ RSA не соответствует сертификату</value>
+  </data>
+  <data name="Tsa_Unreachable" xml:space="preserve">
+    <value>Не удалось получить метку времени от НУЦ РК — проверьте подключение к интернету</value>
+  </data>
+  <data name="Tsa_Rejected" xml:space="preserve">
+    <value>Сервер меток времени отказал: {0}</value>
+  </data>
+  <data name="Tsa_BadResponse" xml:space="preserve">
+    <value>Сервер меток времени вернул некорректный ответ</value>
+  </data>
+  <data name="Xml_Empty" xml:space="preserve">
+    <value>Пустой XML-документ</value>
+  </data>
+  <data name="Xml_ElementNotFound" xml:space="preserve">
+    <value>Элемент {0} не найден</value>
+  </data>
+  <data name="Xml_NoId" xml:space="preserve">
+    <value>Подписываемый элемент должен иметь атрибут Id</value>
+  </data>
+</root>

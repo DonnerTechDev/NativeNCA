@@ -1,0 +1,1125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Common_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Common_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Common_Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="Common_Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="Common_Copied" xml:space="preserve">
+    <value>Copied: {0}</value>
+  </data>
+  <data name="Common_KeyPassword" xml:space="preserve">
+    <value>Key password</value>
+  </data>
+  <data name="Common_Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Tray_Tooltip" xml:space="preserve">
+    <value>NativeNCA — ready to sign</value>
+  </data>
+  <data name="Tray_Open" xml:space="preserve">
+    <value>Open NativeNCA</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="Tray_UpdateTitle" xml:space="preserve">
+    <value>NativeNCA {0} is available</value>
+  </data>
+  <data name="Tray_UpdateText" xml:space="preserve">
+    <value>You have version {0}. Click to open NativeNCA and update</value>
+  </data>
+  <data name="Main_Title" xml:space="preserve">
+    <value>NativeNCA · Kazakhstan digital signature</value>
+  </data>
+  <data name="Keys_Title" xml:space="preserve">
+    <value>My keys</value>
+  </data>
+  <data name="Keys_EncryptedNote" xml:space="preserve">
+    <value>Encrypted in Windows storage (DPAPI)</value>
+  </data>
+  <data name="Keys_Empty" xml:space="preserve">
+    <value>Your digital signature keys will appear here.</value>
+  </data>
+  <data name="Keys_Add" xml:space="preserve">
+    <value>Add key</value>
+  </data>
+  <data name="Key_PasswordSavedTooltip" xml:space="preserve">
+    <value>The password is kept in the secure vault</value>
+  </data>
+  <data name="Key_SignTooltip" xml:space="preserve">
+    <value>Signing key (SIGN)</value>
+  </data>
+  <data name="Key_AuthTooltip" xml:space="preserve">
+    <value>Sign-in key (AUTH)</value>
+  </data>
+  <data name="Key_BothTooltip" xml:space="preserve">
+    <value>Key for sign-in and signing</value>
+  </data>
+  <data name="Key_SavedPasswordPill" xml:space="preserve">
+    <value>Password in Vault</value>
+  </data>
+  <data name="Key_SavedPasswordPillTooltip" xml:space="preserve">
+    <value>The password is kept in Windows secure storage (DPAPI)</value>
+  </data>
+  <data name="Key_Individual" xml:space="preserve">
+    <value>Individual</value>
+  </data>
+  <data name="Key_Usage_Both" xml:space="preserve">
+    <value>Sign-in and signing</value>
+  </data>
+  <data name="Key_Usage_Auth" xml:space="preserve">
+    <value>Sign-in</value>
+  </data>
+  <data name="Key_Usage_Sign" xml:space="preserve">
+    <value>Signing</value>
+  </data>
+  <data name="Key_Purpose_Both" xml:space="preserve">
+    <value>Sign-in and signing (AUTH + SIGN)</value>
+  </data>
+  <data name="Key_Purpose_Auth" xml:space="preserve">
+    <value>Sign-in (AUTH)</value>
+  </data>
+  <data name="Key_Purpose_Sign" xml:space="preserve">
+    <value>Signing (SIGN)</value>
+  </data>
+  <data name="Key_Status_Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Key_Status_Expired" xml:space="preserve">
+    <value>Expired on {0}</value>
+  </data>
+  <data name="Key_Status_ExpiresIn_Plural" xml:space="preserve">
+    <value>Expires in {0} day|Expires in {0} days</value>
+  </data>
+  <data name="Key_Algorithm_Gost" xml:space="preserve">
+    <value>GOST</value>
+  </data>
+  <data name="Key_ChangePhoto" xml:space="preserve">
+    <value>Change key photo</value>
+  </data>
+  <data name="Key_Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Key_ExpiringTitle" xml:space="preserve">
+    <value>Expires soon</value>
+  </data>
+  <data name="Key_ExpiringMessage" xml:space="preserve">
+    <value>Reissue the key at pki.gov.kz in advance so you don't lose access to eGov and banks.</value>
+  </data>
+  <data name="Key_ExpiredTitle" xml:space="preserve">
+    <value>The certificate has expired</value>
+  </data>
+  <data name="Key_ExpiredMessage" xml:space="preserve">
+    <value>This key can no longer be used for signing. Get a new key from NCA RK.</value>
+  </data>
+  <data name="Key_CertificateSection" xml:space="preserve">
+    <value>Certificate</value>
+  </data>
+  <data name="Key_Owner" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="Key_Iin" xml:space="preserve">
+    <value>IIN</value>
+  </data>
+  <data name="Key_CopyIin" xml:space="preserve">
+    <value>Copy IIN</value>
+  </data>
+  <data name="Key_Bin" xml:space="preserve">
+    <value>BIN</value>
+  </data>
+  <data name="Key_CopyBin" xml:space="preserve">
+    <value>Copy BIN</value>
+  </data>
+  <data name="Key_Organization" xml:space="preserve">
+    <value>Organization</value>
+  </data>
+  <data name="Key_Validity" xml:space="preserve">
+    <value>Validity period</value>
+  </data>
+  <data name="Key_Purpose" xml:space="preserve">
+    <value>Purpose</value>
+  </data>
+  <data name="Key_Issuer" xml:space="preserve">
+    <value>Issuer</value>
+  </data>
+  <data name="Key_SecuritySection" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="Key_SavePasswordTitle" xml:space="preserve">
+    <value>Save the password in the secure vault</value>
+  </data>
+  <data name="Key_SavePasswordDescription" xml:space="preserve">
+    <value>The password is encrypted with Windows DPAPI, so signing only needs Windows Hello confirmation</value>
+  </data>
+  <data name="Key_PasswordTitle" xml:space="preserve">
+    <value>Key password</value>
+  </data>
+  <data name="Key_PasswordDescription" xml:space="preserve">
+    <value>Re-encrypt the key with a new password. The original .p12 file on disk won't change</value>
+  </data>
+  <data name="Key_ChangePassword" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="Key_DeleteTitle" xml:space="preserve">
+    <value>Remove the key from the vault</value>
+  </data>
+  <data name="Key_DeleteDescription" xml:space="preserve">
+    <value>The encrypted copy and the saved password will be deleted permanently</value>
+  </data>
+  <data name="Server_BannerTitle" xml:space="preserve">
+    <value>{0}: websites can't reach NativeNCA</value>
+  </data>
+  <data name="Server_CloseNcaLayer" xml:space="preserve">
+    <value>Close NCALayer</value>
+  </data>
+  <data name="Server_DisableNcaLayerAutostart" xml:space="preserve">
+    <value>Turn off NCALayer startup</value>
+  </data>
+  <data name="Server_SetUpCertificate" xml:space="preserve">
+    <value>Set up certificate</value>
+  </data>
+  <data name="Vault_ReadOnlyTitle" xml:space="preserve">
+    <value>The key vault is read-only</value>
+  </data>
+  <data name="Update_Install" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="Update_WhatsNew" xml:space="preserve">
+    <value>What's new</value>
+  </data>
+  <data name="Update_OpenSettings" xml:space="preserve">
+    <value>Open settings</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings_SigningSection" xml:space="preserve">
+    <value>Signing</value>
+  </data>
+  <data name="Settings_HelloEveryTimeTitle" xml:space="preserve">
+    <value>Windows Hello for every signature</value>
+  </data>
+  <data name="Settings_HelloEveryTimeDescription" xml:space="preserve">
+    <value>Confirm with your face, fingerprint or PIN before a key is used</value>
+  </data>
+  <data name="Settings_HelloMissingTitle" xml:space="preserve">
+    <value>Windows Hello isn't set up</value>
+  </data>
+  <data name="Settings_HelloMissingMessage" xml:space="preserve">
+    <value>This device has no PIN or biometrics, so confirmation will be skipped. Set up Windows Hello in Settings &gt; Accounts &gt; Sign-in options.</value>
+  </data>
+  <data name="Settings_RememberTitle" xml:space="preserve">
+    <value>Remember confirmation</value>
+  </data>
+  <data name="Settings_RememberDescription" xml:space="preserve">
+    <value>Don't ask for Windows Hello again for the same site during the chosen time</value>
+  </data>
+  <data name="Settings_RememberNever" xml:space="preserve">
+    <value>Don't remember</value>
+  </data>
+  <data name="Settings_RememberMinutes_Plural" xml:space="preserve">
+    <value>{0} minute|{0} minutes</value>
+  </data>
+  <data name="Settings_RememberHour" xml:space="preserve">
+    <value>1 hour</value>
+  </data>
+  <data name="Settings_TimestampTitle" xml:space="preserve">
+    <value>NCA time stamp (CAdES-T)</value>
+  </data>
+  <data name="Settings_TimestampDescription" xml:space="preserve">
+    <value>The NCA server confirms the signing time, so the signature can still be verified after the certificate expires. Requires internet</value>
+  </data>
+  <data name="Settings_VaultSection" xml:space="preserve">
+    <value>Vault</value>
+  </data>
+  <data name="Settings_HelloVaultTitle" xml:space="preserve">
+    <value>Protect the vault with Windows Hello</value>
+  </data>
+  <data name="Settings_HelloVaultDescription" xml:space="preserve">
+    <value>Keys and passwords are additionally encrypted with a Windows Hello key in the TPM. Without your face, fingerprint or PIN, not even a program running as you can decrypt them</value>
+  </data>
+  <data name="Settings_Lock" xml:space="preserve">
+    <value>Lock</value>
+  </data>
+  <data name="Vault_UnlockedFor_Plural" xml:space="preserve">
+    <value>Unlocked for {0} more minute — signing won't ask for Windows Hello|Unlocked for {0} more minutes — signing won't ask for Windows Hello</value>
+  </data>
+  <data name="Vault_LockedState" xml:space="preserve">
+    <value>Locked — signing will need Windows Hello</value>
+  </data>
+  <data name="Settings_UpdatesSection" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="Update_CheckNow" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="Settings_AutoCheckTitle" xml:space="preserve">
+    <value>Check for updates automatically</value>
+  </data>
+  <data name="Settings_AutoCheckDescription" xml:space="preserve">
+    <value>Every few hours NativeNCA checks GitHub for a new version and lets you know. Only versions signed by the developer are installed</value>
+  </data>
+  <data name="Settings_RollbackTitle" xml:space="preserve">
+    <value>Go back to the previous version ({0})</value>
+  </data>
+  <data name="Settings_RollbackDescription" xml:space="preserve">
+    <value>If something stopped working after an update. Your keys and settings are kept</value>
+  </data>
+  <data name="Settings_Rollback" xml:space="preserve">
+    <value>Go back</value>
+  </data>
+  <data name="Settings_InstallTitle" xml:space="preserve">
+    <value>Install NativeNCA</value>
+  </data>
+  <data name="Settings_InstallDescription" xml:space="preserve">
+    <value>This copy runs without being installed and doesn't update itself. Installed NativeNCA is in the Start menu and gets updates</value>
+  </data>
+  <data name="Settings_SystemSection" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Settings_LanguageTitle" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Settings_LanguageDescription" xml:space="preserve">
+    <value>The language NativeNCA uses. Changes right away</value>
+  </data>
+  <data name="Language_System" xml:space="preserve">
+    <value>Same as Windows</value>
+  </data>
+  <data name="Language_Kazakh" xml:space="preserve">
+    <value>Қазақша</value>
+  </data>
+  <data name="Language_Russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="Language_English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Settings_AutostartTitle" xml:space="preserve">
+    <value>Start with Windows</value>
+  </data>
+  <data name="Settings_AutostartDescription" xml:space="preserve">
+    <value>NativeNCA will be ready to sign right after you sign in</value>
+  </data>
+  <data name="Settings_ServerTitle" xml:space="preserve">
+    <value>Local server</value>
+  </data>
+  <data name="Settings_ServerDescription" xml:space="preserve">
+    <value>Compatible with the NCALayer protocol, so websites work unchanged</value>
+  </data>
+  <data name="Server_Running" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="Server_Stopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+  <data name="Settings_TlsTitle" xml:space="preserve">
+    <value>Browser certificate</value>
+  </data>
+  <data name="Tls_StatusOwn" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="Tls_StatusNcaLayer" xml:space="preserve">
+    <value>NCALayer certificate</value>
+  </data>
+  <data name="Tls_StatusNone" xml:space="preserve">
+    <value>Not installed</value>
+  </data>
+  <data name="Tls_DescriptionOwn" xml:space="preserve">
+    <value>This computer's own certificate. It's valid only for 127.0.0.1 and localhost, and its root key has been destroyed</value>
+  </data>
+  <data name="Tls_DescriptionNcaLayer" xml:space="preserve">
+    <value>NCALayer's shared certificate is in use. Install your own: it's safer, and you won't need NCALayer anymore</value>
+  </data>
+  <data name="Tls_DescriptionNone" xml:space="preserve">
+    <value>Without a certificate, browsers can't connect to NativeNCA</value>
+  </data>
+  <data name="Settings_UninstallTitle" xml:space="preserve">
+    <value>Uninstall NativeNCA</value>
+  </data>
+  <data name="Settings_UninstallDescription" xml:space="preserve">
+    <value>The app will be removed from this computer. You can keep your keys and settings or remove them too</value>
+  </data>
+  <data name="Settings_Uninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Welcome to NativeNCA</value>
+  </data>
+  <data name="Welcome_Text" xml:space="preserve">
+    <value>Add a digital signature key, and when you sign on eGov or with your bank, a Windows Hello confirmation will appear.</value>
+  </data>
+  <data name="Status_SettingsNotSaved" xml:space="preserve">
+    <value>Settings weren't saved: the vault was written by a newer version of NativeNCA</value>
+  </data>
+  <data name="Status_TlsInstalled" xml:space="preserve">
+    <value>Certificate installed. If Firefox was open, restart it</value>
+  </data>
+  <data name="Status_TlsRemoved" xml:space="preserve">
+    <value>The NativeNCA certificate was removed from Windows</value>
+  </data>
+  <data name="Status_HelloEnabled" xml:space="preserve">
+    <value>The vault is protected with Windows Hello</value>
+  </data>
+  <data name="Status_HelloDisabled" xml:space="preserve">
+    <value>Windows Hello protection is off; only DPAPI is used</value>
+  </data>
+  <data name="Status_VaultLocked" xml:space="preserve">
+    <value>The vault is locked</value>
+  </data>
+  <data name="Status_KeyDeleted" xml:space="preserve">
+    <value>The key was removed from the vault</value>
+  </data>
+  <data name="Status_KeyAdded" xml:space="preserve">
+    <value>The key was added to the vault</value>
+  </data>
+  <data name="Status_PasswordChanged" xml:space="preserve">
+    <value>The key password was changed</value>
+  </data>
+  <data name="Status_PhotoUpdated" xml:space="preserve">
+    <value>Key photo updated</value>
+  </data>
+  <data name="Status_PhotoRemoved" xml:space="preserve">
+    <value>Key photo removed</value>
+  </data>
+  <data name="Status_KeyRenamed" xml:space="preserve">
+    <value>Key renamed</value>
+  </data>
+  <data name="Status_PasswordSaved" xml:space="preserve">
+    <value>Password saved in the secure vault</value>
+  </data>
+  <data name="Status_PasswordForgotten" xml:space="preserve">
+    <value>The saved password was removed from the vault</value>
+  </data>
+  <data name="Error_KeyNotFound" xml:space="preserve">
+    <value>Key not found</value>
+  </data>
+  <data name="Error_WrongPassword" xml:space="preserve">
+    <value>Wrong key password</value>
+  </data>
+  <data name="Hello_AddKey" xml:space="preserve">
+    <value>NativeNCA: add a key to the vault</value>
+  </data>
+  <data name="Hello_ChangePassword" xml:space="preserve">
+    <value>NativeNCA: change a key password</value>
+  </data>
+  <data name="Hello_SavePassword" xml:space="preserve">
+    <value>NativeNCA: save a key password</value>
+  </data>
+  <data name="Hello_DisableProtection" xml:space="preserve">
+    <value>NativeNCA: turn off Windows Hello vault protection</value>
+  </data>
+  <data name="Hello_CreateKey" xml:space="preserve">
+    <value>NativeNCA: create the vault protection key</value>
+  </data>
+  <data name="Hello_ConfirmKeyUse" xml:space="preserve">
+    <value>NativeNCA: confirm using the key “{0}” for {1}</value>
+  </data>
+  <data name="Hello_Canceled" xml:space="preserve">
+    <value>Windows Hello confirmation was canceled</value>
+  </data>
+  <data name="Hello_CreateCanceled" xml:space="preserve">
+    <value>Creating the Windows Hello key was canceled</value>
+  </data>
+  <data name="Hello_OpenProviderFailed" xml:space="preserve">
+    <value>Couldn't open the Windows Hello key storage</value>
+  </data>
+  <data name="Hello_CreateKeyFailed" xml:space="preserve">
+    <value>Couldn't create the Windows Hello key</value>
+  </data>
+  <data name="Hello_OpenKeyFailed" xml:space="preserve">
+    <value>Couldn't open the Windows Hello key</value>
+  </data>
+  <data name="Hello_ReadPublicKeyFailed" xml:space="preserve">
+    <value>Couldn't read the Windows Hello public key</value>
+  </data>
+  <data name="Hello_DecryptFailed" xml:space="preserve">
+    <value>Couldn't decrypt the vault key</value>
+  </data>
+  <data name="Hello_SetPropertyFailed" xml:space="preserve">
+    <value>Couldn't set the Windows Hello key property “{0}”</value>
+  </data>
+  <data name="Hello_BindWindowFailed" xml:space="preserve">
+    <value>Couldn't attach the Windows Hello window</value>
+  </data>
+  <data name="Hello_KeyLost" xml:space="preserve">
+    <value>The Windows Hello key that protected the vault no longer exists (for example, after a PIN reset). Remove the keys from NativeNCA and add them again from the original .p12 files.</value>
+  </data>
+  <data name="Vault_LockedError" xml:space="preserve">
+    <value>The vault is locked: Windows Hello confirmation is required</value>
+  </data>
+  <data name="Vault_KeyCorrupted" xml:space="preserve">
+    <value>The vault key is damaged</value>
+  </data>
+  <data name="Vault_HelloNotSetUp" xml:space="preserve">
+    <value>Windows Hello isn't set up on this device</value>
+  </data>
+  <data name="Vault_KeyFileNotFound" xml:space="preserve">
+    <value>Key file not found</value>
+  </data>
+  <data name="Vault_KeyAlreadyAdded" xml:space="preserve">
+    <value>This key is already in the vault</value>
+  </data>
+  <data name="Vault_BadAvatar" xml:space="preserve">
+    <value>A PNG image up to 2 MB is expected</value>
+  </data>
+  <data name="Vault_EncryptedFileMissing" xml:space="preserve">
+    <value>The key file in the secure vault wasn't found</value>
+  </data>
+  <data name="Vault_FormatTooNew" xml:space="preserve">
+    <value>The key vault was written by a newer version of NativeNCA (format {0}). This version doesn't change it so the data isn't damaged. Update NativeNCA to change keys and settings again.</value>
+  </data>
+  <data name="Overlay_WindowTitle" xml:space="preserve">
+    <value>NativeNCA — confirm operation</value>
+  </data>
+  <data name="Overlay_ApproveHello" xml:space="preserve">
+    <value>Confirm with Windows Hello</value>
+  </data>
+  <data name="Overlay_ApproveSign" xml:space="preserve">
+    <value>Sign</value>
+  </data>
+  <data name="Overlay_ApproveSelect" xml:space="preserve">
+    <value>Share certificate</value>
+  </data>
+  <data name="Overlay_Waiting" xml:space="preserve">
+    <value>Waiting for confirmation…</value>
+  </data>
+  <data name="Overlay_Subtitle" xml:space="preserve">
+    <value>A website wants to use your digital signature</value>
+  </data>
+  <data name="Overlay_NotSecure" xml:space="preserve">
+    <value>Not secure</value>
+  </data>
+  <data name="Overlay_RequestContent" xml:space="preserve">
+    <value>Request content</value>
+  </data>
+  <data name="Overlay_Key" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="Overlay_IinPrefix" xml:space="preserve">
+    <value>  ·  IIN </value>
+  </data>
+  <data name="Overlay_NoKeysTitle" xml:space="preserve">
+    <value>No suitable keys</value>
+  </data>
+  <data name="Overlay_NoKeysMessage" xml:space="preserve">
+    <value>Add a valid digital signature key in the NativeNCA window and try again on the website.</value>
+  </data>
+  <data name="Overlay_PasswordFromVault" xml:space="preserve">
+    <value>The password will be taken from the secure vault</value>
+  </data>
+  <data name="Overlay_ErrorTitle" xml:space="preserve">
+    <value>Couldn't confirm</value>
+  </data>
+  <data name="Overlay_UnknownOrigin" xml:space="preserve">
+    <value>Unknown source</value>
+  </data>
+  <data name="Overlay_SelectKey" xml:space="preserve">
+    <value>Choose a key to continue</value>
+  </data>
+  <data name="Overlay_EnterPassword" xml:space="preserve">
+    <value>Enter the key password</value>
+  </data>
+  <data name="Overlay_HelloUnavailable" xml:space="preserve">
+    <value>Windows Hello isn't available; enter the key password manually</value>
+  </data>
+  <data name="Overlay_HelloFailed" xml:space="preserve">
+    <value>Windows Hello verification failed</value>
+  </data>
+  <data name="Overlay_SavedPasswordUnreadable" xml:space="preserve">
+    <value>Couldn't read the saved password; enter it manually</value>
+  </data>
+  <data name="Overlay_SavedPasswordWrong" xml:space="preserve">
+    <value>The saved password didn't work; enter the key password</value>
+  </data>
+  <data name="Request_ShareCertificate" xml:space="preserve">
+    <value>Share certificate</value>
+  </data>
+  <data name="Request_ShareCertificatePreview" xml:space="preserve">
+    <value>The website asks for your certificate details: name, IIN and validity. The private key isn't used.</value>
+  </data>
+  <data name="Request_SignCms" xml:space="preserve">
+    <value>Sign a document (CMS)</value>
+  </data>
+  <data name="Request_SignHash" xml:space="preserve">
+    <value>Sign a document hash</value>
+  </data>
+  <data name="Request_SignXml" xml:space="preserve">
+    <value>Sign an XML document</value>
+  </data>
+  <data name="Request_SignXmls" xml:space="preserve">
+    <value>Sign XML documents ({0})</value>
+  </data>
+  <data name="Request_SignDocument" xml:space="preserve">
+    <value>Sign a document</value>
+  </data>
+  <data name="Request_SignDocuments" xml:space="preserve">
+    <value>Sign documents ({0})</value>
+  </data>
+  <data name="Request_HashPreview" xml:space="preserve">
+    <value>Hash: {0}</value>
+  </data>
+  <data name="Request_BinaryPreview_Plural" xml:space="preserve">
+    <value>Binary data, {0:N0} byte · SHA-256 {1}…|Binary data, {0:N0} bytes · SHA-256 {1}…</value>
+  </data>
+  <data name="Server_NoCertificateTitle" xml:space="preserve">
+    <value>No browser certificate</value>
+  </data>
+  <data name="Server_CertificateErrorTitle" xml:space="preserve">
+    <value>TLS certificate error</value>
+  </data>
+  <data name="Server_NcaLayerTitle" xml:space="preserve">
+    <value>NCALayer is running</value>
+  </data>
+  <data name="Server_NcaLayerMessage" xml:space="preserve">
+    <value>The original NCALayer is using port 13579, which websites use for signing. The two apps can't run at the same time: close NCALayer and NativeNCA will start on its own.</value>
+  </data>
+  <data name="Server_PortBusyTitle" xml:space="preserve">
+    <value>Port 13579 is in use</value>
+  </data>
+  <data name="Server_PortBusyMessage" xml:space="preserve">
+    <value>Close the app that's using the port and select Retry.</value>
+  </data>
+  <data name="Server_PortBusyOwner" xml:space="preserve">
+    <value>It's used by {0}.</value>
+  </data>
+  <data name="Server_PortOpenFailedTitle" xml:space="preserve">
+    <value>Couldn't open port 13579</value>
+  </data>
+  <data name="Tls_MissingMessage" xml:space="preserve">
+    <value>There's no certificate browsers trust. Select Set up certificate and NativeNCA will create its own certificate for this computer.</value>
+  </data>
+  <data name="Install_DialogTitle" xml:space="preserve">
+    <value>Install NativeNCA?</value>
+  </data>
+  <data name="Install_DialogText" xml:space="preserve">
+    <value>This copy runs without being installed, so it can't update automatically. Install NativeNCA: it will appear in the Start menu, and you can install the update right after it starts.
+
+Or download the new version manually from the release page.</value>
+  </data>
+  <data name="Install_ReleasePage" xml:space="preserve">
+    <value>Release page</value>
+  </data>
+  <data name="Rollback_DialogTitle" xml:space="preserve">
+    <value>Go back to version {0}?</value>
+  </data>
+  <data name="Rollback_DialogText" xml:space="preserve">
+    <value>NativeNCA will restart in version {0}. Your keys and settings are kept. Version {1} won't be offered automatically anymore; you can install it again with Check for updates.</value>
+  </data>
+  <data name="Rename_DialogTitle" xml:space="preserve">
+    <value>Rename key</value>
+  </data>
+  <data name="Rename_Placeholder" xml:space="preserve">
+    <value>For example: Personal eGov</value>
+  </data>
+  <data name="Rename_Hint" xml:space="preserve">
+    <value>Only you see the name: in the key list and in the signing confirmation window.</value>
+  </data>
+  <data name="DeleteKey_DialogTitle" xml:space="preserve">
+    <value>Delete “{0}”?</value>
+  </data>
+  <data name="DeleteKey_DialogText" xml:space="preserve">
+    <value>The encrypted copy of the key and the saved password will be removed from the NativeNCA vault. The original .p12 file stays on disk, so you can add the key again if needed.</value>
+  </data>
+  <data name="SavePassword_DialogTitle" xml:space="preserve">
+    <value>Save the password in Vault</value>
+  </data>
+  <data name="SavePassword_DialogText" xml:space="preserve">
+    <value>Enter the password for the key “{0}”. It will be checked and saved encrypted.</value>
+  </data>
+  <data name="SavePassword_WrongTitle" xml:space="preserve">
+    <value>Wrong password</value>
+  </data>
+  <data name="SavePassword_WrongMessage" xml:space="preserve">
+    <value>Check the keyboard layout and try again</value>
+  </data>
+  <data name="HelloVault_DialogTitle" xml:space="preserve">
+    <value>Protect the vault with Windows Hello?</value>
+  </data>
+  <data name="HelloVault_DialogText" xml:space="preserve">
+    <value>Keys and saved passwords will be additionally encrypted with a Windows Hello key that's stored in the TPM and never leaves this computer. Signing and changing the vault will require your face, fingerprint or PIN.
+
+Important: if you reset your PIN or set up Windows Hello again, the vault can't be decrypted. Keep the original .p12 files and their passwords so you can add the keys again.</value>
+  </data>
+  <data name="HelloVault_Enable" xml:space="preserve">
+    <value>Turn on protection</value>
+  </data>
+  <data name="Tls_InstallDeclined" xml:space="preserve">
+    <value>The certificate wasn't installed: No was selected in the Windows prompt</value>
+  </data>
+  <data name="Tls_RemoveDeclined" xml:space="preserve">
+    <value>The certificate wasn't removed: No was selected in the Windows prompt</value>
+  </data>
+  <data name="TlsRemove_DialogTitle" xml:space="preserve">
+    <value>Remove the NativeNCA certificate?</value>
+  </data>
+  <data name="TlsRemove_DialogText" xml:space="preserve">
+    <value>The root certificate will be removed from Windows and the server certificate from disk. Windows will ask you to confirm.
+
+Without it, browsers can connect to NativeNCA only if NCALayer is installed on this computer. You can install your own certificate again at any time.</value>
+  </data>
+  <data name="CloseNcaLayer_DialogTitle" xml:space="preserve">
+    <value>Close NCALayer?</value>
+  </data>
+  <data name="CloseNcaLayer_DialogText" xml:space="preserve">
+    <value>NCALayer will be closed and NativeNCA will start accepting website requests on port 13579. If NCALayer is signing something right now, that operation will be interrupted.</value>
+  </data>
+  <data name="CloseNcaLayer_AlsoAutostart" xml:space="preserve">
+    <value>Also turn off NCALayer startup</value>
+  </data>
+  <data name="NcaLayer_Closed" xml:space="preserve">
+    <value>NCALayer is closed; NativeNCA is accepting website requests</value>
+  </data>
+  <data name="NcaLayer_CloseFailed" xml:space="preserve">
+    <value>NCALayer didn't close. Close it from its icon in the notification area (Exit) and select Retry</value>
+  </data>
+  <data name="DisableAutostart_DialogTitle" xml:space="preserve">
+    <value>Turn off NCALayer startup?</value>
+  </data>
+  <data name="DisableAutostart_DialogText" xml:space="preserve">
+    <value>NCALayer will no longer start when you sign in to Windows or take port 13579. The app itself isn't removed: you can start it manually or turn it back on in Windows Settings &gt; Apps &gt; Startup.</value>
+  </data>
+  <data name="DisableAutostart_Confirm" xml:space="preserve">
+    <value>Turn off</value>
+  </data>
+  <data name="NcaLayer_AutostartDisabled" xml:space="preserve">
+    <value>NCALayer startup is turned off</value>
+  </data>
+  <data name="NcaLayer_AutostartNeedsSettings" xml:space="preserve">
+    <value>NCALayer startup for all users is turned off in Windows Settings: turn off NCALayer in the list that opens</value>
+  </data>
+  <data name="Setup_CloseRunningFailed" xml:space="preserve">
+    <value>Couldn't close the running NativeNCA. Close it from its icon in the notification area and try again</value>
+  </data>
+  <data name="Install_Failed" xml:space="preserve">
+    <value>Couldn't install NativeNCA: {0}</value>
+  </data>
+  <data name="Install_NotStarted" xml:space="preserve">
+    <value>NativeNCA was installed but didn't start. Start it from the Start menu</value>
+  </data>
+  <data name="Uninstall_StartFailed" xml:space="preserve">
+    <value>Couldn't start uninstalling: {0}</value>
+  </data>
+  <data name="Uninstall_RootLeft" xml:space="preserve">
+    <value>The NativeNCA root certificate is still in Windows: No was selected in the confirmation prompt. You can remove it in certmgr.msc under Trusted Root Certification Authorities.</value>
+  </data>
+  <data name="Uninstall_DataLeft" xml:space="preserve">
+    <value>Some data couldn't be removed ({0}). Delete the folder {1} manually.</value>
+  </data>
+  <data name="Setup_WindowTitle" xml:space="preserve">
+    <value>NativeNCA Setup</value>
+  </data>
+  <data name="Setup_UninstallWindowTitle" xml:space="preserve">
+    <value>Uninstall NativeNCA</value>
+  </data>
+  <data name="Setup_AccountTitle" xml:space="preserve">
+    <value>For your account</value>
+  </data>
+  <data name="Setup_AccountText" xml:space="preserve">
+    <value>No administrator rights needed. NativeNCA will appear in the Start menu and in the list of installed apps.</value>
+  </data>
+  <data name="Setup_UpdatesTitle" xml:space="preserve">
+    <value>Updates itself</value>
+  </data>
+  <data name="Setup_UpdatesText" xml:space="preserve">
+    <value>New versions come from GitHub and are installed only if they're signed by the developer. You can go back to the previous version in settings.</value>
+  </data>
+  <data name="Setup_KeysTitle" xml:space="preserve">
+    <value>Your keys stay where they are</value>
+  </data>
+  <data name="Setup_KeysText" xml:space="preserve">
+    <value>The key vault and settings live in your Windows profile. Installing and updating don't change them.</value>
+  </data>
+  <data name="Setup_UninstallText" xml:space="preserve">
+    <value>NativeNCA will close, and the app, its Start menu shortcut and its startup entry will be removed. Websites won't see NativeNCA until you install it again or start NCALayer.</value>
+  </data>
+  <data name="Setup_RemoveData" xml:space="preserve">
+    <value>Also remove keys and the browser certificate</value>
+  </data>
+  <data name="Setup_RemoveDataText" xml:space="preserve">
+    <value>Encrypted key copies, saved passwords and settings will be deleted, and the NativeNCA root certificate will be removed from Windows. The original .p12 files on disk aren't touched. If you leave this unchecked, everything is kept for the next installation.</value>
+  </data>
+  <data name="Setup_RunWithoutInstalling" xml:space="preserve">
+    <value>Run without installing</value>
+  </data>
+  <data name="Setup_AlreadyInstalledTitle" xml:space="preserve">
+    <value>NativeNCA is already installed</value>
+  </data>
+  <data name="Setup_InstalledVersion" xml:space="preserve">
+    <value>Version {0} is installed on this computer</value>
+  </data>
+  <data name="Setup_SameVersion" xml:space="preserve">
+    <value>This same version is already installed. Open it; it updates itself.</value>
+  </data>
+  <data name="Setup_NewerInstalled" xml:space="preserve">
+    <value>A newer version than this copy ({0}) is installed. Open the installed one; you can delete this copy.</value>
+  </data>
+  <data name="Setup_OpenInstalled" xml:space="preserve">
+    <value>Open installed version</value>
+  </data>
+  <data name="Setup_InstallTitle" xml:space="preserve">
+    <value>Install NativeNCA</value>
+  </data>
+  <data name="Setup_InstallSubtitle" xml:space="preserve">
+    <value>Version {0} · sign with NCA RK digital signatures on websites without NCALayer</value>
+  </data>
+  <data name="Setup_ReplaceInstalled" xml:space="preserve">
+    <value>Version {0} is installed. It will be replaced with version {1}; you can go back to it in settings.</value>
+  </data>
+  <data name="Setup_UninstallTitle" xml:space="preserve">
+    <value>Uninstall NativeNCA?</value>
+  </data>
+  <data name="Setup_UninstalledTitle" xml:space="preserve">
+    <value>NativeNCA was uninstalled</value>
+  </data>
+  <data name="Setup_UninstalledSubtitle" xml:space="preserve">
+    <value>The app was removed from this computer</value>
+  </data>
+  <data name="Setup_DataKept" xml:space="preserve">
+    <value>Your keys and settings remain in your Windows profile and will come back if you install NativeNCA again.</value>
+  </data>
+  <data name="Setup_ShortcutDescription" xml:space="preserve">
+    <value>Sign with NCA RK digital signatures on websites, an NCALayer replacement</value>
+  </data>
+  <data name="Setup_InvalidPath" xml:space="preserve">
+    <value>Invalid installation path</value>
+  </data>
+  <data name="Install_NewVersionMissing" xml:space="preserve">
+    <value>The new version wasn't found</value>
+  </data>
+  <data name="Install_NotInstalled" xml:space="preserve">
+    <value>NativeNCA isn't installed</value>
+  </data>
+  <data name="Install_PreviousMissing" xml:space="preserve">
+    <value>The previous version wasn't found</value>
+  </data>
+  <data name="AddKey_Title" xml:space="preserve">
+    <value>Add a signature key</value>
+  </data>
+  <data name="AddKey_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AddKey_Intro" xml:space="preserve">
+    <value>The file will be encrypted with Windows DPAPI and copied to the NativeNCA secure vault. Only your account on this computer can decrypt it.</value>
+  </data>
+  <data name="AddKey_FileLabel" xml:space="preserve">
+    <value>Key file</value>
+  </data>
+  <data name="AddKey_FilePrompt" xml:space="preserve">
+    <value>Choose a .p12 file or drag it here</value>
+  </data>
+  <data name="AddKey_FileHint" xml:space="preserve">
+    <value>Usually AUTH_RSA256_… or GOST512_… from NCA RK</value>
+  </data>
+  <data name="AddKey_Browse" xml:space="preserve">
+    <value>Browse…</value>
+  </data>
+  <data name="AddKey_NameLabel" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="AddKey_NamePlaceholder" xml:space="preserve">
+    <value>For example: Personal eGov or IE Ivanov</value>
+  </data>
+  <data name="AddKey_PasswordPlaceholder" xml:space="preserve">
+    <value>The password set when you got the key</value>
+  </data>
+  <data name="AddKey_SavePassword" xml:space="preserve">
+    <value>Save the password in the secure Vault</value>
+  </data>
+  <data name="AddKey_SavePasswordHint" xml:space="preserve">
+    <value>You won't need to type the password when signing; Windows Hello confirmation is enough.</value>
+  </data>
+  <data name="AddKey_ErrorTitle" xml:space="preserve">
+    <value>Couldn't add the key</value>
+  </data>
+  <data name="AddKey_ChooseFile" xml:space="preserve">
+    <value>Choose a .p12 key file</value>
+  </data>
+  <data name="AddKey_WrongPasswordOrDamaged" xml:space="preserve">
+    <value>Wrong password, or the key file is damaged</value>
+  </data>
+  <data name="AddKey_FileFilter" xml:space="preserve">
+    <value>Signature keys (*.p12;*.pfx)|*.p12;*.pfx|All files (*.*)|*.*</value>
+  </data>
+  <data name="AddKey_FileDialogTitle" xml:space="preserve">
+    <value>Choose a signature key file</value>
+  </data>
+  <data name="ChangePassword_Title" xml:space="preserve">
+    <value>Change key password</value>
+  </data>
+  <data name="ChangePassword_Intro" xml:space="preserve">
+    <value>The key “{0}” will be re-encrypted with a new password. Remember it: the password can't be recovered.</value>
+  </data>
+  <data name="ChangePassword_Current" xml:space="preserve">
+    <value>Current password</value>
+  </data>
+  <data name="ChangePassword_New" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="ChangePassword_Repeat" xml:space="preserve">
+    <value>Confirm new password</value>
+  </data>
+  <data name="ChangePassword_RepeatPlaceholder" xml:space="preserve">
+    <value>Once more</value>
+  </data>
+  <data name="ChangePassword_VaultHint" xml:space="preserve">
+    <value>The password saved in Vault will be updated automatically</value>
+  </data>
+  <data name="ChangePassword_ErrorTitle" xml:space="preserve">
+    <value>Couldn't change the password</value>
+  </data>
+  <data name="ChangePassword_FillBoth" xml:space="preserve">
+    <value>Enter the current and the new password</value>
+  </data>
+  <data name="ChangePassword_Mismatch" xml:space="preserve">
+    <value>The new passwords don't match</value>
+  </data>
+  <data name="ChangePassword_Same" xml:space="preserve">
+    <value>The new password is the same as the current one</value>
+  </data>
+  <data name="Avatar_Title" xml:space="preserve">
+    <value>Key photo</value>
+  </data>
+  <data name="Avatar_Intro" xml:space="preserve">
+    <value>A photo helps you recognize the key in the list and in the signing window.</value>
+  </data>
+  <data name="Avatar_DropHere" xml:space="preserve">
+    <value>Drag a photo here</value>
+  </data>
+  <data name="Avatar_ChooseFile" xml:space="preserve">
+    <value>Choose file…</value>
+  </data>
+  <data name="Avatar_Zoom" xml:space="preserve">
+    <value>Zoom</value>
+  </data>
+  <data name="Avatar_OtherPhoto" xml:space="preserve">
+    <value>Another photo…</value>
+  </data>
+  <data name="Avatar_Remove" xml:space="preserve">
+    <value>Remove photo</value>
+  </data>
+  <data name="Avatar_ErrorTitle" xml:space="preserve">
+    <value>Couldn't open the image</value>
+  </data>
+  <data name="Avatar_SelectFirst" xml:space="preserve">
+    <value>Choose a photo first</value>
+  </data>
+  <data name="Avatar_FileDialogTitle" xml:space="preserve">
+    <value>Choose a photo for the key</value>
+  </data>
+  <data name="Avatar_FilterImages" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="Avatar_FilterAll" xml:space="preserve">
+    <value>All files</value>
+  </data>
+  <data name="Avatar_Unsupported" xml:space="preserve">
+    <value>The format isn't supported or the file is damaged</value>
+  </data>
+  <data name="TlsSetup_Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="TlsSetup_NotNow" xml:space="preserve">
+    <value>Not now</value>
+  </data>
+  <data name="TlsSetup_Intro" xml:space="preserve">
+    <value>Websites connect to NativeNCA at the secure address wss://127.0.0.1:13579. So that browsers trust this connection, NativeNCA will create a certificate for this computer and add its root certificate to Windows.</value>
+  </data>
+  <data name="TlsSetup_OnlyThisPcTitle" xml:space="preserve">
+    <value>Only for this computer</value>
+  </data>
+  <data name="TlsSetup_OnlyThisPcText" xml:space="preserve">
+    <value>The certificate is valid only for 127.0.0.1 and localhost. It can't vouch for any website or app.</value>
+  </data>
+  <data name="TlsSetup_RootKeyTitle" xml:space="preserve">
+    <value>The root certificate's key is destroyed</value>
+  </data>
+  <data name="TlsSetup_RootKeyText" xml:space="preserve">
+    <value>It's needed once to sign the NativeNCA certificate and is deleted right away. Nothing else can ever be issued with it.</value>
+  </data>
+  <data name="TlsSetup_RemovableTitle" xml:space="preserve">
+    <value>You can remove it at any time</value>
+  </data>
+  <data name="TlsSetup_RemovableText" xml:space="preserve">
+    <value>In NativeNCA settings, under Browser certificate. You won't need NCALayer anymore.</value>
+  </data>
+  <data name="TlsSetup_WindowsPrompt" xml:space="preserve">
+    <value>Windows will then show a security warning about installing the “NativeNCA Localhost Root” certificate. Select Yes.</value>
+  </data>
+  <data name="Update_NotChecked" xml:space="preserve">
+    <value>Updates haven't been checked yet</value>
+  </data>
+  <data name="Update_Checking" xml:space="preserve">
+    <value>Checking for updates…</value>
+  </data>
+  <data name="Update_CheckFailed" xml:space="preserve">
+    <value>Couldn't check for updates. Try again later</value>
+  </data>
+  <data name="Update_CheckedAt" xml:space="preserve">
+    <value>Checked at {0}</value>
+  </data>
+  <data name="Update_RateLimited" xml:space="preserve">
+    <value>GitHub has temporarily limited checks. Try again after {0}</value>
+  </data>
+  <data name="Update_Offline" xml:space="preserve">
+    <value>Couldn't check for updates: no connection to GitHub</value>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>You're up to date · {0}</value>
+  </data>
+  <data name="Update_NotReady" xml:space="preserve">
+    <value>Version {0} is out but isn't ready for automatic updates yet · {1}</value>
+  </data>
+  <data name="Update_AvailableSkipped" xml:space="preserve">
+    <value>Version {0} is available (you went back from it to the previous one) · {1}</value>
+  </data>
+  <data name="Update_AvailableStatus" xml:space="preserve">
+    <value>Version {0} is available · {1}</value>
+  </data>
+  <data name="Update_BannerTitle" xml:space="preserve">
+    <value>Version {0} is available</value>
+  </data>
+  <data name="Update_BannerTextInstalled" xml:space="preserve">
+    <value>You have version {0}. Before installing, NativeNCA checks the developer's signature; your keys and settings are kept.</value>
+  </data>
+  <data name="Update_BannerTextPortable" xml:space="preserve">
+    <value>You have version {0}. This copy of NativeNCA isn't installed, so it can't update automatically.</value>
+  </data>
+  <data name="Update_Preparing" xml:space="preserve">
+    <value>Preparing download…</value>
+  </data>
+  <data name="Update_Downloading" xml:space="preserve">
+    <value>Downloading {0} of {1} MB · {2:P0}</value>
+  </data>
+  <data name="Update_DownloadingUnknown" xml:space="preserve">
+    <value>Downloading {0} MB</value>
+  </data>
+  <data name="Update_Restarting" xml:space="preserve">
+    <value>Signature verified. Restarting NativeNCA…</value>
+  </data>
+  <data name="Update_DidNotStart" xml:space="preserve">
+    <value>Version {0} didn't start. Kept the current version {1}</value>
+  </data>
+  <data name="Update_Failed" xml:space="preserve">
+    <value>Couldn't update NativeNCA: {0}</value>
+  </data>
+  <data name="Update_UpdatedBanner" xml:space="preserve">
+    <value>NativeNCA was updated to version {0}. If something doesn't work right, you can go back to the previous version in settings.</value>
+  </data>
+  <data name="Update_RolledBackBanner" xml:space="preserve">
+    <value>Version {0} was restored. Version {1} won't be offered automatically anymore; you can install it from settings with Check for updates.</value>
+  </data>
+  <data name="Update_InstalledBanner" xml:space="preserve">
+    <value>NativeNCA {0} is installed. It's in the Start menu, and updates will arrive on their own.</value>
+  </data>
+  <data name="Rollback_Failed" xml:space="preserve">
+    <value>Couldn't go back to the previous version: {0}</value>
+  </data>
+  <data name="Update_NotNewer" xml:space="preserve">
+    <value>Version {0} isn't newer than the installed {1}</value>
+  </data>
+  <data name="Update_TooLarge" xml:space="preserve">
+    <value>The update file is too large</value>
+  </data>
+  <data name="Update_BadSignature" xml:space="preserve">
+    <value>The update signature isn't valid. The update wasn't installed</value>
+  </data>
+  <data name="Update_NoExe" xml:space="preserve">
+    <value>The update archive doesn't contain NativeNCA.exe</value>
+  </data>
+  <data name="Update_VersionMismatch" xml:space="preserve">
+    <value>The file version ({0}) doesn't match the update version {1}</value>
+  </data>
+  <data name="Update_UnknownVersion" xml:space="preserve">
+    <value>unknown</value>
+  </data>
+  <data name="Update_WrongHost" xml:space="preserve">
+    <value>Updates are downloaded only from GitHub over HTTPS, not from {0}</value>
+  </data>
+  <data name="Update_NoResponse" xml:space="preserve">
+    <value>GitHub isn't responding</value>
+  </data>
+  <data name="Update_TooManyRedirects" xml:space="preserve">
+    <value>Too many redirects while downloading the update</value>
+  </data>
+  <data name="Update_SignatureTooLarge" xml:space="preserve">
+    <value>The update signature file is too large</value>
+  </data>
+  <data name="Update_Interrupted" xml:space="preserve">
+    <value>The update download stopped: no response from the server</value>
+  </data>
+  <data name="Update_Incomplete" xml:space="preserve">
+    <value>The update file wasn't fully downloaded</value>
+  </data>
+  <data name="Crypto_GostKeySize" xml:space="preserve">
+    <value>Only 512-bit GOST 2015 keys are supported (key length {0} bits)</value>
+  </data>
+  <data name="Crypto_GostKeyMismatch" xml:space="preserve">
+    <value>The GOST private key doesn't match the certificate or has an unknown format</value>
+  </data>
+  <data name="Crypto_Pkcs12Format" xml:space="preserve">
+    <value>Unsupported PKCS#12 format (data expected)</value>
+  </data>
+  <data name="Crypto_Pkcs12NoKey" xml:space="preserve">
+    <value>No private key was found in the PKCS#12 file</value>
+  </data>
+  <data name="Crypto_Pkcs12NoCertificate" xml:space="preserve">
+    <value>No certificate was found in the PKCS#12 file</value>
+  </data>
+  <data name="Crypto_LegacyGost" xml:space="preserve">
+    <value>GOST 34.310-2004 keys are no longer issued or supported. Get a new key from NCA RK.</value>
+  </data>
+  <data name="Crypto_UnsupportedAlgorithm" xml:space="preserve">
+    <value>Unsupported key algorithm ({0})</value>
+  </data>
+  <data name="Crypto_RsaKeyMismatch" xml:space="preserve">
+    <value>The RSA private key doesn't match the certificate</value>
+  </data>
+  <data name="Tsa_Unreachable" xml:space="preserve">
+    <value>Couldn't get a time stamp from NCA RK. Check your internet connection</value>
+  </data>
+  <data name="Tsa_Rejected" xml:space="preserve">
+    <value>The time stamp server refused: {0}</value>
+  </data>
+  <data name="Tsa_BadResponse" xml:space="preserve">
+    <value>The time stamp server returned an invalid response</value>
+  </data>
+  <data name="Xml_Empty" xml:space="preserve">
+    <value>The XML document is empty</value>
+  </data>
+  <data name="Xml_ElementNotFound" xml:space="preserve">
+    <value>Element {0} wasn't found</value>
+  </data>
+  <data name="Xml_NoId" xml:space="preserve">
+    <value>The element to sign must have an Id attribute</value>
+  </data>
+</root>

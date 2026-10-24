@@ -3,9 +3,10 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                   xmlns:local="clr-namespace:NativeNCA.App.Views.Dialogs"
-                  Title="Фото ключа"
-                  PrimaryButtonText="Сохранить"
-                  CloseButtonText="Отмена"
+                  xmlns:l="clr-namespace:NativeNCA.App.Localization"
+                  Title="{l:Loc Avatar_Title}"
+                  PrimaryButtonText="{l:Loc Common_Save}"
+                  CloseButtonText="{l:Loc Common_Cancel}"
                   DefaultButton="Primary"
                   DialogMaxWidth="520">
 
@@ -15,7 +16,7 @@
 
     <StackPanel Width="400">
         <TextBlock TextWrapping="Wrap" Style="{StaticResource SecondaryText}" FontSize="13"
-                   Text="Фото поможет сразу узнать ключ в списке и в окне подписи." />
+                   Text="{l:Loc Avatar_Intro}" />
 
         <!-- Crop viewport: drag to move, wheel or slider to zoom; the circle is what will be saved -->
         <Border Width="282" Height="282" Margin="0,14,0,0" HorizontalAlignment="Center" CornerRadius="8" ClipToBounds="True"
@@ -37,9 +38,9 @@
                 <StackPanel x:Name="EmptyState" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <ui:SymbolIcon Symbol="ImageAdd24" FontSize="40" HorizontalAlignment="Center"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Text="Перетащите фото сюда" Margin="0,10,0,12" HorizontalAlignment="Center"
+                    <TextBlock Text="{l:Loc Avatar_DropHere}" Margin="0,10,0,12" HorizontalAlignment="Center"
                                Style="{StaticResource SecondaryText}" FontSize="13" />
-                    <ui:Button Content="Выбрать файл…" Icon="{ui:SymbolIcon FolderOpen24}" HorizontalAlignment="Center"
+                    <ui:Button Content="{l:Loc Avatar_ChooseFile}" Icon="{ui:SymbolIcon FolderOpen24}" HorizontalAlignment="Center"
                                Click="OnBrowseClick" />
                 </StackPanel>
             </Grid>
@@ -55,19 +56,19 @@
                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
             <Slider x:Name="ZoomSlider" Grid.Column="1" Margin="10,0" Minimum="1" Maximum="6" Value="1"
                     SmallChange="0.1" LargeChange="0.5" VerticalAlignment="Center"
-                    AutomationProperties.Name="Масштаб" ValueChanged="OnZoomChanged" />
+                    AutomationProperties.Name="{l:Loc Avatar_Zoom}" ValueChanged="OnZoomChanged" />
             <ui:SymbolIcon Grid.Column="2" Symbol="ZoomIn20" FontSize="16" VerticalAlignment="Center"
                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
         </Grid>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-            <ui:Button x:Name="ChangeButton" Content="Другое фото…" Icon="{ui:SymbolIcon FolderOpen24}"
+            <ui:Button x:Name="ChangeButton" Content="{l:Loc Avatar_OtherPhoto}" Icon="{ui:SymbolIcon FolderOpen24}"
                        Visibility="Collapsed" Click="OnBrowseClick" Margin="0,0,8,0" />
-            <ui:Button x:Name="RemoveButton" Content="Удалить фото" Icon="{ui:SymbolIcon Delete24}"
+            <ui:Button x:Name="RemoveButton" Content="{l:Loc Avatar_Remove}" Icon="{ui:SymbolIcon Delete24}"
                        Visibility="Collapsed" Click="OnRemoveClick" />
         </StackPanel>
 
         <ui:InfoBar x:Name="ErrorBar" Margin="0,12,0,0" Severity="Error" IsClosable="False" IsOpen="False"
-                    Title="Не удалось открыть изображение" />
+                    Title="{l:Loc Avatar_ErrorTitle}" />
     </StackPanel>
 </ui:ContentDialog>

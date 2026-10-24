@@ -3,9 +3,10 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                   xmlns:local="clr-namespace:NativeNCA.App.Views.Dialogs"
-                  Title="Добавить ключ ЭЦП"
-                  PrimaryButtonText="Добавить"
-                  CloseButtonText="Отмена"
+                  xmlns:l="clr-namespace:NativeNCA.App.Localization"
+                  Title="{l:Loc AddKey_Title}"
+                  PrimaryButtonText="{l:Loc AddKey_Add}"
+                  CloseButtonText="{l:Loc Common_Cancel}"
                   DefaultButton="Primary"
                   DialogMaxWidth="560">
 
@@ -15,10 +16,10 @@
 
     <StackPanel Width="460">
         <TextBlock TextWrapping="Wrap" Style="{StaticResource SecondaryText}" FontSize="13"
-                   Text="Файл будет зашифрован Windows DPAPI и скопирован в защищённое хранилище NativeNCA. Расшифровать его сможет только ваша учётная запись на этом компьютере." />
+                   Text="{l:Loc AddKey_Intro}" />
 
         <!-- File picker / drop zone -->
-        <TextBlock Text="Файл ключа" Margin="0,20,0,6" Style="{StaticResource FieldLabelText}" />
+        <TextBlock Text="{l:Loc AddKey_FileLabel}" Margin="0,20,0,6" Style="{StaticResource FieldLabelText}" />
         <Border x:Name="DropZone" CornerRadius="8" BorderThickness="1" Padding="14,12" AllowDrop="True"
                 Background="{DynamicResource ControlFillColorDefaultBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -35,23 +36,23 @@
                                    Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
                 </Border>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                    <TextBlock x:Name="FileNameText" Text="Выберите файл .p12 или перетащите сюда"
+                    <TextBlock x:Name="FileNameText" Text="{l:Loc AddKey_FilePrompt}"
                                Style="{StaticResource PrimaryText}" />
-                    <TextBlock x:Name="FilePathText" Text="Обычно AUTH_RSA256_… или GOST512_… от НУЦ РК"
+                    <TextBlock x:Name="FilePathText" Text="{l:Loc AddKey_FileHint}"
                                Style="{StaticResource TertiaryText}" />
                 </StackPanel>
-                <ui:Button Grid.Column="2" Content="Обзор…" Margin="12,0,0,0" Click="OnBrowseClick" />
+                <ui:Button Grid.Column="2" Content="{l:Loc AddKey_Browse}" Margin="12,0,0,0" Click="OnBrowseClick" />
             </Grid>
         </Border>
 
         <!-- Name -->
-        <TextBlock Text="Название" Margin="0,16,0,6" Style="{StaticResource FieldLabelText}" />
-        <ui:TextBox x:Name="NameInput" PlaceholderText="Например: «Личный eGov» или «ИП Иванов»"
+        <TextBlock Text="{l:Loc AddKey_NameLabel}" Margin="0,16,0,6" Style="{StaticResource FieldLabelText}" />
+        <ui:TextBox x:Name="NameInput" PlaceholderText="{l:Loc AddKey_NamePlaceholder}"
                     Icon="{ui:SymbolIcon Tag24}" ClearButtonEnabled="True" MaxLength="64" />
 
         <!-- Password -->
-        <TextBlock Text="Пароль от ключа" Margin="0,16,0,6" Style="{StaticResource FieldLabelText}" />
-        <ui:PasswordBox x:Name="PasswordInput" PlaceholderText="Пароль, заданный при получении ключа"
+        <TextBlock Text="{l:Loc Common_KeyPassword}" Margin="0,16,0,6" Style="{StaticResource FieldLabelText}" />
+        <ui:PasswordBox x:Name="PasswordInput" PlaceholderText="{l:Loc AddKey_PasswordPlaceholder}"
                         Icon="{ui:SymbolIcon Password24}" />
 
         <!-- Save password -->
@@ -60,14 +61,14 @@
                 BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
             <StackPanel>
                 <CheckBox x:Name="SavePasswordCheck" IsChecked="True">
-                    <TextBlock Text="Сохранить пароль в защищённом Vault" Style="{StaticResource PrimaryText}" />
+                    <TextBlock Text="{l:Loc AddKey_SavePassword}" Style="{StaticResource PrimaryText}" />
                 </CheckBox>
                 <TextBlock Margin="28,2,0,0" TextWrapping="Wrap" Style="{StaticResource SecondaryText}"
-                           Text="Пароль не придётся вводить при подписании — достаточно подтвердить Windows Hello." />
+                           Text="{l:Loc AddKey_SavePasswordHint}" />
             </StackPanel>
         </Border>
 
         <ui:InfoBar x:Name="ErrorBar" Margin="0,16,0,0" Severity="Error" IsClosable="False" IsOpen="False"
-                    Title="Не удалось добавить ключ" />
+                    Title="{l:Loc AddKey_ErrorTitle}" />
     </StackPanel>
 </ui:ContentDialog>

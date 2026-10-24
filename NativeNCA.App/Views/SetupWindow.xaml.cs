@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using NativeNCA.Core.Updates;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.App.Views;
 
@@ -43,17 +44,17 @@ public partial class SetupWindow : FluentWindow
     public static SetupWindow ForInstall(AppVersion version, AppVersion? installedVersion, Func<Task> install, Action openInstalled)
     {
         var window = new SetupWindow();
-        window.SecondaryLink.Content = "Запустить без установки";
+        window.SecondaryLink.Content = Strings.Setup_RunWithoutInstalling;
         window._secondaryAction = () => window.Finish(SetupResult.RunWithoutInstalling);
 
         if (installedVersion != null && installedVersion >= version)
         {
-            window.HeaderTitle.Text = "NativeNCA уже установлен";
-            window.HeaderSubtitle.Text = $"На этом компьютере установлена версия {installedVersion}";
+            window.HeaderTitle.Text = Strings.Setup_AlreadyInstalledTitle;
+            window.HeaderSubtitle.Text = Loc.Format(Strings.Setup_InstalledVersion, installedVersion);
             window.ShowInfo(installedVersion.Equals(version)
-                ? "Эта же версия уже установлена. Откройте её — она обновляется сама."
-                : $"Установлена более новая версия, чем эта копия ({version}). Откройте установленную, а эту копию можно удалить.");
-            window.PrimaryLabel.Text = "Открыть установленную";
+                ? Strings.Setup_SameVersion
+                : Loc.Format(Strings.Setup_NewerInstalled, version));
+            window.PrimaryLabel.Text = Strings.Setup_OpenInstalled;
             window._primaryAction = () =>
             {
                 openInstalled();
@@ -63,12 +64,11 @@ public partial class SetupWindow : FluentWindow
         }
         else
         {
-            window.HeaderTitle.Text = "Установить NativeNCA";
-            window.HeaderSubtitle.Text = $"Версия {version} · подпись ЭЦП НУЦ РК на сайтах без NCALayer";
+            window.HeaderTitle.Text = Strings.Setup_InstallTitle;
+            window.HeaderSubtitle.Text = Loc.Format(Strings.Setup_InstallSubtitle, version);
             if (installedVersion != null)
-                window.ShowInfo($"Установлена версия {installedVersion}. Она будет заменена версией {version}; " +
-                                "вернуть её можно будет в параметрах.");
-            window.PrimaryLabel.Text = "Установить";
+                window.ShowInfo(Loc.Format(Strings.Setup_ReplaceInstalled, installedVersion, version));
+            window.PrimaryLabel.Text = Strings.Common_Install;
             window._primaryAction = async () =>
             {
                 await install();
@@ -82,14 +82,15 @@ public partial class SetupWindow : FluentWindow
     /// <param name="uninstall">Removes NativeNCA (and the data when asked); returns a warning to show, or null.</param>
     public static SetupWindow ForUninstall(AppVersion version, Func<bool, Task<string?>> uninstall)
     {
-        var window = new SetupWindow { Title = "Удаление NativeNCA" };
-        window.HeaderTitle.Text = "Удалить NativeNCA?";
-        window.HeaderSubtitle.Text = $"Версия {version}";
+        var window = new SetupWindow();
+        window.Title = Strings.Setup_UninstallWindowTitle;
+        window.HeaderTitle.Text = Strings.Setup_UninstallTitle;
+        window.HeaderSubtitle.Text = Loc.Format(Strings.Common_Version, version);
         window.InstallContent.Visibility = Visibility.Collapsed;
         window.UninstallContent.Visibility = Visibility.Visible;
         window.SecondaryLink.Visibility = Visibility.Collapsed;
         window.CloseButton.Visibility = Visibility.Visible;
-        window.PrimaryLabel.Text = "Удалить";
+        window.PrimaryLabel.Text = Strings.Settings_Uninstall;
         window.PrimaryButton.Appearance = ControlAppearance.Danger;
         window.PrimaryButton.IsDefault = false;
         window.CloseButton.IsDefault = true;
@@ -107,13 +108,13 @@ public partial class SetupWindow : FluentWindow
     {
         _isDone = true;
         Result = SetupResult.Uninstalled;
-        HeaderTitle.Text = "NativeNCA удалён";
-        HeaderSubtitle.Text = "Программа удалена с этого компьютера";
+        HeaderTitle.Text = Strings.Setup_UninstalledTitle;
+        HeaderSubtitle.Text = Strings.Setup_UninstalledSubtitle;
         UninstallContent.Visibility = Visibility.Collapsed;
         CloseButton.Visibility = Visibility.Collapsed;
         PrimaryButton.Appearance = ControlAppearance.Primary;
         PrimaryButton.IsDefault = true;
-        PrimaryLabel.Text = "Закрыть";
+        PrimaryLabel.Text = Strings.Common_Close;
         _primaryAction = () =>
         {
             Close();
@@ -123,7 +124,7 @@ public partial class SetupWindow : FluentWindow
         if (warning != null)
             ShowError(warning);
         else if (!removedData)
-            ShowInfo("Ключи и параметры остались в вашем профиле Windows и появятся снова, если установить NativeNCA ещё раз.");
+            ShowInfo(Strings.Setup_DataKept);
         else
             InfoNote.Visibility = Visibility.Collapsed;
     }

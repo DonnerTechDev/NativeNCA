@@ -3,6 +3,7 @@ using System.Windows;
 using Microsoft.Win32;
 using NativeNCA.Core.ViewModels;
 using Wpf.Ui.Controls;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.App.Views.Dialogs;
 
@@ -32,13 +33,13 @@ public partial class AddKeyDialog : ContentDialog
 
         if (_filePath == null)
         {
-            ShowError("Выберите файл ключа .p12");
+            ShowError(Strings.AddKey_ChooseFile);
             return;
         }
 
         if (string.IsNullOrEmpty(PasswordInput.Password))
         {
-            ShowError("Введите пароль от ключа");
+            ShowError(Strings.Overlay_EnterPassword);
             PasswordInput.Focus();
             return;
         }
@@ -70,13 +71,13 @@ public partial class AddKeyDialog : ContentDialog
     internal static string FriendlyError(Exception ex)
     {
         if (ex is OperationCanceledException)
-            return "Подтверждение Windows Hello отменено";
+            return Strings.Hello_Canceled;
 
         var message = ex.Message;
         if (message.Contains("MAC", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("password", StringComparison.OrdinalIgnoreCase))
         {
-            return "Неверный пароль или файл ключа повреждён";
+            return Strings.AddKey_WrongPasswordOrDamaged;
         }
         return message;
     }
@@ -101,8 +102,8 @@ public partial class AddKeyDialog : ContentDialog
     {
         var dialog = new OpenFileDialog
         {
-            Filter = "Ключи ЭЦП (*.p12;*.pfx)|*.p12;*.pfx|Все файлы (*.*)|*.*",
-            Title = "Выберите файл ключа ЭЦП"
+            Filter = Strings.AddKey_FileFilter,
+            Title = Strings.AddKey_FileDialogTitle
         };
 
         if (dialog.ShowDialog(Window.GetWindow(this)) == true)

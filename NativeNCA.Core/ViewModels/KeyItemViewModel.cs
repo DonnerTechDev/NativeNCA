@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using NativeNCA.Core.Crypto;
 using NativeNCA.Core.Models;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.ViewModels;
 
@@ -30,20 +32,21 @@ public partial class KeyItemViewModel : ObservableObject
     public string Iin => _model.Iin ?? "—";
     public string Bin => _model.Bin ?? "—";
     public bool HasBin => !string.IsNullOrWhiteSpace(_model.Bin);
-    public string Organization => _model.Organization ?? "Физическое лицо";
+    public string Organization => _model.Organization ?? Strings.Key_Individual;
     public string Issuer => _model.Issuer;
     public string OriginalFileName => _model.OriginalFileName;
     public DateTime NotBefore => _model.NotBefore;
     public DateTime NotAfter => _model.NotAfter;
     public string KeyAlgorithm => _model.KeyAlgorithm;
+    public string KeyAlgorithmText => _model.KeyAlgorithm == CertificateInfo.GostAlgorithm ? Strings.Key_Algorithm_Gost : _model.KeyAlgorithm;
     public string KeyUsage => _model.KeyUsage;
     public bool IsAuth => _model.KeyUsage == "AUTH";
     public bool IsAuthAndSign => _model.KeyUsage == "BOTH";
     public string UsageText => _model.KeyUsage switch
     {
-        "BOTH" => "Вход и подпись",
-        "AUTH" => "Вход",
-        _ => "Подпись"
+        "BOTH" => Strings.Key_Usage_Both,
+        "AUTH" => Strings.Key_Usage_Auth,
+        _ => Strings.Key_Usage_Sign
     };
     public bool IsPasswordSaved => _model.IsPasswordSaved;
 
@@ -51,24 +54,23 @@ public partial class KeyItemViewModel : ObservableObject
     public int DaysLeft => Math.Max(0, (int)Math.Ceiling((_model.NotAfter - DateTime.UtcNow).TotalDays));
     public bool IsExpiringSoon => !IsExpired && DaysLeft <= ExpiringSoonDays;
 
-    public string ExpirationText => IsExpired
-        ? "Истёк"
-        : $"Действителен до {_model.NotAfter:dd.MM.yyyy}";
-
-    public string ValidityPeriodText => $"{_model.NotBefore:dd.MM.yyyy} — {_model.NotAfter:dd.MM.yyyy}";
+    public string ValidityPeriodText => $"{Loc.Date(_model.NotBefore)} — {Loc.Date(_model.NotAfter)}";
 
     public string StatusText => IsExpired
-        ? $"Истёк {_model.NotAfter:dd.MM.yyyy}"
+        ? Loc.Format(Strings.Key_Status_Expired, Loc.Date(_model.NotAfter))
         : IsExpiringSoon
-            ? $"Истекает через {DaysLeft} дн."
-            : "Активен";
+            ? Loc.Plural(DaysLeft, Strings.Key_Status_ExpiresIn_Plural)
+            : Strings.Key_Status_Active;
 
     public string BadgeText => _model.KeyUsage switch
     {
-        "BOTH" => "Вход и подпись / Auth + Sign",
-        "AUTH" => "Вход / Auth",
-        _ => "Подпись / Sign"
+        "BOTH" => Strings.Key_Purpose_Both,
+        "AUTH" => Strings.Key_Purpose_Auth,
+        _ => Strings.Key_Purpose_Sign
     };
+
+    /// <summary>The language changed: every text above is computed, so refresh them all.</summary>
+    public void RefreshTexts() => OnPropertyChanged(string.Empty);
 
     public string Initials
     {

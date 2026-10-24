@@ -26,7 +26,7 @@ public sealed class AppVersion : IComparable<AppVersion>, IEquatable<AppVersion>
     }
 
     public static AppVersion Parse(string text) =>
-        TryParse(text, out var version) ? version! : throw new FormatException($"Не удалось разобрать версию «{text}»");
+        TryParse(text, out var version) ? version! : throw new FormatException($"Cannot parse version \"{text}\"");
 
     /// <summary>Accepts an optional leading <c>v</c>, a missing patch (<c>1.2</c>) and build metadata.</summary>
     public static bool TryParse(string? text, out AppVersion? version)

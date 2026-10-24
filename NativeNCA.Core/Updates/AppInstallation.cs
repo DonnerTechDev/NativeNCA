@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Updates;
 
@@ -107,8 +108,8 @@ public sealed class AppInstallation
     /// </summary>
     public void SwapInNewVersion(AppVersion currentVersion)
     {
-        if (!File.Exists(NewExePath)) throw new FileNotFoundException("Новая версия не найдена", NewExePath);
-        if (!File.Exists(ExePath)) throw new FileNotFoundException("NativeNCA не установлен", ExePath);
+        if (!File.Exists(NewExePath)) throw new FileNotFoundException(Strings.Install_NewVersionMissing, NewExePath);
+        if (!File.Exists(ExePath)) throw new FileNotFoundException(Strings.Install_NotInstalled, ExePath);
 
         // Keep exactly one previous version.
         if (File.Exists(PreviousExePath)) File.Delete(PreviousExePath);
@@ -150,7 +151,7 @@ public sealed class AppInstallation
     /// </summary>
     public void SwapToPreviousVersion()
     {
-        if (!File.Exists(PreviousExePath)) throw new FileNotFoundException("Предыдущая версия не найдена", PreviousExePath);
+        if (!File.Exists(PreviousExePath)) throw new FileNotFoundException(Strings.Install_PreviousMissing, PreviousExePath);
 
         if (File.Exists(DiscardedExePath)) File.Delete(DiscardedExePath);
 

@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using NativeNCA.Core.Security;
 using NativeNCA.Core.Services;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Server;
 
@@ -55,10 +56,10 @@ public class NativeNcaServer
     public bool IsRunning { get; private set; }
 
     /// <summary>Why the server could not start (null when running).</summary>
-    public string? StartError { get; private set; }
+    public LocText? StartError { get; private set; }
 
     /// <summary>Short headline for <see cref="StartError"/>.</summary>
-    public string? StartErrorTitle { get; private set; }
+    public LocText? StartErrorTitle { get; private set; }
 
     public ServerErrorKind StartErrorKind { get; private set; }
 
@@ -75,14 +76,14 @@ public class NativeNcaServer
         {
             _serverCert = _tlsService.GetServerCertificateContext();
         }
-        catch (TlsCertificateMissingException ex)
+        catch (TlsCertificateMissingException)
         {
-            Fail(ServerErrorKind.Certificate, "Нет сертификата для браузеров", ex.Message);
+            Fail(ServerErrorKind.Certificate, new LocText(() => Strings.Server_NoCertificateTitle), new LocText(() => Strings.Tls_MissingMessage));
             return;
         }
         catch (Exception ex)
         {
-            Fail(ServerErrorKind.Certificate, "Ошибка сертификата TLS", ex.Message);
+            Fail(ServerErrorKind.Certificate, new LocText(() => Strings.Server_CertificateErrorTitle), LocText.Raw(ex.Message));
             return;
         }
 
@@ -96,22 +97,22 @@ public class NativeNcaServer
             _listener = null;
             if (NcaLayerService.IsPortOwnedByNcaLayer(WssPort))
             {
-                Fail(ServerErrorKind.NcaLayerRunning, "Запущен NCALayer",
-                    "Оригинальный NCALayer занимает порт 13579, который сайты используют для подписи. " +
-                    "Две программы не могут работать одновременно — закройте NCALayer, и NativeNCA запустится сам.");
+                Fail(ServerErrorKind.NcaLayerRunning, new LocText(() => Strings.Server_NcaLayerTitle),
+                    new LocText(() => Strings.Server_NcaLayerMessage));
             }
             else
             {
-                string owner = NcaLayerService.GetPortOwnerName(WssPort) is { } name ? $"Его использует {name}. " : "";
-                Fail(ServerErrorKind.Other, "Порт 13579 занят",
-                    $"{owner}Закройте программу, которая занимает порт, и нажмите «Повторить».");
+                string? owner = NcaLayerService.GetPortOwnerName(WssPort);
+                Fail(ServerErrorKind.Other, new LocText(() => Strings.Server_PortBusyTitle), new LocText(() => owner != null
+                    ? Loc.Format(Strings.Server_PortBusyOwner, owner) + " " + Strings.Server_PortBusyMessage
+                    : Strings.Server_PortBusyMessage));
             }
             return;
         }
         catch (SocketException ex)
         {
             _listener = null;
-            Fail(ServerErrorKind.Other, "Не удалось открыть порт 13579", ex.Message);
+            Fail(ServerErrorKind.Other, new LocText(() => Strings.Server_PortOpenFailedTitle), LocText.Raw(ex.Message));
             return;
         }
 
@@ -141,13 +142,13 @@ public class NativeNcaServer
         Start();
     }
 
-    private void Fail(ServerErrorKind kind, string title, string message)
+    private void Fail(ServerErrorKind kind, LocText title, LocText message)
     {
         StartErrorKind = kind;
         StartErrorTitle = title;
         StartError = message;
         StateChanged?.Invoke(this, EventArgs.Empty);
-        _ = _promptService.ShowNotificationAsync(title, message);
+        _ = _promptService.ShowNotificationAsync(title.ToString(), message.ToString());
     }
 
     private async Task AcceptLoopAsync(TcpListener listener, CancellationToken ct)
@@ -253,7 +254,7 @@ public class NativeNcaServer
         if (lines.Length == 0 || !lines[0].StartsWith("GET ", StringComparison.Ordinal)) return null;
 
         string? key = null, upgrade = null;
-        string origin = "Неизвестный источник";
+        string origin = string.Empty; // the overlay shows "unknown source"
         foreach (var line in lines.Skip(1))
         {
             int colon = line.IndexOf(':');

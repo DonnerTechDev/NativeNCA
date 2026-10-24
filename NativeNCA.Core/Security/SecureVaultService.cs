@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using NativeNCA.Core.Crypto;
 using NativeNCA.Core.Models;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Security;
 
@@ -107,7 +108,8 @@ public class SecureVaultService
                 _database.AutoStartWithWindows,
                 _database.SessionCacheMinutes,
                 _database.UseTimestamp,
-                IsHelloProtected);
+                IsHelloProtected,
+                _database.Language ?? "system");
         }
     }
 
@@ -120,6 +122,7 @@ public class SecureVaultService
             _database.AutoStartWithWindows = settings.AutoStartWithWindows;
             _database.SessionCacheMinutes = settings.SessionCacheMinutes;
             _database.UseTimestamp = settings.UseTimestamp;
+            _database.Language = settings.Language;
             PersistDatabase();
         }
     }
@@ -151,7 +154,7 @@ public class SecureVaultService
             byte[] wrapped;
             lock (_lock) wrapped = Convert.FromBase64String(_database.HelloWrappedMasterKey!);
             byte[] key = _protector.Unwrap(wrapped, ownerWindow, reason);
-            if (key.Length != 32) throw new CryptographicException("Повреждён ключ хранилища");
+            if (key.Length != 32) throw new CryptographicException(Strings.Vault_KeyCorrupted);
             SetMasterKey(key);
         });
 
@@ -175,7 +178,7 @@ public class SecureVaultService
         EnsureWritable();
         if (IsHelloProtected) return;
         if (!_protector.IsAvailable)
-            throw new InvalidOperationException("Windows Hello не настроен на этом устройстве");
+            throw new InvalidOperationException(Strings.Vault_HelloNotSetUp);
 
         _protector.CreateKey(ownerWindow);
         byte[] masterKey = RandomNumberGenerator.GetBytes(32);
@@ -197,7 +200,7 @@ public class SecureVaultService
     {
         EnsureWritable();
         if (!IsHelloProtected) return;
-        await UnlockAsync(ownerWindow, "NativeNCA: отключение защиты хранилища Windows Hello");
+        await UnlockAsync(ownerWindow, Strings.Hello_DisableProtection);
 
         lock (_lock)
         {
@@ -248,7 +251,7 @@ public class SecureVaultService
     {
         EnsureWritable();
         if (!File.Exists(p12FilePath))
-            throw new FileNotFoundException("Файл ключа не найден", p12FilePath);
+            throw new FileNotFoundException(Strings.Vault_KeyFileNotFound, p12FilePath);
 
         byte[] rawBytes = File.ReadAllBytes(p12FilePath);
 
@@ -259,7 +262,7 @@ public class SecureVaultService
         lock (_lock)
         {
             if (_database.Keys.Any(k => k.CertificateSerial == info.SerialNumberHex && k.Issuer == info.Issuer))
-                throw new InvalidOperationException("Этот ключ уже есть в хранилище");
+                throw new InvalidOperationException(Strings.Vault_KeyAlreadyAdded);
         }
 
         var keyId = Guid.NewGuid();
@@ -338,12 +341,12 @@ public class SecureVaultService
     public void SetAvatar(Guid id, byte[] png)
     {
         if (png.Length > MaxAvatarBytes || !png.AsSpan().StartsWith(PngSignature))
-            throw new ArgumentException("Ожидается изображение PNG размером до 2 МБ", nameof(png));
+            throw new ArgumentException(Strings.Vault_BadAvatar, nameof(png));
         EnsureWritable();
 
         lock (_lock)
         {
-            var key = _database.Keys.FirstOrDefault(k => k.Id == id) ?? throw new InvalidOperationException("Ключ не найден");
+            var key = _database.Keys.FirstOrDefault(k => k.Id == id) ?? throw new InvalidOperationException(Strings.Error_KeyNotFound);
 
             string fileName = $"{id:N}-{DateTime.UtcNow.Ticks:x}.png";
             WriteAtomically(Path.Combine(_avatarsDir, fileName), png);
@@ -399,7 +402,7 @@ public class SecureVaultService
     {
         string filePath = Path.Combine(_keysDir, key.EncryptedFileName);
         if (!File.Exists(filePath))
-            throw new FileNotFoundException("Файл ключа в защищенном хранилище не найден");
+            throw new FileNotFoundException(Strings.Vault_EncryptedFileMissing);
 
         return Unprotect(File.ReadAllBytes(filePath));
     }
@@ -456,7 +459,7 @@ public class SecureVaultService
     public void ChangeKeyPassword(Guid id, string currentPassword, string newPassword)
     {
         EnsureWritable();
-        var key = GetKey(id) ?? throw new InvalidOperationException("Ключ не найден");
+        var key = GetKey(id) ?? throw new InvalidOperationException(Strings.Error_KeyNotFound);
 
         byte[] updated = Pkcs12Writer.ChangePassword(DecryptKeyFile(key), currentPassword, newPassword);
 
@@ -628,8 +631,7 @@ public class SecureVaultService
 
 /// <summary>The vault on disk has a newer format than this build understands; it is not changed.</summary>
 public sealed class VaultFormatTooNewException(int formatVersion) : InvalidOperationException(
-    $"Хранилище ключей записано более новой версией NativeNCA (формат {formatVersion}). Эта версия не меняет его, " +
-    "чтобы не повредить данные. Обновите NativeNCA, чтобы снова изменять ключи и параметры.")
+    Loc.Format(Strings.Vault_FormatTooNew, formatVersion))
 {
     public int FormatVersion { get; } = formatVersion;
 }
@@ -639,4 +641,5 @@ public sealed record VaultSettings(
     bool AutoStartWithWindows,
     int SessionCacheMinutes,
     bool UseTimestamp = true,
-    bool IsHelloProtected = false);
+    bool IsHelloProtected = false,
+    string Language = "system");

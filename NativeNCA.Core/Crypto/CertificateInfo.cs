@@ -19,7 +19,10 @@ public sealed class CertificateInfo
     public required string SerialNumberHex { get; init; }
     public DateTime NotBefore { get; init; }
     public DateTime NotAfter { get; init; }
-    public required string Algorithm { get; init; } // "ГОСТ" / "RSA"
+    /// <summary>Stored in the vault (VaultKeyItem.KeyAlgorithm); shown as Strings.Key_Algorithm_Gost.</summary>
+    public const string GostAlgorithm = "ГОСТ"; // NoLoc: stored value, not UI text
+
+    public required string Algorithm { get; init; } // GostAlgorithm or "RSA"
     public bool CanAuthenticate { get; init; }
     public bool CanSign { get; init; }
 
@@ -77,7 +80,7 @@ public sealed class CertificateInfo
             SerialNumberHex = cert.SerialNumber.ToString(16),
             NotBefore = cert.NotBefore.ToUniversalTime(),
             NotAfter = cert.NotAfter.ToUniversalTime(),
-            Algorithm = keyAlg == KzOids.RsaEncryption ? "RSA" : "ГОСТ",
+            Algorithm = keyAlg == KzOids.RsaEncryption ? "RSA" : GostAlgorithm,
             CanAuthenticate = canAuth,
             CanSign = canSign
         };

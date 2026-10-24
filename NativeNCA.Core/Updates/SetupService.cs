@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32;
 using NativeNCA.Core.Security;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Updates;
 
@@ -74,7 +75,7 @@ public sealed class SetupService
             key.SetValue("EstimatedSize", (int)Math.Min(sizeKb, int.MaxValue), RegistryValueKind.DWord);
         }
 
-        CreateShortcut(ShortcutPath, exe, "Подписание ЭЦП НУЦ РК на сайтах — замена NCALayer");
+        CreateShortcut(ShortcutPath, exe, Strings.Setup_ShortcutDescription);
     }
 
     public static bool IsRegistered()
@@ -106,7 +107,7 @@ public sealed class SetupService
     {
         string dir = Installation.Directory.TrimEnd('\\');
         if (!Directory.Exists(dir)) return;
-        if (dir.Contains('"') || dir.Contains('%')) throw new InvalidOperationException("Недопустимый путь установки");
+        if (dir.Contains('"') || dir.Contains('%')) throw new InvalidOperationException(Strings.Setup_InvalidPath);
 
         string script =
             $"for /L %i in (1,1,30) do @(ping -n 2 127.0.0.1 >nul & rmdir /s /q \"{dir}\" 2>nul & if not exist \"{dir}\" exit /b 0)";

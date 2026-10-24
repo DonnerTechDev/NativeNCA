@@ -18,7 +18,7 @@ public class VaultKeyItem
     public string? FullName { get; set; }
     public DateTime NotBefore { get; set; }
     public DateTime NotAfter { get; set; }
-    public string KeyAlgorithm { get; set; } = string.Empty; // "ГОСТ" or "RSA"
+    public string KeyAlgorithm { get; set; } = string.Empty; // CertificateInfo.GostAlgorithm or "RSA"
     public string KeyUsage { get; set; } = string.Empty; // "AUTH", "SIGN" or "BOTH"
     
     // Security & Password Settings
@@ -47,6 +47,9 @@ public class VaultDatabase
 
     /// <summary>Add a НУЦ time-stamp (CAdES-T) to CMS signatures.</summary>
     public bool UseTimestamp { get; set; } = true;
+
+    /// <summary>UI language: "system" (follow Windows), "kk", "ru" or "en". Optional, not a format change.</summary>
+    public string? Language { get; set; }
 
     /// <summary>
     /// Vault master key encrypted with the Windows Hello (Microsoft Passport) key. When set, key files and

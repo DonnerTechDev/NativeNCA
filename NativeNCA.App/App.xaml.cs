@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using Microsoft.Win32.SafeHandles;
@@ -9,6 +10,7 @@ using NativeNCA.Core.Server;
 using NativeNCA.Core.Updates;
 using NativeNCA.Core.ViewModels;
 using Wpf.Ui.Appearance;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.App;
 
@@ -31,6 +33,11 @@ public partial class App : Application
         var args = e.Args;
         // Follow the Windows light/dark theme and accent colour instead of a hard-coded theme.
         ApplicationThemeManager.ApplySystemTheme(true);
+
+        // The setup windows have no settings yet: they use the Windows display language.
+        LocalizationSource.Instance.CultureChanged += (_, _) => ApplyThreadCulture();
+        LocalizationSource.Instance.SetLanguage(AppLanguage.System);
+        ApplyThreadCulture();
 
         if (HasArgument(args, SetupService.UninstallArgument))
         {
@@ -70,6 +77,7 @@ public partial class App : Application
         if (isInstalledCopy) RefreshInstallation();
 
         var vault = new SecureVaultService();
+        LocalizationSource.Instance.SetLanguage(LocalizationSource.FromSetting(vault.GetSettings().Language));
         var promptService = new WpfUserPromptService(vault, new ConsentCache());
         var tls = new TlsCertificateService();
         _server = new NativeNcaServer(vault, tls, promptService);
@@ -83,7 +91,7 @@ public partial class App : Application
         _server.StateChanged += (_, _) => Dispatcher.BeginInvoke(() =>
         {
             settingsVm.IsServerRunning = _server.IsRunning;
-            settingsVm.ServerError = _server.StartError;
+            settingsVm.ServerErrorText = _server.StartError;
             settingsVm.ServerErrorTitle = _server.StartErrorTitle;
             settingsVm.ServerErrorKind = _server.StartErrorKind;
             if (_server.StartErrorKind == ServerErrorKind.NcaLayerRunning)
@@ -112,6 +120,14 @@ public partial class App : Application
         AutoStartService.Apply(vault.GetSettings().AutoStartWithWindows);
 
         updateVm.StartAutomaticChecks();
+    }
+
+    /// <summary>Formatting done by WPF and the runtime (not only ours) follows the chosen language.</summary>
+    private static void ApplyThreadCulture()
+    {
+        var source = LocalizationSource.Instance;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture = source.Culture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture = source.FormatCulture;
     }
 
     private static bool HasArgument(string[] args, string name) => args.Contains(name, StringComparer.OrdinalIgnoreCase);
@@ -237,7 +253,7 @@ public partial class App : Application
             install: async () =>
             {
                 if (!await InstanceSignals.CloseRunningInstanceAsync(TimeSpan.FromSeconds(15)))
-                    throw new InvalidOperationException("Не удалось закрыть запущенный NativeNCA. Закройте его через значок в трее и повторите");
+                    throw new InvalidOperationException(Strings.Setup_CloseRunningFailed);
                 await Task.Run(() => setup.Install(Environment.ProcessPath!, _version));
                 StartProcess(_installation.ExePath, UpdateViewModel.InstalledArgument);
             },
@@ -264,12 +280,12 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            _mainWindow?.ShowError("Не удалось установить NativeNCA: " + ex.Message);
+            _mainWindow?.ShowError(Loc.Format(Strings.Install_Failed, ex.Message));
             return;
         }
 
         if (!await HandOffAsync(_installation.ExePath, UpdateViewModel.InstalledArgument))
-            _mainWindow?.ShowError("NativeNCA установлен, но не запустился. Запустите его из меню «Пуск»");
+            _mainWindow?.ShowError(Strings.Install_NotStarted);
     }
 
     private static void StartProcess(string exePath, string arguments) =>
@@ -291,7 +307,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            _mainWindow?.ShowError("Не удалось запустить удаление: " + ex.Message);
+            _mainWindow?.ShowError(Loc.Format(Strings.Uninstall_StartFailed, ex.Message));
         }
     }
 
@@ -302,7 +318,7 @@ public partial class App : Application
         window = SetupWindow.ForUninstall(_installation.GetInstalledVersion() ?? _version, async removeData =>
         {
             if (!await InstanceSignals.CloseRunningInstanceAsync(TimeSpan.FromSeconds(15)))
-                throw new InvalidOperationException("Не удалось закрыть запущенный NativeNCA. Закройте его через значок в трее и повторите");
+                throw new InvalidOperationException(Strings.Setup_CloseRunningFailed);
 
             setup.Unregister();
 
@@ -316,8 +332,7 @@ public partial class App : Application
                 }
                 catch (OperationCanceledException)
                 {
-                    warning = "Корневой сертификат NativeNCA остался в Windows: в окне подтверждения был выбран ответ «Нет». " +
-                              "Его можно удалить в оснастке certmgr.msc, раздел «Доверенные корневые центры сертификации».";
+                    warning = Strings.Uninstall_RootLeft;
                 }
 
                 try { new WindowsHelloKeyProtector().DeleteKey(); } catch { /* no Hello key */ }
@@ -328,7 +343,7 @@ public partial class App : Application
                 }
                 catch (Exception ex)
                 {
-                    warning = $"Часть данных удалить не удалось ({ex.Message}). Удалите папку {SetupService.UserDataDirectory} вручную.";
+                    warning = Loc.Format(Strings.Uninstall_DataLeft, ex.Message, SetupService.UserDataDirectory);
                 }
             }
 

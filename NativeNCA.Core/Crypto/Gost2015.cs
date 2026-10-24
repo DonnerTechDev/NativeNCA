@@ -9,6 +9,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
+using NativeNCA.Core.Localization;
 
 namespace NativeNCA.Core.Crypto;
 
@@ -54,7 +55,7 @@ public static class Gost2015
         var spki = cert.CertificateStructure.SubjectPublicKeyInfo;
         byte[] raw = Asn1OctetString.GetInstance(Asn1Object.FromByteArray(spki.PublicKey.GetBytes())).GetOctets();
         if (raw.Length != CoordinateSize * 2)
-            throw new NotSupportedException($"Поддерживаются только ключи ГОСТ 2015 512 бит (длина ключа {raw.Length * 4} бит)");
+            throw new NotSupportedException(Loc.Format(Strings.Crypto_GostKeySize, raw.Length * 4));
 
         var x = FromLittleEndian(raw, 0, CoordinateSize);
         var y = FromLittleEndian(raw, CoordinateSize, CoordinateSize);
@@ -79,7 +80,7 @@ public static class Gost2015
             }
         }
 
-        throw new InvalidDataException("Закрытый ключ ГОСТ не соответствует сертификату или имеет неизвестный формат");
+        throw new InvalidDataException(Strings.Crypto_GostKeyMismatch);
     }
 
     public static byte[] SignDigest(ECPrivateKeyParameters key, byte[] digest)

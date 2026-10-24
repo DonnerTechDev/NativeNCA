@@ -8,12 +8,14 @@ using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
+using NativeNCA.Core.Localization;
+using Strings = NativeNCA.Core.Localization.Strings;
 
 namespace NativeNCA.Core.Crypto;
 
 public class WrongPasswordException : Exception
 {
-    public WrongPasswordException() : base("Неверный пароль от ключа") { }
+    public WrongPasswordException() : base(Strings.Error_WrongPassword) { }
 }
 
 /// <summary>
@@ -38,7 +40,7 @@ public static class Pkcs12Reader
         var pfx = Pfx.GetInstance(Asn1Object.FromByteArray(pfxBytes));
         var authSafeContent = pfx.AuthSafe;
         if (!PkcsObjectIdentifiers.Data.Equals(authSafeContent.ContentType))
-            throw new InvalidDataException("Неподдерживаемый формат PKCS#12 (ожидался data)");
+            throw new InvalidDataException(Strings.Crypto_Pkcs12Format);
 
         byte[] authSafeData = Asn1OctetString.GetInstance(authSafeContent.Content).GetOctets();
         char[] pass = password.ToCharArray();
@@ -93,9 +95,9 @@ public static class Pkcs12Reader
         }
 
         if (keys.Count == 0)
-            throw new InvalidDataException("В файле PKCS#12 не найден закрытый ключ");
+            throw new InvalidDataException(Strings.Crypto_Pkcs12NoKey);
         if (certs.Count == 0)
-            throw new InvalidDataException("В файле PKCS#12 не найден сертификат");
+            throw new InvalidDataException(Strings.Crypto_Pkcs12NoCertificate);
 
         var (key, keyId) = keys[0];
 
