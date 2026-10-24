@@ -18,20 +18,48 @@
 <style>
   .nf { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
   .nf .card { max-width: 520px; padding: 32px; }
-  .nf .code { font: 600 13px/1 var(--mono); color: var(--accent-text); letter-spacing: .06em; }
+  .nf .code { font: 600 13px/1 var(--mono); color: var(--accent-text); letter-spacing: .06em; margin: 20px 0 0; }
   .nf h1 { margin: 12px 0 10px; }
   .nf p { margin: 0 0 24px; color: var(--text-2); }
+  .nf [lang] { display: none; }
+  .nf [lang].on { display: block; }
 </style>
 </head>
 <body>
 <main class="nf">
   <div class="card">
     <img src="icon.png" alt="" width="48" height="48">
-    <p class="code" style="margin:20px 0 0">ОШИБКА 404</p>
-    <h1 class="title">Такой страницы нет</h1>
-    <p>Зато NCALayer бы сейчас всё ещё запускался. Вернитесь на главную, там всё быстрее.</p>
-    <a class="btn btn-accent" href="./">На главную</a>
+    <div lang="ru" class="on">
+      <p class="code">ОШИБКА 404</p>
+      <h1 class="title">Такой страницы нет</h1>
+      <p>Зато NCALayer бы сейчас всё ещё запускался. Вернитесь на главную, там всё быстрее.</p>
+      <a class="btn btn-accent" href="./">На главную</a>
+    </div>
+    <div lang="en">
+      <p class="code">ERROR 404</p>
+      <h1 class="title">This page does not exist</h1>
+      <p>NCALayer would still be starting up by now anyway. Head back to the home page, things are faster there.</p>
+      <a class="btn btn-accent" href="en/">Home page</a>
+    </div>
+    <div lang="kk">
+      <p class="code">404 ҚАТЕСІ</p>
+      <h1 class="title">Мұндай бет жоқ</h1>
+      <p>Есесіне NCALayer әлі іске қосылып жатар еді. Басты бетке оралыңыз, онда бәрі тезірек.</p>
+      <a class="btn btn-accent" href="kk/">Басты бет</a>
+    </div>
   </div>
 </main>
+<script>
+  // One 404 for the whole site: pick the language from the path, then from the browser.
+  (function () {
+    var m = location.pathname.match(/\/(en|kk)(\/|$)/);
+    var lang = m ? m[1] : (navigator.language || "").slice(0, 2);
+    if (lang !== "en" && lang !== "kk") return;
+    document.documentElement.lang = lang;
+    document.title = lang === "en" ? "Page not found — NativeNCA" : "Бет табылмады — NativeNCA";
+    document.querySelector('.nf [lang="ru"]').classList.remove("on");
+    document.querySelector('.nf [lang="' + lang + '"]').classList.add("on");
+  })();
+</script>
 </body>
 </html>

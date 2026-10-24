@@ -25,7 +25,7 @@ The UI is in Kazakh, Russian and English (see Localization below). Code, comment
 | `tools/LocalizationReview` | Writes `docs/localization-review.md` (key, Russian, Kazakh, notes) for the native-speaker review. The sheet is local-only (gitignored) |
 | `tools/ReleaseSigning` | Generates the release signing key, signs and verifies release zips |
 | `.github/workflows/build.yml` | CI, packaging and releases |
-| `site/` | Website for GitHub Pages (static HTML/CSS/JS, Russian). See the Website section |
+| `site/` | Website for GitHub Pages (static HTML/CSS/JS in Russian, English and Kazakh). See the Website section |
 | `.github/workflows/pages.yml` | Builds `site/` and deploys it to GitHub Pages |
 
 `design/` and `CLAUDE_TASK.md` are local-only and ignored by git. Never add them to a commit.
@@ -134,11 +134,13 @@ Everything lives in the one `NativeNCA.exe`; there is no separate installer or u
 
 ## Website
 
-- `site/` is plain HTML, CSS and JS with no framework or bundler. `site/build.py` copies it to `_site/`, converts `docs/screenshots/*.png` to WebP, copies `docs/icon.png` and `app.ico`, replaces `__SITE_URL__` and `__BUILD_DATE__`, adds FAQPage JSON-LD built from the FAQ expanders and bakes the latest releases into `release.json`. Build locally with `pip install pillow` and `python site/build.py`, then serve `_site/` with any static server.
-- Screenshots on the site come from `docs/screenshots`, so refreshing them with `tools/Screenshots` updates the site too. The site expects the current file names (`main`, `overlay`, `add-key`, `avatar-crop`, `settings`, each `-light` and `-dark`).
+- `site/` is plain HTML, CSS and JS with no framework or bundler. `site/build.py` copies it to `_site/`, converts `docs/screenshots/*.png` to WebP, copies `docs/icon.png` and `app.ico`, inlines the icon sprite, replaces `__SITE_URL__`, `__BUILD_DATE__`, `__DOWNLOAD_URL__` and `__DOWNLOAD_META__`, adds FAQPage JSON-LD built from each page's FAQ expanders and bakes the latest releases into `release.json`. It stops if a placeholder is left. Build locally with `pip install pillow` and `python site/build.py`, then serve `_site/` with any static server.
+- Three languages, one page each: `site/index.html` (Russian, the default and `x-default`), `site/en/index.html`, `site/kk/index.html`. They share `site/assets` and the screenshots; pages in subfolders set `data-root="../"` on `<html>` and use `../` paths. Every page links the other two with `hreflang`, the sitemap lists all three, and each has its own Open Graph image (`og.png`, `og-en.png`, `og-kk.png`). A change to the copy goes into all three pages; Kazakh terms follow `README.kk.md`.
+- Strings set from JS (download button text, the Java parody log, alt texts, the donate fallback) live in `I18N` in `site/assets/site.js`, keyed by the page's `lang`. The download button text baked at build time is in `DL_TEXT` in `build.py`.
+- Screenshots on the site come from `docs/screenshots`, so refreshing them with `tools/Screenshots` updates the site too. The site expects the current file names (`main`, `overlay`, `add-key`, `avatar-crop`, `settings`, each `-light` and `-dark`). The app UI is Russian for now, so all three languages show the same screenshots.
 - Download buttons link straight to the newest release zip: `build.py` writes the `-win-x64.zip` URL into the HTML (the Site workflow rebuilds after every tagged release), then `site.js` switches ARM64 visitors to `-win-arm64.zip` and picks up a release newer than the build from the GitHub API. Without any release the buttons lead to the Releases page. Keep the `-win-x64.zip` / `-win-arm64.zip` suffixes in `build.yml`.
-- Icons are Fluent UI System Icons inlined as an SVG sprite at the top of `index.html`. Donation links live in `CONFIG.donate` in `site/assets/site.js`.
-- Copy is Russian, natural, no emoji. Claims about security must match the code and the README.
+- Icons are Fluent UI System Icons in `site/assets/icons.svg`, inlined into each page at `<!--ICONS-->`. Donation links live in `CONFIG.donate` in `site/assets/site.js`.
+- Copy is natural, plain and without emoji. Claims about security, updates and network access must match the code and the README: the app goes online only to GitHub (update checks, can be turned off) and to the НУЦ TSA (when timestamps are on).
 
 ## Working style for this repo
 
