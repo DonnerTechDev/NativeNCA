@@ -6,7 +6,7 @@ Guidance for AI coding agents working on NativeNCA. Read this before changing co
 
 NativeNCA replaces NCALayer, the Java application that Kazakh websites (eGov, banks, government services) use to sign data with keys issued by НУЦ РК (the National Certification Authority). It listens on `wss://127.0.0.1:13579`, speaks the NCALayer protocol, shows a Fluent confirmation window and signs locally with keys kept in an encrypted vault. Windows only, .NET 10, WPF.
 
-The UI is in Russian. Code, comments, commit messages and the English README are in English.
+The UI is in Kazakh, Russian and English (see Localization below). Code, comments, commit messages and the English README are in English.
 
 ## Repository layout
 
@@ -16,11 +16,13 @@ The UI is in Russian. Code, comments, commit messages and the English README are
 | `NativeNCA.Core/Security` | Key vault (DPAPI, optional Windows Hello layer), Windows Hello, TLS certificate, autostart, consent cache |
 | `NativeNCA.Core/Server` | `NativeNcaServer` (TLS + WebSocket transport) and `NcaProtocolHandler` (request handling, transport independent) |
 | `NativeNCA.Core/Services` | Prompt service interface, `NcaLayerService` (detect, close and un-autostart the original NCALayer) |
+| `NativeNCA.Core/Localization` | `Strings.resx` (Russian, neutral), `Strings.kk.resx`, `Strings.en.resx`; `LocalizationSource` (current language), `Loc` (format, dates, plurals), `LocText` |
 | `NativeNCA.Core/Updates` | Versions, GitHub release check, release signatures, download/verify, install folder swap and rollback, setup (shortcut, Uninstall key) |
 | `NativeNCA.Core/ViewModels` | MVVM view models (CommunityToolkit.Mvvm). Core has no WPF dependency |
-| `NativeNCA.App` | WPF UI on WPF-UI 4.3.0: main window, signing overlay, dialogs, tray. Assembly name is `NativeNCA` |
+| `NativeNCA.App` | WPF UI on WPF-UI 4.3.0: main window, signing overlay, dialogs, tray. Assembly name is `NativeNCA`. `{l:Loc Key}` markup extension in `Localization/` |
 | `NativeNCA.Tests` | xUnit tests |
-| `tools/Screenshots` | Renders `docs/screenshots` with fictional data (`--updates` renders the install/update UI for review) |
+| `tools/Screenshots` | Renders `docs/screenshots/<en\|ru\|kk>` with fictional data (`--updates`: install/update UI, `--review`: every screen and dialog, `--lang kk`: one language) |
+| `tools/LocalizationReview` | Writes `docs/localization-review.md` (key, Russian, Kazakh, notes) for the native-speaker review. The sheet is local-only (gitignored) |
 | `tools/ReleaseSigning` | Generates the release signing key, signs and verifies release zips |
 | `.github/workflows/build.yml` | CI, packaging and releases |
 
@@ -32,7 +34,9 @@ The UI is in Russian. Code, comments, commit messages and the English README are
 dotnet build NativeNCA.slnx
 dotnet test NativeNCA.Tests --filter "Category!=Network"
 dotnet test NativeNCA.Tests                                  # also calls the real НУЦ TSA
-dotnet run --project tools/Screenshots -- docs/screenshots   # refresh README screenshots
+dotnet run --project tools/Screenshots -- docs/screenshots   # refresh README screenshots (all three languages)
+dotnet run --project tools/Screenshots -- <dir> --review     # every screen and dialog in every language, for layout checks
+dotnet run --project tools/LocalizationReview -- docs/localization-review.md
 dotnet publish NativeNCA.App -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:Version=0.2.0-dev -o publish/win-x64
 ```
 
@@ -101,6 +105,17 @@ Everything lives in the one `NativeNCA.exe`; there is no separate installer or u
 - **Uninstall.** Closes the running instance, removes the Run entry, shortcut and Uninstall key, optionally the TLS root (`RemoveOwnCertificate`), the Hello key and `%APPDATA%\NativeNCA`, then a hidden `cmd` (working dir %TEMP%) retries `rmdir` of the install folder for ~30 s after the process exits.
 - **Tray notification.** WPF-UI's NotifyIcon has no balloon API. `TrayNotification` reads the icon's hWnd/uID/callback message from its internal manager by reflection and calls `Shell_NotifyIcon(NIM_MODIFY, NIF_INFO)`; clicks arrive as `NIN_BALLOONUSERCLICK` on the hook window. Re-check after a WPF-UI upgrade.
 - **Tests** use temp folders and fake HTTP handlers only. Never touch the real install folder, Start menu, Uninstall key or Run key from tests or tools.
+
+## Localization
+
+- **No hard-coded text.** Every user-visible string lives in `NativeNCA.Core/Localization/Strings*.resx`: XAML, code-behind, view-model texts, exception messages a user can see, toasts, tray, setup window. `ProductCode_HasNoCyrillicLiterals` fails on a Cyrillic literal in `NativeNCA.Core` or `NativeNCA.App`. The exceptions are marked `// NoLoc` on the same line: protocol messages websites receive (they stay Russian, like NCALayer's) and values stored on disk (`CertificateInfo.GostAlgorithm`). Log or debug text nobody sees is English. Certificate data (names, organisations) is shown as issued.
+- **Adding a string.** Add the key to all three `.resx` files (same key set and the same `{0}` placeholders: both are tested). Name it by area: `Common_`, `Keys_`, `Key_`, `Settings_`, `Server_`, `Tls_`, `Update_`, `Setup_`, `Overlay_`, `Request_`, `Hello_`, `Vault_`, `Status_`, `AddKey_`, `Avatar_`, `ChangePassword_`, `Crypto_`, `Tray_`. The build generates `Strings` (public, in Core), so a misspelt key does not compile. In XAML use `Text="{l:Loc Key}"` (`xmlns:l="clr-namespace:NativeNCA.App.Localization"`); it works in setters, templates and context menus. In code use `Strings.Key` and `Loc.Format(Strings.Key, args)`, never `string.Format` with the current culture. Put a reviewer note for an uncertain term into `<comment>` of `Strings.kk.resx` and regenerate the review sheet.
+- **Plurals.** Keys ending in `_Plural` hold the forms separated by `|`: Russian three (1 день / 2 дня / 5 дней), English two, Kazakh one (a noun after a numeral stays singular). Use `Loc.Plural(count, Strings.X_Plural, extra args)`; `{0}` is the count.
+- **Live switching.** `LocalizationSource.SetLanguage` sets `Strings.Culture`, raises `Item[]` (all `{l:Loc}` bindings) and `CultureChanged`. View models re-raise their computed texts on `CultureChanged` (`OnPropertyChanged(string.Empty)`). Messages that stay on screen (banners, status lines, overlay errors) are kept as `LocText` so they re-render in the new language; toasts and open dialogs are not re-translated. Dates and numbers use `Loc.Date`, `Loc.Time` and `Loc.FormatCulture` (the Windows regional format if it is in the chosen language, otherwise kk-KZ, ru-RU or en-US).
+- **Language setting.** `VaultDatabase.Language` (`system`, `kk`, `ru`, `en`; optional, not a format change). "Как в Windows" maps a Kazakh Windows display language to Kazakh, Russian to Russian and anything else to English. The setup and uninstall windows always use the Windows display language. Tests that switch the language or compare texts with `Strings` belong to the `Localization` xUnit collection, which does not run in parallel.
+- **Layout.** Kazakh is the longest language. After changing texts, render `--review` and check the narrow (minimum size) settings screens, the overlay and the dialogs. Kazakh hyphenated words (`Windows‑тан`, `аты‑жөні`) use a non-breaking hyphen (U+2011) so WPF does not split them.
+- **Kazakh terminology** (as on egov.kz and pki.gov.kz): ЭЦП → ЭЦҚ (электрондық цифрлық қолтаңба), НУЦ РК → ҚР ҰКО (Ұлттық куәландырушы орталық), ИИН → ЖСН, БИН → БСН, пароль → құпиясөз, ключ → кілт, хранилище → қойма, подпись (действие) → қол қою, подпись (результат) → қолтаңба, метка времени → уақыт белгісі, сертификат → сертификат, корневой → түбірлік, закрытый ключ → жабық кілт, физическое лицо → жеке тұлға, ИП → ЖК, ТОО → ЖШС, параметры → параметрлер, учётная запись → тіркелгі, меню «Пуск» → «Бастау» мәзірі, обновление → жаңарту, версия → нұсқа. Russian legal and Windows terms are not calqued; Windows UI names in Kazakh that could not be confirmed are noted in the review sheet.
+- **English** follows Windows 11 wording: sentence case, contractions, "Select" for buttons, Settings > Apps > Startup.
 
 ## UI notes (WPF-UI 4.3.0)
 
