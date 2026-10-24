@@ -2,4 +2,5 @@
   <Project Path="NativeNCA.App/NativeNCA.App.csproj" />
   <Project Path="NativeNCA.Core/NativeNCA.Core.csproj" />
   <Project Path="NativeNCA.Tests/NativeNCA.Tests.csproj" />
+  <Project Path="tools/ReleaseSigning/ReleaseSigning.csproj" />
 </Solution>

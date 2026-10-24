@@ -86,6 +86,25 @@ jobs:
           Compress-Archive -Path publish/${{ matrix.rid }}/* -DestinationPath $name
           (Get-FileHash $name -Algorithm SHA256).Hash.ToLower() + "  $name" | Out-File "$name.sha256" -Encoding ascii
 
+      # The updater installs only zips signed with the release key (version and architecture included).
+      # The private key is the RELEASE_SIGNING_KEY secret; see tools/ReleaseSigning.
+      - name: Sign
+        shell: pwsh
+        env:
+          RELEASE_SIGNING_KEY: ${{ secrets.RELEASE_SIGNING_KEY }}
+        run: |
+          $name = "NativeNCA-${{ steps.version.outputs.value }}-${{ matrix.rid }}.zip"
+          if (-not $env:RELEASE_SIGNING_KEY) {
+            if ($env:GITHUB_REF_TYPE -eq 'tag') {
+              Write-Error "RELEASE_SIGNING_KEY is not set: a release without signatures cannot be installed by the updater"
+              exit 1
+            }
+            Write-Host "RELEASE_SIGNING_KEY is not set; this untagged build is not signed"
+            exit 0
+          }
+          dotnet run --project tools/ReleaseSigning -c Release -- sign $name "${{ steps.version.outputs.value }}" "${{ matrix.rid }}"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - uses: actions/upload-artifact@v4
         with:
           name: NativeNCA-${{ matrix.rid }}
