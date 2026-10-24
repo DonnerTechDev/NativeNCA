@@ -10,6 +10,7 @@
     <conv:NotEmptyToBoolConverter x:Key="NotEmptyToBool" />
     <conv:InverseBoolConverter x:Key="InverseBool" />
     <conv:CacheMinutesToTextConverter x:Key="CacheMinutesToText" />
+    <conv:ImagePathToSourceConverter x:Key="ImagePathToSource" />
 
     <FontFamily x:Key="MonoFontFamily">Cascadia Mono, Consolas, Courier New</FontFamily>
 
@@ -67,6 +68,34 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
     </Style>
+
+    <!--
+        Key avatar: the user's picture if set, otherwise initials on an accent circle.
+        Usage: <ContentControl Template="{StaticResource KeyAvatarView}" Width="40" Height="40" FontSize="14" />
+        (DataContext = KeyItemViewModel; FontSize sets the initials size)
+    -->
+    <ControlTemplate x:Key="KeyAvatarView" TargetType="ContentControl">
+        <Grid>
+            <Ellipse Fill="{DynamicResource AccentFillColorDefaultBrush}" />
+            <TextBlock x:Name="Initials" Text="{Binding Initials}" FontSize="{TemplateBinding FontSize}" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
+            <Ellipse x:Name="Photo" Visibility="Collapsed">
+                <Ellipse.Fill>
+                    <ImageBrush ImageSource="{Binding AvatarPath, Converter={StaticResource ImagePathToSource}}"
+                                Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                </Ellipse.Fill>
+            </Ellipse>
+            <Ellipse x:Name="Ring" Stroke="{DynamicResource ControlStrokeColorDefaultBrush}" StrokeThickness="1" Visibility="Collapsed" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding HasAvatar}" Value="True">
+                <Setter TargetName="Photo" Property="Visibility" Value="Visible" />
+                <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                <Setter TargetName="Initials" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
 
     <Style x:Key="Pill" TargetType="Border">
         <Setter Property="CornerRadius" Value="10" />

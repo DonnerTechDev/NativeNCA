@@ -207,6 +207,26 @@ public partial class MainWindow : FluentWindow
         await new AddKeyDialog(DialogHost, _viewModel).ShowAsync();
     }
 
+    private async void OnAvatarClick(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.SelectedKey is not { } key) return;
+
+        var dialog = new AvatarCropDialog(DialogHost, key.AvatarPath);
+        await dialog.ShowAsync();
+
+        try
+        {
+            if (dialog.ResultPng is { } png)
+                _viewModel.SetAvatar(key.Id, png);
+            else if (dialog.RemoveRequested)
+                _viewModel.RemoveAvatar(key.Id);
+        }
+        catch (Exception ex)
+        {
+            ShowToast("Ошибка: " + ex.Message);
+        }
+    }
+
     private async void OnChangePasswordClick(object sender, RoutedEventArgs e)
     {
         if (_viewModel.SelectedKey is not { } key) return;

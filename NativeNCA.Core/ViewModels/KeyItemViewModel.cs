@@ -9,11 +9,16 @@ public partial class KeyItemViewModel : ObservableObject
 
     private readonly VaultKeyItem _model;
 
-    public KeyItemViewModel(VaultKeyItem model)
+    public KeyItemViewModel(VaultKeyItem model, string? avatarPath = null)
     {
         _model = model;
         _name = model.Name;
+        AvatarPath = avatarPath;
     }
+
+    /// <summary>Full path of the user's picture for this key, or null to show initials.</summary>
+    public string? AvatarPath { get; }
+    public bool HasAvatar => AvatarPath != null;
 
     public VaultKeyItem Model => _model;
     public Guid Id => _model.Id;

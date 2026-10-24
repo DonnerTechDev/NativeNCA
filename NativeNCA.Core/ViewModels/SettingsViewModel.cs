@@ -103,7 +103,7 @@ public partial class SettingsViewModel : ObservableObject
         Keys.Clear();
         foreach (var key in _vault.GetKeys())
         {
-            Keys.Add(new KeyItemViewModel(key));
+            Keys.Add(new KeyItemViewModel(key, _vault.GetAvatarPath(key)));
         }
 
         SelectedKey = Keys.FirstOrDefault(k => k.Id == keepId) ?? Keys.FirstOrDefault();
@@ -205,6 +205,20 @@ public partial class SettingsViewModel : ObservableObject
         await Task.Run(() => _vault.ChangeKeyPassword(keyId, currentPassword, newPassword));
         RefreshKeys();
         StatusMessage = "Пароль ключа успешно изменен";
+    }
+
+    public void SetAvatar(Guid keyId, byte[] png)
+    {
+        _vault.SetAvatar(keyId, png);
+        RefreshKeys();
+        StatusMessage = "Фото ключа обновлено";
+    }
+
+    public void RemoveAvatar(Guid keyId)
+    {
+        _vault.RemoveAvatar(keyId);
+        RefreshKeys();
+        StatusMessage = "Фото ключа удалено";
     }
 
     public void RenameKey(Guid keyId, string newName)

@@ -79,7 +79,7 @@ public partial class SignOverlayViewModel : ObservableObject
 
         MatchingKeys.Clear();
         foreach (var k in keys)
-            MatchingKeys.Add(new KeyItemViewModel(k));
+            MatchingKeys.Add(new KeyItemViewModel(k, _vault.GetAvatarPath(k)));
 
         SelectedKey = MatchingKeys.FirstOrDefault();
         OnPropertyChanged(nameof(HasKeys));

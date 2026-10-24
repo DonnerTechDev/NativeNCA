@@ -22,6 +22,7 @@ NCALayer does its job, but it is a Java application: it takes a while to start, 
 - **Compatible with NCALayer.** Listens on `wss://127.0.0.1:13579` and implements the `kz.gov.pki.knca.commonUtils` and `kz.gov.pki.knca.basics` modules: CMS/CAdES and XML signatures, multiple documents at once, certificate info.
 - **GOST and RSA keys from NCA.** СТ РК ГОСТ Р 34.10-2015 (512 bit) and RSA keys issued by НУЦ РК. The cryptography is implemented in managed code on top of BouncyCastle and checked against signatures produced by NCA's own Kalkan library. No Kalkan SDK, no Java.
 - **Key vault.** Keys and, if you choose, their passwords are stored encrypted with Windows DPAPI. You can give each key a readable name ("Personal eGov", "LLP Shanyrak") and change its password.
+- **Key pictures.** Give each key a photo or a company logo, cropped right in the app, so the right key is easy to spot in the list and in the signing prompt.
 - **Windows Hello.** Every signature can require face, fingerprint or PIN. In the optional protected mode, the vault itself is encrypted with a Windows Hello key kept in the TPM, so the keys cannot be decrypted without you, even by a program running under your account.
 - **Timestamps.** CMS signatures can carry a trusted timestamp from the NCA time-stamping service (CAdES-T), so they remain verifiable after the certificate expires.
 - **Built for Windows 11.** Fluent design, Mica, light and dark themes, tray icon, start with Windows.

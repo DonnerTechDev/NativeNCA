@@ -26,6 +26,9 @@ public class VaultKeyItem
     public string? EncryptedPasswordBase64 { get; set; }
     public DateTime AddedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastUsedAt { get; set; }
+
+    /// <summary>Square PNG picture chosen by the user (file name inside the vault's avatars folder).</summary>
+    public string? AvatarFileName { get; set; }
 }
 
 public class VaultDatabase

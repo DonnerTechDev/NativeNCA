@@ -22,6 +22,7 @@ public class SecureVaultService
     private const int NonceSize = 12, TagSize = 16;
 
     private readonly string _keysDir;
+    private readonly string _avatarsDir;
     private readonly string _dbPath;
     private readonly byte[] _entropy = Encoding.UTF8.GetBytes("NativeNCA.Vault.Entropy.v1");
     private readonly IVaultKeyProtector _protector;
@@ -36,10 +37,12 @@ public class SecureVaultService
         _protector = protector ?? new WindowsHelloKeyProtector();
         string vaultDir = customVaultDir ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NativeNCA", "Vault");
         _keysDir = Path.Combine(vaultDir, "keys");
+        _avatarsDir = Path.Combine(vaultDir, "avatars");
         _dbPath = Path.Combine(vaultDir, "vault.json");
 
         Directory.CreateDirectory(vaultDir);
         Directory.CreateDirectory(_keysDir);
+        Directory.CreateDirectory(_avatarsDir);
         LoadDatabase();
     }
 
@@ -295,12 +298,63 @@ public class SecureVaultService
         }
     }
 
+    // ===================== Avatars =====================
+
+    public const int MaxAvatarBytes = 2 * 1024 * 1024;
+    private static readonly byte[] PngSignature = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+
+    public string? GetAvatarPath(VaultKeyItem key) =>
+        key.AvatarFileName == null ? null : Path.Combine(_avatarsDir, key.AvatarFileName);
+
+    /// <summary>
+    /// Stores a cropped PNG picture for the key. Pictures are not secret and are kept unencrypted.
+    /// A new file name is used every time so image caches never show the old picture.
+    /// </summary>
+    public void SetAvatar(Guid id, byte[] png)
+    {
+        if (png.Length > MaxAvatarBytes || !png.AsSpan().StartsWith(PngSignature))
+            throw new ArgumentException("Ожидается изображение PNG размером до 2 МБ", nameof(png));
+
+        lock (_lock)
+        {
+            var key = _database.Keys.FirstOrDefault(k => k.Id == id) ?? throw new InvalidOperationException("Ключ не найден");
+
+            string fileName = $"{id:N}-{DateTime.UtcNow.Ticks:x}.png";
+            WriteAtomically(Path.Combine(_avatarsDir, fileName), png);
+            DeleteAvatarFile(key);
+            key.AvatarFileName = fileName;
+            PersistDatabase();
+        }
+    }
+
+    public void RemoveAvatar(Guid id)
+    {
+        lock (_lock)
+        {
+            var key = _database.Keys.FirstOrDefault(k => k.Id == id);
+            if (key?.AvatarFileName == null) return;
+            DeleteAvatarFile(key);
+            key.AvatarFileName = null;
+            PersistDatabase();
+        }
+    }
+
+    private void DeleteAvatarFile(VaultKeyItem key)
+    {
+        if (GetAvatarPath(key) is { } path && File.Exists(path))
+        {
+            try { File.Delete(path); } catch { /* a leftover picture is harmless */ }
+        }
+    }
+
     public void RemoveKey(Guid id)
     {
         lock (_lock)
         {
             var key = _database.Keys.FirstOrDefault(k => k.Id == id);
             if (key == null) return;
+
+            DeleteAvatarFile(key);
 
             string filePath = Path.Combine(_keysDir, key.EncryptedFileName);
             if (File.Exists(filePath))

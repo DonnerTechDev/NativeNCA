@@ -254,6 +254,50 @@ public sealed class ProtocolTests : IDisposable
         Assert.True(CmsVerifier.Verify(CmsSigner.Sign(key, new byte[] { 1, 2, 3 }, true)).IsValid);
     }
 
+    private static byte[] TinyPng(byte shade)
+    {
+        // 1x1 PNG; changing a CRC byte keeps the PNG signature valid and makes the files differ.
+        byte[] png = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==");
+        png[^5] ^= shade;
+        return png;
+    }
+
+    [Fact]
+    public void Avatar_is_stored_replaced_and_removed_with_the_key()
+    {
+        var item = AddKey(TestKeys.CreateGostPfx());
+
+        _vault.SetAvatar(item.Id, TinyPng(1));
+        string first = _vault.GetAvatarPath(_vault.GetKey(item.Id)!)!;
+        Assert.True(File.Exists(first));
+
+        _vault.SetAvatar(item.Id, TinyPng(2));
+        string second = _vault.GetAvatarPath(_vault.GetKey(item.Id)!)!;
+        Assert.NotEqual(first, second);
+        Assert.False(File.Exists(first));
+
+        // Survives a restart
+        var reopened = new SecureVaultService(_dir);
+        Assert.Equal(second, reopened.GetAvatarPath(reopened.GetKey(item.Id)!));
+
+        _vault.RemoveKey(item.Id);
+        Assert.False(File.Exists(second));
+    }
+
+    [Fact]
+    public void Avatar_can_be_removed_and_must_be_png()
+    {
+        var item = AddKey(TestKeys.CreateGostPfx());
+        Assert.Throws<ArgumentException>(() => _vault.SetAvatar(item.Id, Encoding.UTF8.GetBytes("not an image")));
+
+        _vault.SetAvatar(item.Id, TinyPng(3));
+        string path = _vault.GetAvatarPath(_vault.GetKey(item.Id)!)!;
+        _vault.RemoveAvatar(item.Id);
+
+        Assert.Null(_vault.GetKey(item.Id)!.AvatarFileName);
+        Assert.False(File.Exists(path));
+    }
+
     [Fact]
     public void Adding_the_same_key_twice_is_rejected()
     {

@@ -58,6 +58,34 @@ public class InverseBoolConverter : IValueConverter
 }
 
 /// <summary>
+/// File path → ImageSource, read fully into memory so the file is never locked or cached by URI
+/// (avatars are replaced on disk while the app is running).
+/// </summary>
+public class ImagePathToSourceConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not string path || !System.IO.File.Exists(path)) return null;
+        try
+        {
+            var image = new System.Windows.Media.Imaging.BitmapImage();
+            image.BeginInit();
+            image.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+            image.StreamSource = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(path));
+            image.EndInit();
+            image.Freeze();
+            return image;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+
+/// <summary>
 /// Session cache minutes → human readable label for the settings ComboBox.
 /// </summary>
 public class CacheMinutesToTextConverter : IValueConverter
