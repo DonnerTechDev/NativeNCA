@@ -1,20 +1,97 @@
-// NativeNCA site. Plain JS, no dependencies.
+// NativeNCA site. Plain JS, no dependencies. One script for all languages:
+// the page's <html lang> picks the strings, <html data-root> points to the shared files.
 "use strict";
 
 const CONFIG = {
   repo: "DonnerTechDev/NativeNCA",
-  // Donation options shown in the "Поддержать" dialog. Fill in real links;
-  // entries with an empty url are hidden. With a single entry the button opens it directly.
+  // Donation options shown in the donate dialog. Fill in real links; entries with an
+  // empty url are hidden. With a single entry the button opens it directly.
   donate: [
-    { title: "Kaspi", note: "Перевод на карту или по номеру", url: "", icon: "heart" },
-    { title: "Boosty", note: "Разово или по подписке", url: "", icon: "heart" },
-    { title: "GitHub Sponsors", note: "Для тех, у кого есть зарубежная карта", url: "", icon: "github" },
+    { title: "Kaspi", url: "", icon: "heart",
+      note: { ru: "Перевод на карту или по номеру", en: "Card or phone transfer in Kazakhstan", kk: "Картаға немесе нөмір бойынша аударым" } },
+    { title: "Boosty", url: "", icon: "heart",
+      note: { ru: "Разово или по подписке", en: "One-off or monthly", kk: "Бір рет немесе жазылым арқылы" } },
+    { title: "GitHub Sponsors", url: "", icon: "github",
+      note: { ru: "Для тех, у кого есть зарубежная карта", en: "With any international card", kk: "Шетелдік картасы барларға" } },
   ],
 };
 
+const I18N = {
+  ru: {
+    locale: "ru-RU", sec: "с", mb: "МБ",
+    meta: (v, beta, arch, size) => `Версия ${v}${beta ? " (бета)" : ""} · ${arch} · ${size}`,
+    onlyWindows: (v) => `Версия ${v} · только для Windows`,
+    forArch: (a) => `Для ${a}`, whatsNew: "Что нового",
+    again: "Ещё раз",
+    shot: (t, dark) => `Скриншот NativeNCA: ${t}${dark ? ", тёмная тема" : ""}`,
+    star: "Поставить звезду на GitHub", starNote: "Ссылки для донатов скоро появятся",
+    console: "Код сайта и программы:",
+    race: [
+      "> Запуск виртуальной машины Java…",
+      "> Разогреваем JVM. Можно пока заварить чай.",
+      "> Выберите файл ключа:\n  AUTH_RSA256_9c4f….p12\n  RSA256_9c4f….p12\n  GOST512_7e21….p12\n  Какой из них? Угадайте.",
+      "> Введите пароль. Тот, что на стикере под клавиатурой.",
+      "! Неверный пароль. Раскладка была KZ.",
+      "> Введите пароль ещё раз.",
+      "> Проверяем обновления NCALayer…",
+      "> Подписываем… 99%",
+      "> Подписываем… 99%",
+      "> Готово. Если сайт не понял, обновите страницу.",
+    ],
+  },
+  en: {
+    locale: "en-US", sec: "s", mb: "MB",
+    meta: (v, beta, arch, size) => `Version ${v}${beta ? " (beta)" : ""} · ${arch} · ${size}`,
+    onlyWindows: (v) => `Version ${v} · Windows only`,
+    forArch: (a) => `For ${a}`, whatsNew: "What's new",
+    again: "Again",
+    shot: (t, dark) => `NativeNCA screenshot: ${t}${dark ? ", dark theme" : ""}`,
+    star: "Star it on GitHub", starNote: "Donation links are coming soon",
+    console: "Source of the site and the app:",
+    race: [
+      "> Starting the Java virtual machine…",
+      "> Warming up the JVM. Go make some tea.",
+      "> Choose the key file:\n  AUTH_RSA256_9c4f….p12\n  RSA256_9c4f….p12\n  GOST512_7e21….p12\n  Which one? Take a guess.",
+      "> Enter the password. The one on the sticky note under the keyboard.",
+      "! Wrong password. The keyboard was on the Kazakh layout.",
+      "> Enter the password again.",
+      "> Checking for NCALayer updates…",
+      "> Signing… 99%",
+      "> Signing… 99%",
+      "> Done. If the site didn't get it, reload the page.",
+    ],
+  },
+  kk: {
+    locale: "kk-KZ", sec: "с", mb: "МБ",
+    meta: (v, beta, arch, size) => `Нұсқа ${v}${beta ? " (бета)" : ""} · ${arch} · ${size}`,
+    onlyWindows: (v) => `Нұсқа ${v} · тек Windows үшін`,
+    forArch: (a) => `${a} үшін`, whatsNew: "Не өзгерді",
+    again: "Тағы бір рет",
+    shot: (t, dark) => `NativeNCA скриншоты: ${t}${dark ? ", күңгірт тақырып" : ""}`,
+    star: "GitHub-та жұлдызша қою", starNote: "Демеу сілтемелері жақында пайда болады",
+    console: "Сайт пен бағдарламаның коды:",
+    race: [
+      "> Java виртуалды машинасы іске қосылуда…",
+      "> JVM қызып жатыр. Әзірге шай қойып алыңыз.",
+      "> Кілт файлын таңдаңыз:\n  AUTH_RSA256_9c4f….p12\n  RSA256_9c4f….p12\n  GOST512_7e21….p12\n  Қайсысы екен? Табыңыз.",
+      "> Құпиясөзді енгізіңіз. Пернетақтаның астындағы стикерде жазылған.",
+      "! Құпиясөз қате. Пернетақта KZ тілінде тұр екен.",
+      "> Құпиясөзді қайта енгізіңіз.",
+      "> NCALayer жаңартулары тексерілуде…",
+      "> Қол қойылуда… 99%",
+      "> Қол қойылуда… 99%",
+      "> Дайын. Сайт түсінбесе, бетті жаңартыңыз.",
+    ],
+  },
+};
+
+const LANG = I18N[document.documentElement.lang] ? document.documentElement.lang : "ru";
+const T = I18N[LANG];
+const ROOT = document.documentElement.dataset.root || "";
+
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-const fmt = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const fmt = new Intl.NumberFormat(T.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -54,25 +131,39 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   map.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
 })();
 
-/* ---------- Narrow screens: section menu flyout ---------- */
-(function navMenu() {
-  const btn = $("#nav-menu-btn"), fly = $("#nav-flyout");
-  const set = (open) => {
+/* ---------- Flyout menus: sections on narrow screens, language ---------- */
+(function flyouts() {
+  const pairs = $$("[data-flyout]").map((btn) => [btn, document.getElementById(btn.dataset.flyout)]);
+  const set = (btn, fly, open) => {
     fly.hidden = !open;
     btn.setAttribute("aria-expanded", open);
     if (open) fly.querySelector("a").focus({ preventScroll: true });
   };
-  btn.addEventListener("click", (e) => { e.stopPropagation(); set(fly.hidden); });
-  fly.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
-  document.addEventListener("click", (e) => { if (!fly.hidden && !e.target.closest(".nav-menu")) set(false); });
+  const closeAll = (except) => pairs.forEach(([b, f]) => { if (f !== except && !f.hidden) set(b, f, false); });
+
+  pairs.forEach(([btn, fly]) => {
+    btn.addEventListener("click", (e) => { e.stopPropagation(); closeAll(fly); set(btn, fly, fly.hidden); });
+    fly.addEventListener("click", (e) => { if (e.target.closest("a")) set(btn, fly, false); });
+  });
+  document.addEventListener("click", (e) => { if (!e.target.closest(".menu-anchor")) closeAll(); });
   document.addEventListener("keydown", (e) => {
-    if (fly.hidden) return;
+    const open = pairs.find(([, f]) => !f.hidden);
+    if (!open) return;
+    const [btn, fly] = open;
     const items = $$("a", fly), i = items.indexOf(document.activeElement);
-    if (e.key === "Escape") { set(false); btn.focus(); }
+    if (e.key === "Escape") { set(btn, fly, false); btn.focus(); }
     if (e.key === "ArrowDown") { items[(i + 1) % items.length].focus(); e.preventDefault(); }
     if (e.key === "ArrowUp") { items[(i - 1 + items.length) % items.length].focus(); e.preventDefault(); }
   });
-  addEventListener("resize", () => { if (!fly.hidden && matchMedia("(min-width: 1101px)").matches) set(false); });
+  addEventListener("resize", () => {
+    const nav = document.getElementById("nav-flyout");
+    if (nav && !nav.hidden && matchMedia("(min-width: 1101px)").matches) closeAll();
+  });
+
+  // Keep the section you are reading when switching language.
+  $$("[data-lang-link]").forEach((a) => a.addEventListener("click", () => {
+    if (location.hash) a.href = a.getAttribute("href").split("#")[0] + location.hash;
+  }));
 })();
 
 /* ---------- Reveal on scroll ---------- */
@@ -86,6 +177,9 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 })();
 
 /* ---------- Download: latest GitHub release ---------- */
+// The build already put a direct link to the newest x64 zip into the buttons, so a click
+// downloads at once. Here we only switch ARM64 visitors to their zip and pick up a
+// release that came out after the last build.
 (async function download() {
   const releasesPage = `https://github.com/${CONFIG.repo}/releases`;
 
@@ -118,26 +212,20 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   };
 
   let release = null;
-  // Our own copy first: same origin, no rate limit. Then the API, in case a release
-  // came out after the last build.
-  try { release = pick(await getJson("release.json", 3000)); } catch (e) {}
+  // Our own copy first (same origin, no rate limit), then the API for anything newer.
+  try { release = pick(await getJson(ROOT + "release.json", 3000)); } catch (e) {}
   try {
     const fresh = pick(await getJson(`https://api.github.com/repos/${CONFIG.repo}/releases?per_page=10`, 4000));
     if (fresh) release = fresh;
   } catch (e) {}
 
-  const arch = await detectArch();
-  const mb = (b) => fmt.format(b / 1048576) + " МБ";
-
-  // The build already put a direct link to the newest x64 zip into the buttons.
-  // Here we only switch to ARM64 when needed and catch a release newer than the build.
   const baked = (a) => /\.zip$/i.test(a.getAttribute("href") || "");
-
   if (!release) {
     $$("[data-download]").forEach((a) => { if (!baked(a)) a.href = releasesPage; });
     return;
   }
 
+  const arch = await detectArch();
   const zip = (rid) => release.assets.find((a) => a.name.endsWith(`-${rid}.zip`));
   const main = zip(`win-${arch}`) || zip("win-x64") || release.assets.find((a) => a.name.endsWith(".zip"));
   const otherRid = main.name.includes("arm64") ? "win-x64" : "win-arm64";
@@ -146,22 +234,18 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const version = release.tag_name.replace(/^v/, "");
   const label = main.name.includes("arm64") ? "ARM64" : "x64";
 
-  $$("[data-download]").forEach((a) => {
-    a.href = main.browser_download_url;
-  });
+  $$("[data-download]").forEach((a) => { a.href = main.browser_download_url; });
   $$("[data-dl-meta]").forEach((m) => {
-    m.textContent = `Версия ${version}${release.prerelease ? " (бета)" : ""} · ${label} · ${mb(main.size)}`;
+    m.textContent = isWindows()
+      ? T.meta(version, release.prerelease, label, `${fmt.format(main.size / 1048576)} ${T.mb}`)
+      : T.onlyWindows(version);
   });
 
   const parts = [];
-  if (other) parts.push(`<a href="${other.browser_download_url}" data-download-alt>Для ${otherRid.endsWith("arm64") ? "ARM64" : "x64"}</a>`);
+  if (other) parts.push(`<a href="${other.browser_download_url}" data-download-alt>${T.forArch(otherRid.endsWith("arm64") ? "ARM64" : "x64")}</a>`);
   if (sha) parts.push(`<a href="${sha.browser_download_url}">SHA-256</a>`);
-  parts.push(`<a href="${release.html_url}">Что нового</a>`);
+  parts.push(`<a href="${release.html_url}">${T.whatsNew}</a>`);
   $$("[data-dl-alt]").forEach((el) => { el.innerHTML = parts.join(" · "); el.hidden = false; });
-
-  if (!isWindows()) {
-    $$("[data-dl-meta]").forEach((m) => { m.textContent = `Версия ${version} · только для Windows`; });
-  }
 })();
 
 /* Toast after a download click */
@@ -184,47 +268,41 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const oldLog = $("#old-log"), oldBar = $("#old-bar"), oldBtn = $("#old-run"), tOld = $("#t-old");
   const win = $("#new-win"), newBtn = $("#new-run"), tNew = $("#t-new");
   let oldBusy = false, newBusy = false;
+  const secs = (ms) => `${fmt.format(ms / 1000)} ${T.sec}`;
 
   function stopwatch(el) {
     const start = performance.now();
     el.className = "timer";
-    const id = setInterval(() => { el.textContent = fmt.format((performance.now() - start) / 1000) + " с"; }, 100);
+    const id = setInterval(() => { el.textContent = secs(performance.now() - start); }, 100);
     return (cls) => {
       clearInterval(id);
-      el.textContent = fmt.format((performance.now() - start) / 1000) + " с";
+      el.textContent = secs(performance.now() - start);
       el.classList.add(cls);
     };
   }
 
-  const script = [
-    [900, "> Запуск виртуальной машины Java…", 8],
-    [1300, "> Разогреваем JVM. Можно пока заварить чай.", 22],
-    [1300, "> Выберите файл ключа:\n  AUTH_RSA256_9c4f….p12\n  RSA256_9c4f….p12\n  GOST512_7e21….p12\n  Какой из них? Угадайте.", 38],
-    [1400, "> Введите пароль. Тот, что на стикере под клавиатурой.", 52],
-    [1000, "! Неверный пароль. Раскладка была KZ.", 52, "err"],
-    [900, "> Введите пароль ещё раз.", 64],
-    [800, "> Проверяем обновления NCALayer…", 80],
-    [700, "> Подписываем… 99%", 99],
-    [1700, "> Подписываем… 99%", 99],
-    [600, "> Готово. Если сайт не понял, обновите страницу.", 100],
-  ];
+  // [delay before the line, progress %, css class]. About 18 seconds in total,
+  // closer to a real first signature in NCALayer than the old 10.
+  const timing = [[1600, 8], [2300, 22], [2300, 38], [2400, 52], [1700, 52, "err"],
+                  [1600, 64], [1400, 80], [1200, 99], [3000, 99], [1000, 100]];
 
   async function runOld() {
     if (oldBusy) return;
     oldBusy = true; oldBtn.disabled = true;
     oldLog.textContent = ""; oldBar.style.width = "0%";
     const stop = stopwatch(tOld);
-    for (const [ms, text, pct, cls] of script) {
+    for (let i = 0; i < timing.length; i++) {
+      const [ms, pct, cls] = timing[i];
       await sleep(reduceMotion ? 150 : ms);
       const line = document.createElement("div");
-      line.textContent = text;
+      line.textContent = T.race[i];
       if (cls) line.className = cls;
       oldLog.append(line);
       oldLog.scrollTop = oldLog.scrollHeight;
       oldBar.style.width = pct + "%";
     }
     stop("done-bad");
-    oldBusy = false; oldBtn.disabled = false; oldBtn.textContent = "Ещё раз";
+    oldBusy = false; oldBtn.disabled = false; oldBtn.textContent = T.again;
   }
 
   async function runNew() {
@@ -242,7 +320,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   oldBtn.addEventListener("click", runOld);
   newBtn.addEventListener("click", runNew);
   $("#new-reset").addEventListener("click", () => {
-    win.dataset.state = "idle"; tNew.textContent = "0,0 с"; tNew.className = "timer";
+    win.dataset.state = "idle"; tNew.textContent = secs(0); tNew.className = "timer";
     newBtn.focus({ preventScroll: true });
   });
   $("#race").addEventListener("click", () => {
@@ -260,7 +338,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let index = 0;
 
   const frame = $("#shot-open");
-  const src = (name, theme) => `screenshots/${name}-${theme}.webp`;
+  const src = (name, theme) => `${ROOT}screenshots/${name}-${theme}.webp`;
   const currentTheme = () => document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
   let token = 0;
 
@@ -281,7 +359,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const [w, h] = "portrait" in t.dataset ? [900, 1089] : [1600, 1090];
     for (const [img, theme] of [[light, "light"], [dark, "dark"]]) {
       img.width = w; img.height = h;
-      img.alt = `Скриншот NativeNCA: ${t.dataset.title}${theme === "dark" ? ", тёмная тема" : ""}`;
+      img.alt = T.shot(t.dataset.title, theme === "dark");
       img.src = src(name, theme);
     }
     const visible = currentTheme() === "dark" ? dark : light;
@@ -322,9 +400,9 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Lightbox
   const lb = $("#lightbox"), lbImg = $("#lightbox-img");
-  $("#shot-open").addEventListener("click", () => {
+  frame.addEventListener("click", () => {
     lbImg.src = src(tabs[index].dataset.shot, currentTheme());
-    lbImg.alt = `Скриншот NativeNCA: ${tabs[index].dataset.title}`;
+    lbImg.alt = T.shot(tabs[index].dataset.title, false);
     lb.showModal();
   });
   lb.addEventListener("click", (e) => { if (e.target === lb || e.target.closest("[data-close]")) lb.close(); });
@@ -337,6 +415,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const dlg = $("#donate-dialog");
   const list = $("#donate-list");
   const ext = '<svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>';
+  const note = (d) => (typeof d.note === "object" ? d.note[LANG] || d.note.ru : d.note) || "";
 
   if (items.length === 1) {
     btn.addEventListener("click", () => window.open(items[0].url, "_blank", "noopener"));
@@ -344,12 +423,12 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
   if (items.length === 0) {
     // No donation links configured yet: offer a star instead of a dead end.
-    items.push({ title: "Поставить звезду на GitHub", note: "Ссылки для донатов скоро появятся", url: `https://github.com/${CONFIG.repo}`, icon: "github" });
+    items.push({ title: T.star, note: T.starNote, url: `https://github.com/${CONFIG.repo}`, icon: "github" });
   }
   list.innerHTML = items.map((d) =>
     `<a class="donate-item" href="${d.url}" target="_blank" rel="noopener">
        <svg class="icon icon-24" aria-hidden="true"><use href="#i-${d.icon || "heart"}"/></svg>
-       <span><b>${d.title}</b><small>${d.note || ""}</small></span>${ext}</a>`).join("");
+       <span><b>${d.title}</b><small>${note(d)}</small></span>${ext}</a>`).join("");
   btn.addEventListener("click", () => dlg.showModal());
   dlg.addEventListener("click", (e) => { if (e.target === dlg || e.target.closest("[data-close]")) dlg.close(); });
 })();
@@ -360,4 +439,4 @@ $$("#faq-list details").forEach((d) => d.addEventListener("toggle", () => {
 }));
 
 /* Hi, curious one. */
-console.log("%cNativeNCA", "font:600 20px 'Segoe UI';color:#005fb8", "\nКод сайта и программы: https://github.com/" + CONFIG.repo);
+console.log("%cNativeNCA", "font:600 20px 'Segoe UI';color:#005fb8", `\n${T.console} https://github.com/${CONFIG.repo}`);

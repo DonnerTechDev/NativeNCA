@@ -9,6 +9,10 @@ Environment:
                direct link to the newest zip, and release.json keeps a copy for site.js.
                The Site workflow rebuilds after every tagged release.
 
+Pages: site/index.html (Russian, the default), site/en/index.html, site/kk/index.html.
+Each page marks where the icon sprite goes with <!--ICONS-->; the sprite itself is
+site/assets/icons.svg, so the three pages share one copy.
+
 Needs Pillow for the WebP screenshots (pip install pillow).
 """
 import datetime
@@ -33,7 +37,7 @@ if not SITE_URL.endswith("/"):
 def copy_sources():
     if OUT.exists():
         shutil.rmtree(OUT)
-    shutil.copytree(SRC, OUT, ignore=shutil.ignore_patterns("build.py", "__pycache__", ".DS_Store"))
+    shutil.copytree(SRC, OUT, ignore=shutil.ignore_patterns("build.py", "icons.svg", "__pycache__", ".DS_Store"))
     shutil.copy2(ROOT / "docs" / "icon.png", OUT / "icon.png")
     shutil.copy2(ROOT / "NativeNCA.App" / "Assets" / "app.ico", OUT / "favicon.ico")
     (OUT / ".nojekyll").write_text("")
@@ -71,22 +75,34 @@ def releases():
     return data
 
 
-def download_link(data):
+# Text on the download buttons, per page language.
+DL_TEXT = {
+    "ru": {"meta": "Версия {v}{beta} · {arch} · {size} МБ", "beta": " (бета)", "dec": ",",
+           "none": "Страница релизов на GitHub"},
+    "en": {"meta": "Version {v}{beta} · {arch} · {size} MB", "beta": " (beta)", "dec": ".",
+           "none": "Releases page on GitHub"},
+    "kk": {"meta": "Нұсқа {v}{beta} · {arch} · {size} МБ", "beta": " (бета)", "dec": ",",
+           "none": "GitHub-тағы релиздер беті"},
+}
+
+
+def download_link(data, lang="ru"):
     """Direct link to the newest x64 zip, so the button downloads without waiting for JS.
 
     Same choice as site.js: the newest stable release, a pre-release only if nothing
     stable exists. Without releases the button leads to the Releases page.
     """
+    t = DL_TEXT.get(lang, DL_TEXT["ru"])
     ok = [r for r in data if not r.get("draft") and any(a["name"].endswith(".zip") for a in r["assets"])]
     rel = next((r for r in ok if not r.get("prerelease")), ok[0] if ok else None)
     if not rel:
-        return f"https://github.com/{REPO}/releases", "Страница релизов на GitHub"
+        return f"https://github.com/{REPO}/releases", t["none"]
     asset = next((a for a in rel["assets"] if a["name"].endswith("-win-x64.zip")),
                  next(a for a in rel["assets"] if a["name"].endswith(".zip")))
-    version = rel["tag_name"].lstrip("v") + (" (бета)" if rel.get("prerelease") else "")
-    size = f"{asset['size'] / 1048576:.1f}".replace(".", ",")
-    arch = "ARM64" if "arm64" in asset["name"] else "x64"
-    return asset["browser_download_url"], f"Версия {version} · {arch} · {size} МБ"
+    size = f"{asset['size'] / 1048576:.1f}".replace(".", t["dec"])
+    meta = t["meta"].format(v=rel["tag_name"].lstrip("v"), beta=t["beta"] if rel.get("prerelease") else "",
+                            arch="ARM64" if "arm64" in asset["name"] else "x64", size=size)
+    return asset["browser_download_url"], meta
 
 
 def faq_jsonld(page: str) -> str:
@@ -104,15 +120,22 @@ def faq_jsonld(page: str) -> str:
 
 def finalize(data):
     today = datetime.date.today().isoformat()
-    dl_url, dl_meta = download_link(data)
+    sprite = (SRC / "assets" / "icons.svg").read_text(encoding="utf-8").strip()
+    sprite = "<!-- Fluent UI System Icons (MIT), from site/assets/icons.svg -->\n" + sprite
     for f in OUT.rglob("*"):
         if f.suffix not in {".html", ".xml", ".txt"}:
             continue
         s = f.read_text(encoding="utf-8")
         s = s.replace("__SITE_URL__", SITE_URL).replace("__BUILD_DATE__", today)
-        s = s.replace("__DOWNLOAD_URL__", html.escape(dl_url)).replace("__DOWNLOAD_META__", html.escape(dl_meta))
         if f.name == "index.html":
+            lang = re.search(r'<html lang="([a-z]+)"', s).group(1)
+            dl_url, dl_meta = download_link(data, lang)
+            s = s.replace("__DOWNLOAD_URL__", html.escape(dl_url)).replace("__DOWNLOAD_META__", html.escape(dl_meta))
+            s = s.replace("<!--ICONS-->", sprite, 1)
             s = s.replace("</head>", faq_jsonld(s) + "</head>", 1)
+            left = sorted(set(re.findall(r"__[A-Z_]+__|<!--ICONS-->", s)))
+            if left:
+                sys.exit(f"{f.relative_to(OUT)}: unreplaced placeholders {left}")
         f.write_text(s, encoding="utf-8")
 
 

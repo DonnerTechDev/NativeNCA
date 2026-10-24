@@ -307,6 +307,11 @@ code {
 .flyout a:hover { background: var(--subtle-hover); text-decoration: none; }
 .flyout a .icon { width: 18px; height: 18px; color: var(--text-2); }
 .flyout hr { border: 0; border-top: 1px solid var(--divider); margin: 4px 0; }
+.flyout a .check { margin-left: auto; color: var(--accent-text); }
+.flyout a[aria-checked="true"] { font-weight: 600; }
+.flyout-narrow { width: min(100%, 200px); }
+.lang-btn { --h: 36px; padding: 0 10px; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-2); }
+.lang-btn .icon { width: 18px; height: 18px; }
 @media (max-width: 1100px) {
   .nav { display: none; }
   .nav-menu { display: block; }
@@ -314,6 +319,9 @@ code {
 }
 @media (max-width: 480px) {
   .appbar .hide-sm { display: none; }
+  .appbar-dl { width: 36px; padding: 0; }
+  .appbar-dl span { display: none; }
+  .lang-btn { padding: 0 8px; }
   .hero-actions .btn { width: 100%; justify-content: flex-start; }
 }
 
@@ -379,6 +387,7 @@ section { position: relative; }
 @media (max-width: 1060px) { .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 860px) { .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .grid-4, .grid-3 { grid-template-columns: 1fr; } }
+@media (min-width: 601px) and (max-width: 860px) { .features > :last-child:nth-child(odd) { grid-column: span 2; } }
 
 .feature { padding: 22px 22px 24px; transition: background-color .15s, transform .25s var(--ease); }
 .feature:hover { background: var(--card-hover); }
@@ -716,6 +725,7 @@ section { position: relative; }
 .reqs { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14.5px; color: var(--text-2); }
 .reqs span { display: inline-flex; align-items: center; gap: 8px; }
 .reqs .icon { width: 18px; height: 18px; color: var(--text-3); }
+.start-note { margin: 12px 0 0; font-size: 14px; color: var(--text-2); max-width: 60ch; }
 .dl-alt { font-size: 13.5px; color: var(--text-2); margin-top: 8px; }
 .dl-alt a { color: var(--accent-text); }
 
