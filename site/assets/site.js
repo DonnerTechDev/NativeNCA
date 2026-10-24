@@ -54,6 +54,27 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   map.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
 })();
 
+/* ---------- Narrow screens: section menu flyout ---------- */
+(function navMenu() {
+  const btn = $("#nav-menu-btn"), fly = $("#nav-flyout");
+  const set = (open) => {
+    fly.hidden = !open;
+    btn.setAttribute("aria-expanded", open);
+    if (open) fly.querySelector("a").focus({ preventScroll: true });
+  };
+  btn.addEventListener("click", (e) => { e.stopPropagation(); set(fly.hidden); });
+  fly.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
+  document.addEventListener("click", (e) => { if (!fly.hidden && !e.target.closest(".nav-menu")) set(false); });
+  document.addEventListener("keydown", (e) => {
+    if (fly.hidden) return;
+    const items = $$("a", fly), i = items.indexOf(document.activeElement);
+    if (e.key === "Escape") { set(false); btn.focus(); }
+    if (e.key === "ArrowDown") { items[(i + 1) % items.length].focus(); e.preventDefault(); }
+    if (e.key === "ArrowUp") { items[(i - 1 + items.length) % items.length].focus(); e.preventDefault(); }
+  });
+  addEventListener("resize", () => { if (!fly.hidden && matchMedia("(min-width: 1101px)").matches) set(false); });
+})();
+
 /* ---------- Reveal on scroll ---------- */
 (function reveal() {
   const els = $$(".reveal");

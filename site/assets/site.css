@@ -256,7 +256,7 @@ code {
   transition: border-color .2s, background-color .2s;
 }
 .appbar.scrolled { border-bottom-color: var(--divider); background: var(--layer-strong); }
-.appbar-inner { display: flex; align-items: center; gap: 8px; height: 60px; }
+.appbar-inner { position: relative; display: flex; align-items: center; gap: 8px; height: 60px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); font-weight: 600; font-size: 16px; margin-right: 12px; }
 .brand:hover { text-decoration: none; }
 .brand img { width: 28px; height: 28px; }
@@ -278,8 +278,33 @@ code {
 .theme-toggle .i-sun { display: none; }
 :root[data-theme="dark"] .theme-toggle .i-sun { display: block; }
 :root[data-theme="dark"] .theme-toggle .i-moon { display: none; }
-@media (max-width: 900px) {
+.nav a { white-space: nowrap; }
+.nav-menu { display: none; }
+.flyout {
+  /* Anchored to the app bar's right edge. A nested backdrop-filter would not
+     blur the page behind the bar, so the flyout is solid. */
+  position: absolute; top: calc(100% + 4px); right: 0; z-index: 60;
+  width: min(100%, 280px); padding: 4px;
+  display: flex; flex-direction: column;
+  background: var(--layer-solid);
+  border: 1px solid var(--stroke-strong);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-flyout);
+  animation: flyIn .2s var(--ease);
+}
+.flyout[hidden] { display: none; }
+@keyframes flyIn { from { opacity: 0; transform: translateY(-8px); } }
+.flyout a {
+  display: flex; align-items: center; gap: 10px;
+  height: 40px; padding: 0 12px; border-radius: var(--r-ctrl);
+  color: var(--text); font-size: 15px;
+}
+.flyout a:hover { background: var(--subtle-hover); text-decoration: none; }
+.flyout a .icon { width: 18px; height: 18px; color: var(--text-2); }
+.flyout hr { border: 0; border-top: 1px solid var(--divider); margin: 4px 0; }
+@media (max-width: 1100px) {
   .nav { display: none; }
+  .nav-menu { display: block; }
   .brand { margin-right: auto; }
 }
 @media (max-width: 480px) {
