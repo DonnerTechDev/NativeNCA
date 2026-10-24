@@ -161,15 +161,16 @@
     </Style>
 
     <!--
-        Card list item with Win11-style hover/selection: a soft highlight layer fades in,
-        selected item gets an accent stroke and the vertical accent "pill" on the left.
+        Card list item with Win11-style hover/selection, like the NavigationView / Settings list:
+        selection is a filled background plus the vertical accent "pill", no accent outline
+        (an outline reads as keyboard focus). Radio cards (Tag=NoPill) use the accent outline instead.
     -->
     <Style x:Key="KeyCardItem" TargetType="ListBoxItem">
         <Setter Property="Margin" Value="0,0,0,6" />
         <Setter Property="Padding" Value="12,10" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
@@ -179,8 +180,8 @@
                                 BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" />
                         <Border x:Name="Hover" CornerRadius="8" Opacity="0"
                                 Background="{DynamicResource SubtleFillColorSecondaryBrush}" />
-                        <Border x:Name="Selection" CornerRadius="8" Opacity="0" BorderThickness="1"
-                                Background="{DynamicResource SubtleFillColorTertiaryBrush}"
+                        <Border x:Name="Selection" CornerRadius="8" Opacity="0" BorderThickness="0"
+                                Background="{DynamicResource SubtleFillColorSecondaryBrush}"
                                 BorderBrush="{DynamicResource AccentFillColorDefaultBrush}" />
                         <Border x:Name="Pill" Width="3" Height="18" CornerRadius="1.5" Margin="3,0,0,0"
                                 HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -236,6 +237,8 @@
                         </Trigger>
                         <Trigger Property="Tag" Value="NoPill">
                             <Setter TargetName="Pill" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Selection" Property="BorderThickness" Value="1" />
+                            <Setter TargetName="Selection" Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
