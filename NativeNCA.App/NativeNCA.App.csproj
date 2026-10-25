@@ -25,6 +25,8 @@
     <Version>0.0.0-dev</Version>
     <!-- Setup and the updater copy only NativeNCA.exe: WPF's native DLLs must be inside it. -->
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- About 75 MB instead of 170 MB, as the release builds. -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
