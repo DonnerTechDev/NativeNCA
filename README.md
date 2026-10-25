@@ -1,4 +1,4 @@
-<img src="docs/icon.png" alt="" width="96" align="right">
+<img src="docs/icon.png" alt="" width="64" align="right">
 
 # NativeNCA
 
