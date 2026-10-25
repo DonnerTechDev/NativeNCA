@@ -70,10 +70,12 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #10161e;
-  --bloom-1: rgba(28, 112, 178, .55);
-  --bloom-2: rgba(84, 66, 170, .42);
-  --bloom-3: rgba(16, 136, 150, .38);
+  /* Dark Mica is a near-neutral grey with a faint tint, so the blooms stay
+     low in chroma and fade out slowly instead of glowing. */
+  --bg: #14171c;
+  --bloom-1: rgba(46, 116, 178, .42);
+  --bloom-2: rgba(92, 86, 170, .30);
+  --bloom-3: rgba(34, 124, 142, .26);
 
   --text: #fff;
   --text-2: rgba(255, 255, 255, .78);
@@ -148,6 +150,24 @@ body::before {
     radial-gradient(36vw 30vw at 86% 22%, var(--bloom-2), transparent 70%),
     radial-gradient(44vw 30vw at 60% 92%, var(--bloom-3), transparent 70%);
   filter: saturate(110%);
+}
+/* Larger, eased falloff: a plain two-stop gradient leaves a visible rim on a dark base. */
+:root[data-theme="dark"] body::before {
+  background:
+    radial-gradient(56vw 46vw at 20% 16%, var(--bloom-1), color-mix(in srgb, var(--bloom-1) 55%, transparent) 26%, color-mix(in srgb, var(--bloom-1) 22%, transparent) 50%, transparent 78%),
+    radial-gradient(48vw 40vw at 84% 28%, var(--bloom-2), color-mix(in srgb, var(--bloom-2) 55%, transparent) 26%, color-mix(in srgb, var(--bloom-2) 22%, transparent) 50%, transparent 78%),
+    radial-gradient(60vw 40vw at 56% 90%, var(--bloom-3), color-mix(in srgb, var(--bloom-3) 55%, transparent) 26%, color-mix(in srgb, var(--bloom-3) 22%, transparent) 50%, transparent 78%);
+  filter: none;
+}
+/* Faint grain, as in Acrylic: it also hides the banding of dark gradients. */
+:root[data-theme="dark"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .05;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 img { max-width: 100%; height: auto; display: block; }
 a { color: var(--accent-text); text-decoration: none; }
