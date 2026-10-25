@@ -3,6 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+// northbound oss hand-over: opened from oss.northbound.sh, the page starts black and plays the oss intro
+// (https://oss.northbound.sh/intro.js, the same for every oss project); a direct visit gets none of it
+(function () {
+  var o = location.hostname === 'localhost' ? 'http://localhost:4330' : 'https://oss.northbound.sh';
+  var r = document.referrer, d = document.documentElement;
+  try { if ((r !== o + '/' && r !== o + '/ru/') || matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
+  window.ossIntro = { product: 'NativeNCA', by: 'DonnerTechDev', line: 'Windows үшін NCALayer баламасы' };
+  d.classList.add('oss-in');
+  var s = document.createElement('script');
+  s.src = o + '/intro.js'; s.async = true;
+  s.onerror = function () { d.classList.remove('oss-in'); };
+  document.head.appendChild(s);
+  setTimeout(function () { if (!window.ossIntroStarted) d.classList.remove('oss-in'); }, 2500);
+})();
+</script>
+<style>html.oss-in{background:#000;overflow:hidden}html.oss-in body{visibility:hidden}</style>
 <title>NativeNCA — Windows үшін NCALayer баламасы: Java-сыз ЭЦҚ</title>
 <meta name="description" content="eGov-та және банктерде ҰКО ЭЦҚ-сымен кіруге және қол қоюға арналған тегін, ашық кодты бағдарлама, NCALayer орнына. Java қажет емес: Windows Hello, шифрланған кілттер қоймасы және қол қойылған жаңартулар.">
 <link rel="canonical" href="__SITE_URL__kk/">
