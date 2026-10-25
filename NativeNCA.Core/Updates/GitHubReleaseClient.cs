@@ -20,7 +20,7 @@ public sealed record ReleasePackage(ReleaseInfo Release, string Architecture, Re
 /// </summary>
 public sealed class GitHubReleaseClient
 {
-    public const string Repository = "DonnerTechDev/NativeNCA";
+    public const string Repository = "northbound-oss/NativeNCA";
     public static readonly Uri LatestReleaseUrl = new($"https://api.github.com/repos/{Repository}/releases/latest");
     public static readonly Uri ReleasesPageUrl = new($"https://github.com/{Repository}/releases");
 
@@ -38,45 +38,74 @@ public sealed class GitHubReleaseClient
     {
         if (RateLimitedUntil is { } until && until > DateTimeOffset.UtcNow) return _cached;
 
-        using var request = new HttpRequestMessage(HttpMethod.Get, LatestReleaseUrl);
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-        request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-        if (_etag != null) request.Headers.TryAddWithoutValidation("If-None-Match", _etag);
+        Uri url = LatestReleaseUrl;
+        for (int hop = 0; ; hop++)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+            request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+            if (_etag != null) request.Headers.TryAddWithoutValidation("If-None-Match", _etag);
 
-        HttpResponseMessage response;
-        try
-        {
-            response = await _http.SendAsync(request, cancellationToken);
-        }
-        catch (HttpRequestException)
-        {
-            return null; // offline
-        }
-        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
-        {
-            return null; // timeout
-        }
-
-        using (response)
-        {
-            if (response.StatusCode == HttpStatusCode.NotModified) return _cached;
-
-            if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests)
+            HttpResponseMessage response;
+            try
             {
-                RateLimitedUntil = ReadRateLimitReset(response) ?? DateTimeOffset.UtcNow.AddHours(1);
-                return _cached;
+                response = await _http.SendAsync(request, cancellationToken);
+            }
+            catch (HttpRequestException)
+            {
+                return null; // offline
+            }
+            catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                return null; // timeout
             }
 
-            if (response.StatusCode == HttpStatusCode.NotFound) return null; // no releases yet
-            if (!response.IsSuccessStatusCode) return _cached;
+            using (response)
+            {
+                // A renamed or transferred repository answers with a redirect to /repositories/<id>/...
+                if (IsRedirect(response.StatusCode))
+                {
+                    var location = response.Headers.Location;
+                    if (location == null || hop >= MaxApiRedirects) return _cached;
+                    url = location.IsAbsoluteUri ? location : new Uri(url, location);
+                    if (!IsApiUri(url)) return _cached;
+                    continue;
+                }
 
-            string json = await response.Content.ReadAsStringAsync(cancellationToken);
-            var release = ParseRelease(json);
-            _cached = release;
-            _etag = response.Headers.ETag?.ToString();
-            RateLimitedUntil = null;
-            return release;
+                return await ReadResponseAsync(response, cancellationToken);
+            }
         }
+    }
+
+    private const int MaxApiRedirects = 3;
+
+    private static bool IsRedirect(HttpStatusCode status) => status is
+        HttpStatusCode.MovedPermanently or HttpStatusCode.Found or
+        HttpStatusCode.TemporaryRedirect or HttpStatusCode.PermanentRedirect;
+
+    private static bool IsApiUri(Uri uri) =>
+        uri.Scheme == Uri.UriSchemeHttps && uri.IsDefaultPort &&
+        string.Equals(uri.IdnHost, "api.github.com", StringComparison.OrdinalIgnoreCase);
+
+    private async Task<ReleaseInfo?> ReadResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        if (response.StatusCode == HttpStatusCode.NotModified) return _cached;
+
+        if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests)
+        {
+            RateLimitedUntil = ReadRateLimitReset(response) ?? DateTimeOffset.UtcNow.AddHours(1);
+            return _cached;
+        }
+
+        if (response.StatusCode == HttpStatusCode.NotFound) return null; // no releases yet
+        if (!response.IsSuccessStatusCode) return _cached;
+
+        string json = await response.Content.ReadAsStringAsync(cancellationToken);
+        var release = ParseRelease(json);
+        _cached = release;
+        _etag = response.Headers.ETag?.ToString();
+        RateLimitedUntil = null;
+        return release;
     }
 
     private static DateTimeOffset? ReadRateLimitReset(HttpResponseMessage response)

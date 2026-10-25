@@ -69,15 +69,15 @@ public class ReleaseSelectionTests
         foreach (string arch in new[] { "win-x64", "win-arm64" })
         {
             string zip = $"NativeNCA-{v}-{arch}.zip";
-            assets.Add(new { name = zip, size = 1000, browser_download_url = $"https://{host}/DonnerTechDev/NativeNCA/releases/download/{tag}/{zip}" });
-            assets.Add(new { name = zip + ".sha256", size = 90, browser_download_url = $"https://{host}/DonnerTechDev/NativeNCA/releases/download/{tag}/{zip}.sha256" });
+            assets.Add(new { name = zip, size = 1000, browser_download_url = $"https://{host}/northbound-oss/NativeNCA/releases/download/{tag}/{zip}" });
+            assets.Add(new { name = zip + ".sha256", size = 90, browser_download_url = $"https://{host}/northbound-oss/NativeNCA/releases/download/{tag}/{zip}.sha256" });
             if (withSignatures)
-                assets.Add(new { name = zip + ".sig", size = 90, browser_download_url = $"https://{host}/DonnerTechDev/NativeNCA/releases/download/{tag}/{zip}.sig" });
+                assets.Add(new { name = zip + ".sig", size = 90, browser_download_url = $"https://{host}/northbound-oss/NativeNCA/releases/download/{tag}/{zip}.sig" });
         }
         return JsonSerializer.Serialize(new
         {
             tag_name = tag,
-            html_url = $"https://github.com/DonnerTechDev/NativeNCA/releases/tag/{tag}",
+            html_url = $"https://github.com/northbound-oss/NativeNCA/releases/tag/{tag}",
             draft,
             prerelease,
             assets
@@ -596,6 +596,38 @@ public class UpdateCheckTests : IDisposable
         await vm.CheckAsync(manual: true);
         Assert.True(vm.IsUpdateAvailable);
         Assert.Equal(0, notifications);
+    }
+
+    private static HttpResponseMessage Redirect(string location)
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.MovedPermanently);
+        response.Headers.Location = new Uri(location);
+        return response;
+    }
+
+    [Fact]
+    public async Task MovedRepository_IsFollowedOnTheApiHost()
+    {
+        var handler = new FakeGitHub(request => request.RequestUri!.AbsolutePath.StartsWith("/repos/")
+            ? Redirect("https://api.github.com/repositories/1/releases/latest")
+            : Json(ReleaseSelectionTests.ReleaseJson("v0.2.0")));
+
+        var release = await new GitHubReleaseClient(new HttpClient(handler)).GetLatestAsync();
+
+        Assert.Equal("0.2.0", release!.Version.ToString());
+        Assert.Equal(2, handler.Requests);
+    }
+
+    [Fact]
+    public async Task Redirects_ToOtherHosts_OrInLoops_AreNotFollowed()
+    {
+        var elsewhere = new FakeGitHub(_ => Redirect("https://evil.example/releases/latest"));
+        Assert.Null(await new GitHubReleaseClient(new HttpClient(elsewhere)).GetLatestAsync());
+        Assert.Equal(1, elsewhere.Requests);
+
+        var loop = new FakeGitHub(_ => Redirect("https://api.github.com/repositories/1/releases/latest"));
+        Assert.Null(await new GitHubReleaseClient(new HttpClient(loop)).GetLatestAsync());
+        Assert.Equal(4, loop.Requests);
     }
 
     [Fact]

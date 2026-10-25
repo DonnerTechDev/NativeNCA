@@ -162,7 +162,7 @@ class Program
     }
 
     static ReleaseInfo FakeRelease(string version) =>
-        new(AppVersion.Parse(version), "v" + version, new Uri($"https://github.com/DonnerTechDev/NativeNCA/releases/tag/v{version}"), Array.Empty<ReleaseAsset>());
+        new(AppVersion.Parse(version), "v" + version, new Uri($"https://github.com/northbound-oss/NativeNCA/releases/tag/v{version}"), Array.Empty<ReleaseAsset>());
 
     static SecureVaultService MakeVault(int count = 3)
     {
