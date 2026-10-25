@@ -315,6 +315,20 @@ public class InstallationSwapTests : IDisposable
     }
 
     [Fact]
+    public void Update_ReplacesReadOnlyPreviousVersion()
+    {
+        File.WriteAllText(_install.ExePath, "v2");
+        File.WriteAllText(_install.PreviousExePath, "v1");
+        File.SetAttributes(_install.PreviousExePath, FileAttributes.ReadOnly);
+
+        File.WriteAllText(_install.NewExePath, "v3");
+        _install.SwapInNewVersion(AppVersion.Parse("0.2.0"));
+
+        Assert.Equal("v3", Read(_install.ExePath));
+        Assert.Equal("v2", Read(_install.PreviousExePath));
+    }
+
+    [Fact]
     public void FailedSwap_PutsTheCurrentExeBack()
     {
         File.WriteAllText(_install.ExePath, "v1");

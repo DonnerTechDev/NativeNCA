@@ -41,11 +41,13 @@ public sealed class SetupService
         if (Installation.IsInstalled)
         {
             File.Copy(sourceExe, Installation.NewExePath, overwrite: true);
+            AppInstallation.MakeWritable(Installation.NewExePath);
             Installation.SwapInNewVersion(Installation.GetInstalledVersion() ?? AppVersion.Parse("0.0.0"));
         }
         else
         {
             File.Copy(sourceExe, Installation.ExePath, overwrite: false);
+            AppInstallation.MakeWritable(Installation.ExePath);
         }
 
         Register(version);

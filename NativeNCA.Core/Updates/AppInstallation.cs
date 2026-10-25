@@ -57,6 +57,21 @@ public sealed class AppInstallation
         }
     }
 
+    /// <summary>
+    /// Clears the read-only attribute. A copy keeps the source's attributes, and a read-only exe could
+    /// not be deleted by the next update.
+    /// </summary>
+    public static void MakeWritable(string path) =>
+        File.SetAttributes(path, File.GetAttributes(path) & ~FileAttributes.ReadOnly);
+
+    /// <summary>Deletes <paramref name="path"/> if it exists, also when it is read-only.</summary>
+    private static void DeleteFile(string path)
+    {
+        if (!File.Exists(path)) return;
+        MakeWritable(path);
+        File.Delete(path);
+    }
+
     // ===================== Previous version =====================
 
     public bool HasPreviousVersion => File.Exists(PreviousExePath);
@@ -112,7 +127,7 @@ public sealed class AppInstallation
         if (!File.Exists(ExePath)) throw new FileNotFoundException(Strings.Install_NotInstalled, ExePath);
 
         // Keep exactly one previous version.
-        if (File.Exists(PreviousExePath)) File.Delete(PreviousExePath);
+        DeleteFile(PreviousExePath);
         DeletePreviousInfo();
 
         File.Move(ExePath, PreviousExePath);
@@ -135,7 +150,7 @@ public sealed class AppInstallation
         if (!File.Exists(PreviousExePath)) return;
         if (File.Exists(ExePath))
         {
-            if (File.Exists(NewExePath)) File.Delete(NewExePath);
+            DeleteFile(NewExePath);
             File.Move(ExePath, NewExePath);
         }
         File.Move(PreviousExePath, ExePath);
@@ -153,7 +168,7 @@ public sealed class AppInstallation
     {
         if (!File.Exists(PreviousExePath)) throw new FileNotFoundException(Strings.Install_PreviousMissing, PreviousExePath);
 
-        if (File.Exists(DiscardedExePath)) File.Delete(DiscardedExePath);
+        DeleteFile(DiscardedExePath);
 
         bool hadCurrent = File.Exists(ExePath);
         if (hadCurrent) File.Move(ExePath, DiscardedExePath);
@@ -184,7 +199,7 @@ public sealed class AppInstallation
     {
         foreach (string path in new[] { DiscardedExePath, NewExePath })
         {
-            try { if (File.Exists(path)) File.Delete(path); } catch { /* next time */ }
+            try { DeleteFile(path); } catch { /* next time */ }
         }
         if (!HasPreviousVersion) DeletePreviousInfo();
     }

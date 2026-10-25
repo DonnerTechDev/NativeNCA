@@ -85,6 +85,7 @@ public sealed class UpdateDownloader
                             ?? throw new UpdateRejectedException(Strings.Update_NoExe);
                 entry.ExtractToFile(temp, overwrite: true);
             }
+            AppInstallation.MakeWritable(temp);
 
             var exeVersion = AppInstallation.ReadExeVersion(temp);
             if (exeVersion == null || !exeVersion.Equals(version))
