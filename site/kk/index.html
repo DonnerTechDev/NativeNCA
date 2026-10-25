@@ -20,8 +20,8 @@
 })();
 </script>
 <style>html.oss-in{background:#000;overflow:hidden}html.oss-in body{visibility:hidden}</style>
-<title>NativeNCA — Windows үшін NCALayer баламасы: Java-сыз ЭЦҚ</title>
-<meta name="description" content="eGov-та және банктерде ҰКО ЭЦҚ-сымен кіруге және қол қоюға арналған тегін, ашық кодты бағдарлама, NCALayer орнына. Java қажет емес: Windows Hello, шифрланған кілттер қоймасы және қол қойылған жаңартулар.">
+<title>Windows үшін NCALayer баламасы: Java-сыз ЭЦҚ — NativeNCA</title>
+<meta name="description" content="NCALayer-дің тегін, ашық кодты баламасы: eGov-та және банктерде ҰКО ЭЦҚ-сымен Java-сыз кіру және қол қою. Сайттар оны NCALayer деп таниды, растау Windows Hello арқылы.">
 <link rel="canonical" href="__SITE_URL__kk/">
 <link rel="alternate" hreflang="ru" href="__SITE_URL__">
 <link rel="alternate" hreflang="en" href="__SITE_URL__en/">
@@ -150,11 +150,10 @@
 <section class="hero" id="top">
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">
-        <svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>
-        Windows үшін NCALayer-дің нативті баламасы
-      </p>
-      <h1 class="display">ЭЦҚ Java-сыз және&nbsp;<em>әр қолтаңбаға құпиясөзсіз</em></h1>
+      <h1 class="hero-title">
+        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>Windows үшін NCALayer-дің нативті баламасы</span>
+        <span class="display">ЭЦҚ Java-сыз және&nbsp;<em>әр қолтаңбаға құпиясөзсіз</em></span>
+      </h1>
       <p class="lead">NativeNCA ҰКО ЭЦҚ кілтімен eGov-қа, интернет-банктерге және басқа қазақстандық сервистерге кіріп, құжаттарға қол қояды. Сайттар онымен NCALayer-мен қалай жұмыс істесе, дәл солай жұмыс істейді, ал қолтаңбаны бет-әлпетіңізбен, саусақ ізіңізбен немесе Windows Hello PIN-кодымен растайсыз.</p>
 
       <div class="hero-actions">
@@ -515,6 +514,10 @@
       <details class="expander">
         <summary>NCALayer-ді жою керек пе?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
         <div class="exp-body"><p>Жоқ. Бірақ екеуі бір мезгілде жұмыс істей алмайды: сайттар екі бағдарламаны да бір портта, 13579-да күтеді. NCALayer іске қосулы болса, NativeNCA оны жабуды және автоматты іске қосылуын өшіруді ұсынады. Автоматты іске қосуды кез келген уақытта қайта қосуға болады.</p></div>
+      </details>
+      <details class="expander">
+        <summary>NCALayer іске қосылмайды немесе сайт оған қосыла алмайды. NativeNCA көмектесе ме?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Мәселе NCALayer-дің өзінде болса, көмектесуі мүмкін. NativeNCA-ға Java қажет емес, оның <code>127.0.0.1</code> үшін өз сертификаты бар, ал 13579 порты бос болмаса, оны қай бағдарлама ұстап тұрғанын көрсетеді және NCALayer-ді жабуды ұсынады.</p><p>Сайттардың <code>127.0.0.1</code> мекенжайына жүгінуіне тыйым салатын жарнама бұғаттағыштар (мысалы, uBlock Origin-нің кейбір сүзгілері) NativeNCA-ға да кедергі келтіреді. eGov-ты немесе банк сайтын ерекшеліктерге қосыңыз.</p></div>
       </details>
       <details class="expander">
         <summary>NativeNCA eGov-пен және банктермен жұмыс істей ме?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>

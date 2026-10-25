@@ -360,7 +360,10 @@ section { position: relative; }
   gap: clamp(32px, 4vw, 64px);
   align-items: center;
 }
-.hero .display { margin-top: 4px; }
+/* The h1 holds both the eyebrow and the display line, so the heading names NCALayer. */
+.hero-title { margin: 0; font-size: inherit; font-weight: inherit; }
+.hero-title .eyebrow { display: flex; width: fit-content; }
+.hero .display { display: block; margin-top: 4px; }
 .hero .display em { font-style: normal; color: var(--accent-text); }
 .hero .lead { margin-top: 20px; max-width: 34em; }
 .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 32px; }

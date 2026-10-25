@@ -29,9 +29,14 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "site"
 OUT = Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / "_site").resolve()
 REPO = os.environ.get("GITHUB_REPOSITORY", "DonnerTechDev/NativeNCA")
-SITE_URL = os.environ.get("SITE_URL") or "https://donnertechdev.github.io/NativeNCA/"
+SITE_URL = os.environ.get("SITE_URL") or "https://oss.northbound.sh/NativeNCA/"
 if not SITE_URL.endswith("/"):
     SITE_URL += "/"
+# configure-pages reports http:// for a custom domain without "Enforce HTTPS". Canonical
+# links, hreflang and the sitemap must name the https:// address, or search engines
+# index both versions.
+if SITE_URL.startswith("http://"):
+    SITE_URL = "https://" + SITE_URL[len("http://"):]
 
 
 def copy_sources():

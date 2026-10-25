@@ -20,8 +20,8 @@
 })();
 </script>
 <style>html.oss-in{background:#000;overflow:hidden}html.oss-in body{visibility:hidden}</style>
-<title>NativeNCA — замена NCALayer для Windows: ЭЦП без Java и вечных паролей</title>
-<meta name="description" content="Бесплатная программа с открытым кодом для входа и подписи ЭЦП НУЦ РК на eGov и в банках вместо NCALayer. Без Java, с Windows Hello, зашифрованным хранилищем ключей и подписанными обновлениями.">
+<title>Замена NCALayer для Windows: ЭЦП без Java — NativeNCA</title>
+<meta name="description" content="Бесплатная замена NCALayer с открытым кодом: вход и подпись ЭЦП НУЦ РК на eGov и в банках без Java. Сайты работают с ней как с NCALayer, подпись через Windows Hello.">
 <link rel="canonical" href="__SITE_URL__">
 <link rel="alternate" hreflang="ru" href="__SITE_URL__">
 <link rel="alternate" hreflang="en" href="__SITE_URL__en/">
@@ -150,11 +150,10 @@
 <section class="hero" id="top">
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">
-        <svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>
-        Нативная замена NCALayer для Windows
-      </p>
-      <h1 class="display">ЭЦП без Java и&nbsp;<em>без пароля на&nbsp;каждую подпись</em></h1>
+      <h1 class="hero-title">
+        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>Нативная замена NCALayer для Windows</span>
+        <span class="display">ЭЦП без Java и&nbsp;<em>без пароля на&nbsp;каждую подпись</em></span>
+      </h1>
       <p class="lead">NativeNCA входит и подписывает на eGov, в интернет-банках и других казахстанских сервисах ключом ЭЦП НУЦ РК. Сайты работают с ней так же, как с NCALayer, а подпись вы подтверждаете лицом, отпечатком или PIN-кодом Windows Hello.</p>
 
       <div class="hero-actions">
@@ -515,6 +514,10 @@
       <details class="expander">
         <summary>Нужно ли удалять NCALayer?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
         <div class="exp-body"><p>Нет. Но одновременно они работать не могут: сайты ждут обе программы на одном порту 13579. Если NCALayer запущен, NativeNCA предложит закрыть его и отключить его автозапуск. Включить автозапуск обратно можно в любой момент.</p></div>
+      </details>
+      <details class="expander">
+        <summary>NCALayer не запускается или сайт не может к нему подключиться. Поможет ли NativeNCA?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Может помочь, если дело в самом NCALayer. NativeNCA не нужна Java, у неё свой сертификат для <code>127.0.0.1</code>, а если порт 13579 занят, она покажет, какая программа его держит, и предложит закрыть NCALayer.</p><p>Блокировщики рекламы, которые запрещают сайтам обращаться к <code>127.0.0.1</code> (например, некоторые фильтры uBlock Origin), мешают и NativeNCA. Добавьте eGov или сайт банка в исключения.</p></div>
       </details>
       <details class="expander">
         <summary>Работает ли NativeNCA с eGov и банками?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>

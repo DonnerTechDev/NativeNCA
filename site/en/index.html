@@ -20,8 +20,8 @@
 })();
 </script>
 <style>html.oss-in{background:#000;overflow:hidden}html.oss-in body{visibility:hidden}</style>
-<title>NativeNCA — an NCALayer replacement for Windows: Kazakh e-signature without Java</title>
-<meta name="description" content="Free, open-source app for signing in and signing with your NCA (НУЦ РК) digital signature on eGov and in banks, instead of NCALayer. No Java, Windows Hello, an encrypted key vault and signed updates.">
+<title>NCALayer alternative for Windows without Java — NativeNCA</title>
+<meta name="description" content="Free, open-source NCALayer alternative: sign in and sign with your NCA key on eGov and in banks. No Java, websites see it as NCALayer, you approve with Windows Hello.">
 <link rel="canonical" href="__SITE_URL__en/">
 <link rel="alternate" hreflang="ru" href="__SITE_URL__">
 <link rel="alternate" hreflang="en" href="__SITE_URL__en/">
@@ -150,11 +150,10 @@
 <section class="hero" id="top">
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">
-        <svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>
-        A native NCALayer replacement for Windows
-      </p>
-      <h1 class="display">Digital signatures without Java <em>or a password every&nbsp;time</em></h1>
+      <h1 class="hero-title">
+        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>A native NCALayer replacement for Windows</span>
+        <span class="display">Digital signatures without Java <em>or a password every&nbsp;time</em></span>
+      </h1>
       <p class="lead">NativeNCA signs you in and signs documents on eGov, in online banking and other Kazakh services with your NCA (НУЦ РК) key. Websites talk to it the same way they talk to NCALayer, and you approve each signature with your face, fingerprint or Windows Hello PIN.</p>
 
       <div class="hero-actions">
@@ -515,6 +514,10 @@
       <details class="expander">
         <summary>Do I need to uninstall NCALayer?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
         <div class="exp-body"><p>No. But the two cannot run at the same time, because websites expect both on the same port, 13579. If NCALayer is running, NativeNCA offers to close it and turn off its autostart. You can turn autostart back on at any time.</p></div>
+      </details>
+      <details class="expander">
+        <summary>NCALayer won't start, or the site can't connect to it. Will NativeNCA help?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>It may, if the problem is NCALayer itself. NativeNCA doesn't need Java, has its own certificate for <code>127.0.0.1</code>, and if port 13579 is taken, it shows which program holds it and offers to close NCALayer.</p><p>Ad blockers that stop websites from reaching <code>127.0.0.1</code> (such as some uBlock Origin filter lists) block NativeNCA too. Add eGov or your bank's site to their exceptions.</p></div>
       </details>
       <details class="expander">
         <summary>Does NativeNCA work with eGov and banks?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
