@@ -3,7 +3,7 @@
 "use strict";
 
 const CONFIG = {
-  repo: "DonnerTechDev/NativeNCA",
+  repo: "northbound-oss/NativeNCA",
   // Donation options shown in the donate dialog. Fill in real links; entries with an
   // empty url are hidden. With a single entry the button opens it directly.
   donate: [
