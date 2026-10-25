@@ -23,6 +23,8 @@
     <Product>NativeNCA</Product>
     <!-- CI passes -p:Version from the release tag; the updater compares the informational version. -->
     <Version>0.0.0-dev</Version>
+    <!-- Setup and the updater copy only NativeNCA.exe: WPF's native DLLs must be inside it. -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
