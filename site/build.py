@@ -44,18 +44,43 @@ def copy_sources():
 
 
 def screenshots():
-    """docs/screenshots/*.png (rendered at 2x) -> screenshots/*.webp, sized for the web."""
+    """docs/screenshots/<lang>/*.png (rendered at 2x) -> screenshots/<lang>/*.webp, sized for the web."""
     from PIL import Image
 
     dst = OUT / "screenshots"
     dst.mkdir(exist_ok=True)
+    for lang in ("ru", "en", "kk"):
+        lang_dir = ROOT / "docs" / "screenshots" / lang
+        if not lang_dir.is_dir():
+            continue
+        lang_dst = dst / lang
+        lang_dst.mkdir(exist_ok=True)
+        for png in sorted(lang_dir.glob("*.png")):
+            with Image.open(png) as raw:
+                im = raw.convert("RGB")
+            width = 1600 if im.width > 2000 else 900
+            if im.width > width:
+                resized = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
+                im.close()
+                im = resized
+            webp_name = png.stem + ".webp"
+            im.save(lang_dst / webp_name, "WEBP", quality=84, method=5)
+            if lang == "ru":
+                im.save(dst / webp_name, "WEBP", quality=84, method=5)
+            print(f"  {lang}/{png.name} -> {lang}/{webp_name} {im.size[0]}x{im.size[1]}")
+            im.close()
+
     for png in sorted((ROOT / "docs" / "screenshots").glob("*.png")):
-        im = Image.open(png).convert("RGB")
+        with Image.open(png) as raw:
+            im = raw.convert("RGB")
         width = 1600 if im.width > 2000 else 900
         if im.width > width:
-            im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
-        im.save(dst / (png.stem + ".webp"), "WEBP", quality=84, method=6)
+            resized = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
+            im.close()
+            im = resized
+        im.save(dst / (png.stem + ".webp"), "WEBP", quality=84, method=5)
         print(f"  {png.name} -> {png.stem}.webp {im.size[0]}x{im.size[1]}")
+        im.close()
 
 
 def releases():

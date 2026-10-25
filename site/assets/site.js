@@ -338,7 +338,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let index = 0;
 
   const frame = $("#shot-open");
-  const src = (name, theme) => `${ROOT}screenshots/${name}-${theme}.webp`;
+  const src = (name, theme) => `${ROOT}screenshots/${LANG}/${name}-${theme}.webp`;
   const currentTheme = () => document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
   let token = 0;
 
