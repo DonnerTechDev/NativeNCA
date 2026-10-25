@@ -62,6 +62,9 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
             {
                 SetInt(key, "Length", 2048);
                 SetInt(key, "Key Usage", NcryptAllowAllUsages);
+                // Without this the provider reuses the gesture cached at Windows sign-in and never prompts.
+                if (NCryptSetProperty(key, "NgcCacheType", BitConverter.GetBytes(NgcCacheTypeAuthMandatory), 4, 0) != 0)
+                    SetInt(key, "NgcCacheTypeProperty", NgcCacheTypeAuthMandatory); // name before Windows 10 1703
                 SetWindow(key, ownerWindow);
                 SetString(key, "Use Context", Strings.Hello_CreateKey);
 
@@ -102,6 +105,8 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
     {
         SetWindow(key, ownerWindow);
         SetString(key, "Use Context", reason);
+        // Also covers keys created before NgcCacheType was set. Fails closed: no silent decryption.
+        SetInt(key, "PinCacheIsGestureRequired", 1);
 
         // Shows the Windows Hello prompt (the first call already performs the private-key operation).
         var output = new byte[wrapped.Length];
@@ -158,6 +163,7 @@ public sealed class WindowsHelloKeyProtector : IVaultKeyProtector
     private const int NteBadKeyset = unchecked((int)0x80090016);
     private const int NcryptAllowAllUsages = 0x00FFFFFF;
     private const int NcryptPadPkcs1Flag = 0x2;
+    private const int NgcCacheTypeAuthMandatory = 0x1;
 
     // NTE_USER_CANCELLED (0x80090036) / ERROR_CANCELLED (0x800704C7)
     private static bool IsCancellation(int status) =>
