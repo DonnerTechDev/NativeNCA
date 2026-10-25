@@ -10,7 +10,7 @@
   var o = location.hostname === 'localhost' ? 'http://localhost:4330' : 'https://oss.northbound.sh';
   var r = document.referrer, d = document.documentElement;
   try { if ((r !== o + '/' && r !== o + '/ru/') || matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
-  window.ossIntro = { product: 'NativeNCA', by: 'DonnerTechDev', line: 'Замена NCALayer для Windows' };
+  window.ossIntro = { product: 'NativeNCA', by: 'DonnerTechDev', line: 'Как NCALayer, только удобнее' };
   d.classList.add('oss-in');
   var s = document.createElement('script');
   s.src = o + '/intro.js'; s.async = true;
@@ -151,10 +151,10 @@
   <div class="wrap hero-grid">
     <div>
       <h1 class="hero-title">
-        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>Нативная замена NCALayer для Windows</span>
-        <span class="display">ЭЦП без Java и&nbsp;<em>без пароля на&nbsp;каждую подпись</em></span>
+        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>Программа вместо NCALayer</span>
+        <span class="display">Всё, что умеет NCALayer, <em>только удобнее</em></span>
       </h1>
-      <p class="lead">NativeNCA входит и подписывает на eGov, в интернет-банках и других казахстанских сервисах ключом ЭЦП НУЦ РК. Сайты работают с ней так же, как с NCALayer, а подпись вы подтверждаете лицом, отпечатком или PIN-кодом Windows Hello.</p>
+      <p class="lead">NativeNCA делает то же самое: вход на eGov, в банки и другие сервисы по ЭЦП и подпись документов. Только без Java, открывается сразу, не просит пароль на каждую подпись, показывает, что именно вы подписываете, и сама подскажет, если что-то не так.</p>
 
       <div class="hero-actions">
         <a class="btn btn-accent btn-download" href="__DOWNLOAD_URL__" data-download data-download-main>
@@ -175,9 +175,9 @@
       </div>
 
       <div class="hero-facts">
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Бесплатно</span>
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Открытый код, GPL-3.0</span>
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Windows 10 и 11, x64 и ARM64</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Бесплатно и без рекламы</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Java не нужна</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Windows 10 и 11</span>
       </div>
     </div>
 
@@ -196,7 +196,7 @@
     <div class="section-head center reveal">
       <p class="eyebrow">Почему не NCALayer</p>
       <h2 class="title-lg">NCALayer заслужил пенсию</h2>
-      <p class="lead">Он много лет подписывал документы за весь Казахстан, и спасибо ему за это. Сравните, как проходит одна подпись в нём и в NativeNCA: нажмите кнопку в любом из окон.</p>
+      <p class="lead">Он много лет подписывал документы за весь Казахстан, и спасибо ему за это. Но подписывать можно проще. Нажмите кнопку в любом из окон и сравните.</p>
     </div>
 
     <div class="versus reveal">
@@ -253,24 +253,24 @@
         <caption class="visually-hidden">Сравнение NCALayer и NativeNCA</caption>
         <thead><tr><th scope="col">Коротко</th><th scope="col">NCALayer</th><th scope="col">NativeNCA</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Java</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Везёт с собой целую Java-машину и держит её в памяти</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Не нужна. Один файл на .NET, сидит в трее</span></td></tr>
           <tr><th scope="row">Пароль от ключа</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Найти файл .p12 и ввести пароль. На каждую подпись</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Один раз при добавлении ключа, дальше Windows Hello</span></td></tr>
-          <tr><th scope="row">Выбор ключа</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Угадать, какой из <code>GOST512_…p12</code> нужный</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Понятные имена и фото: «Личный eGov», «ТОО Шанырак»</span></td></tr>
-          <tr><th scope="row">Сертификат для 127.0.0.1</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Один и тот же закрытый ключ на всех компьютерах</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Свой на каждом компьютере, ключ центра сертификации уничтожен</span></td></tr>
-          <tr><th scope="row">Исходный код</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Закрыт, проверить нельзя</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Открыт на GitHub под GPL-3.0, можно собрать самому</span></td></tr>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Искать файл ключа и вводить пароль при каждой подписи</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Один раз, когда добавляете ключ. Дальше отпечаток, лицо или PIN-код</span></td></tr>
+          <tr><th scope="row">Несколько ключей</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Файлы с похожими именами вроде <code>GOST512_…p12</code>, угадайте нужный</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Понятные названия и фото: «Личный», «ТОО Шанырак»</span></td></tr>
+          <tr><th scope="row">Что нужно установить</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Java и сам NCALayer. Долго запускается и занимает много памяти</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Одна небольшая программа, открывается сразу</span></td></tr>
+          <tr><th scope="row">Если что-то не работает</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Сайт пишет «Ошибка подключения», а почему, непонятно</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Программа сама подскажет, что мешает, и предложит исправить</span></td></tr>
+          <tr><th scope="row">Можно ли проверить</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Нет, код закрыт</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Да, код открыт, любой специалист может посмотреть, что делает программа</span></td></tr>
           <tr><th scope="row">Внешний вид</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Привет из эпохи Java-апплетов</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Fluent Design, Mica, светлая и тёмная темы</span></td></tr>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Как программа из начала 2000-х</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Как современное приложение Windows 11, есть тёмная тема</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -283,53 +283,38 @@
     <div class="section-head reveal">
       <p class="eyebrow">Возможности</p>
       <h2 class="title-lg">Что умеет NativeNCA</h2>
-      <p class="lead">Ключи <code>.p12</code> добавляются один раз. Потом на каждый запрос сайта появляется окно, где видно, кто просит подпись, что именно подписать и каким ключом.</p>
+      <p class="lead">Вы один раз добавляете свои ключи ЭЦП. Когда сайт попросит подпись, NativeNCA покажет окно: кто просит, что подписать и каким ключом.</p>
     </div>
     <div class="grid grid-3 features">
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-plug"/></svg></span>
-        <h3>Совместим с NCALayer</h3>
-        <p>Слушает тот же <code>wss://127.0.0.1:13579</code> и понимает тот же протокол, поэтому сайтам ничего менять не нужно.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg></span>
-        <h3>Ключи ГОСТ и RSA</h3>
-        <p>СТ РК ГОСТ Р 34.10-2015 (512 бит) и RSA от НУЦ. Подписи CMS/CAdES и XML сверены с эталонными подписями Kalkan.</p>
+        <h3>Работает там же, где NCALayer</h3>
+        <p>eGov, интернет-банки и другие сайты, которые просят NCALayer, работают с NativeNCA так же. Ничего настраивать не нужно.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg></span>
-        <h3>Windows Hello</h3>
-        <p>Подпись подтверждается лицом, отпечатком пальца или PIN-кодом. Пароль от ключа вводится один раз, когда вы добавляете ключ.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-keys"/></svg></span>
-        <h3>Зашифрованное хранилище</h3>
-        <p>Ключи и пароли шифруются Windows DPAPI. По желанию их дополнительно закрывает ключ Windows Hello из TPM.</p>
+        <h3>Пароль только один раз</h3>
+        <p>Пароль от ключа вы вводите при добавлении ключа. Потом подпись подтверждается отпечатком пальца, лицом или PIN-кодом Windows.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg></span>
         <h3>Видно, что подписываете</h3>
-        <p>В окне подтверждения показаны домен сайта, сами данные и ключи, которые подходят для запроса.</p>
+        <p>Перед подписью вы видите адрес сайта, который её просит, и сам документ. Если что-то не так, просто нажмите «Отмена».</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-image"/></svg></span>
-        <h3>Фото ключей</h3>
-        <p>Ключу можно назначить фото или логотип компании и кадрировать его прямо в программе, чтобы не путать ключи.</p>
+        <h3>Ключи не перепутать</h3>
+        <p>Дайте каждому ключу название и фото: «Личный», «ИП», логотип компании. Удобно, если у вас несколько ключей или вы бухгалтер.</p>
       </article>
       <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-clock-lock"/></svg></span>
-        <h3>Метки времени НУЦ</h3>
-        <p>С меткой CAdES-T подпись можно проверить и после того, как срок сертификата закончится.</p>
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-keys"/></svg></span>
+        <h3>Ключи под замком</h3>
+        <p>Ключи и пароли хранятся только на вашем компьютере в зашифрованном виде. Никуда не отправляются, даже разработчику.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-sync"/></svg></span>
-        <h3>Установка и обновления</h3>
-        <p>Ставится без прав администратора. О новой версии программа сообщит сама и обновится, когда вы нажмёте «Обновить». Предыдущую версию можно вернуть.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg></span>
-        <h3>Сделано для Windows 11</h3>
-        <p>Fluent Design, Mica, тёмная тема, значок в трее и запуск вместе с Windows. Открывается сразу, без заставки.</p>
+        <h3>Простая установка и обновления</h3>
+        <p>Права администратора не нужны. О новой версии программа сообщит сама, обновится по одной кнопке, а если что-то не понравится, можно вернуть прежнюю.</p>
       </article>
     </div>
   </div>
@@ -340,12 +325,12 @@
   <div class="wrap how">
     <div class="reveal">
       <p class="eyebrow">Как проходит подпись</p>
-      <h2 class="title-lg">Что происходит, когда сайт просит подпись</h2>
+      <h2 class="title-lg">Как это выглядит на сайте</h2>
       <ol class="steps" style="margin-top: 28px">
-        <li><div><h3>Сайт отправляет запрос</h3><p>eGov или банк обращается к <code>127.0.0.1:13579</code>, как раньше к NCALayer.</p></div></li>
-        <li><div><h3>Вы видите, кто и что просит</h3><p>Домен, содержимое запроса и подходящие ключи. Можно выбрать другой ключ или отменить.</p></div></li>
-        <li><div><h3>Подтверждаете через Windows Hello</h3><p>Ключ расшифровывается в памяти, данные подписываются на вашем компьютере.</p></div></li>
-        <li><div><h3>Сайт получает только подпись</h3><p>Ему уходят подпись и открытый сертификат. Закрытый ключ остаётся на компьютере.</p></div></li>
+        <li><div><h3>Нажимаете «Войти с ЭЦП» или «Подписать»</h3><p>На eGov, в банке или в любом другом сервисе, где раньше открывался NCALayer.</p></div></li>
+        <li><div><h3>Появляется окно NativeNCA</h3><p>В нём видно, какой сайт просит подпись и что именно подписать. Здесь же выбираете ключ.</p></div></li>
+        <li><div><h3>Прикладываете палец или вводите PIN-код</h3><p>Как при входе в Windows. Пароль от ключа вводить не нужно.</p></div></li>
+        <li><div><h3>Готово</h3><p>Сайт получает подпись, а сам ключ остаётся на вашем компьютере.</p></div></li>
       </ol>
     </div>
     <div class="how-shot reveal">
@@ -362,51 +347,51 @@
   <div class="wrap">
     <div class="section-head reveal">
       <p class="eyebrow">Безопасность</p>
-      <h2 class="title-lg">Как NativeNCA защищает ключи</h2>
-      <p class="lead">Код открыт под лицензией GPL-3.0, устройство защиты подробно описано в README. Здесь собрано главное.</p>
+      <h2 class="title-lg">Ваш ключ остаётся у вас</h2>
+      <p class="lead">ЭЦП — это ваша подпись, и программа, которая её хранит, должна её беречь. Вот как это делает NativeNCA, простыми словами. Подробности для специалистов есть на GitHub.</p>
     </div>
 
     <div class="grid grid-3">
       <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-server"/></svg></span>
+        <h3>Подпись делается на вашем компьютере</h3>
+        <p>Сайт получает только готовую подпись. Сам ключ никуда не уходит: ни на сайт, ни в интернет, ни разработчику.</p>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-shield-keyhole"/></svg></span>
+        <h3>Ключи зашифрованы</h3>
+        <p>Ключи и пароли зашифрованы средствами Windows и открываются только под вашей учётной записью. Можно включить ещё один замок: тогда их открывает только ваш отпечаток, лицо или PIN-код.</p>
+        <div class="vs">
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>С этим замком без вашего подтверждения ключи не расшифрует даже другая программа на этом компьютере</div>
+        </div>
+      </article>
+      <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg></span>
-        <h3>Открытый исходный код</h3>
-        <p>Криптография, хранилище, протокол и обновления лежат на GitHub. Релизы собирает GitHub Actions из этого же кода, к каждому архиву приложена контрольная сумма SHA-256.</p>
+        <h3>Ничего не скрыто</h3>
+        <p>Весь код программы опубликован. Любой специалист может проверить, что она делает и чего не делает.</p>
         <div class="vs">
           <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: код закрыт</div>
-          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: код открыт, лицензия GPL-3.0</div>
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: код открыт</div>
         </div>
       </article>
       <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg></span>
-        <h3>Свой сертификат на каждом компьютере</h3>
-        <p>Браузеру нужен сертификат для <code>127.0.0.1</code>. NativeNCA выпускает его своим центром сертификации и сразу уничтожает ключ этого центра. Ограничения имён разрешают только локальные адреса.</p>
+        <h3>Защищённая связь с браузером</h3>
+        <p>Чтобы сайт мог безопасно обратиться к программе, нужен специальный сертификат. NativeNCA создаёт свой на каждом компьютере, и ни для чего другого он не годится.</p>
         <div class="vs">
-          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: закрытый ключ одинаковый во всех установках</div>
+          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: один и тот же сертификат на всех компьютерах</div>
           <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: у каждого компьютера свой</div>
         </div>
       </article>
       <article class="card sec-card reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-shield-keyhole"/></svg></span>
-        <h3>Хранилище под защитой Windows</h3>
-        <p>Ключи и пароли зашифрованы DPAPI для вашей учётной записи. В защищённом режиме их дополнительно шифрует AES-256-GCM с ключом из TPM, который открывается только через Windows Hello.</p>
-        <div class="vs">
-          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Без вас ключи не расшифрует даже программа, запущенная от вашего имени</div>
-        </div>
-      </article>
-      <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-sync"/></svg></span>
-        <h3>Подписанные обновления</h3>
-        <p>Каждый архив релиза подписан ключом проекта. NativeNCA ставит обновление, только если подпись верна для этой версии и архитектуры, а версия новее установленной. Файлы скачиваются только с github.com по HTTPS. Предыдущая версия сохраняется для отката.</p>
-      </article>
-      <article class="card sec-card reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-server"/></svg></span>
-        <h3>Сервер только для этого компьютера</h3>
-        <p>NativeNCA слушает только <code>127.0.0.1</code>: из локальной сети и интернета к нему не подключиться. Подпись создаётся на компьютере, закрытый ключ никуда не отправляется.</p>
+        <h3>Обновления не подделать</h3>
+        <p>Каждое обновление подписано разработчиком. Программа проверяет подпись и не установит файл, который кто-то подменил.</p>
       </article>
       <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-cloud-off"/></svg></span>
-        <h3>Без телеметрии</h3>
-        <p>Разработчику программа ничего не отправляет. В интернет она обращается в двух случаях: к GitHub, чтобы проверить обновления (это можно выключить), и к службе меток времени НУЦ, если метки включены.</p>
+        <h3>Без слежки</h3>
+        <p>Программа не собирает статистику и ничего не отправляет разработчику. В интернет она выходит, только чтобы проверить обновления (можно выключить) и получить метку времени для подписи, если вы её включили.</p>
       </article>
     </div>
 
@@ -415,17 +400,16 @@
       <div>
         <b>Что важно знать</b>
         <ul>
-          <li>NativeNCA — независимый проект. Он не связан с НУЦ РК и АО «НИТ», не одобрен ими и не является сертифицированным средством криптографической защиты информации.</li>
-          <li>Если сбросить PIN-код Windows при включённой защите Windows Hello, хранилище не расшифровать. Храните исходные файлы <code>.p12</code> и пароли к ним.</li>
-          <li>Держите NCALayer под рукой на случай, если какой-то сервис не примет подпись, и напишите нам об этом.</li>
+          <li>NativeNCA — независимая программа. Её сделал не НУЦ РК и не АО «НИТ», и она не проходила их сертификацию.</li>
+          <li>Сохраните файлы ключей и пароли к ним в надёжном месте, как и раньше. Они понадобятся, если вы смените компьютер или сбросите PIN-код Windows.</li>
+          <li>Не спешите удалять NCALayer. Если какой-то сайт не примет подпись, воспользуйтесь им и напишите нам.</li>
         </ul>
       </div>
     </div>
 
     <div class="verify reveal">
       <a class="btn" href="https://github.com/northbound-oss/NativeNCA"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>Исходный код</a>
-      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/blob/main/README.ru.md#как-это-работает"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Как устроена защита</a>
-      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/actions"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Сборки в GitHub Actions</a>
+      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/blob/main/README.ru.md#как-это-работает"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Технические подробности</a>
     </div>
   </div>
 </section>
@@ -436,15 +420,15 @@
     <div class="section-head reveal">
       <p class="eyebrow">Скриншоты</p>
       <h2 class="title-lg">Выглядит как приложение Windows 11</h2>
-      <p class="lead">Интерфейс собран на Fluent Design. Тема скриншотов переключается вместе с темой сайта.</p>
+      <p class="lead">Светлая и тёмная тема, как в самой Windows. Скриншоты переключаются вместе с темой сайта.</p>
     </div>
 
     <div class="selector reveal" role="tablist" aria-label="Скриншоты" id="shots-tabs">
-      <button role="tab" type="button" aria-selected="true" data-shot="main" data-title="Мои ключи" data-text="Все ключи в одном списке: названия, фото, срок действия и назначение. Рядом сведения о сертификате, ИИН и издатель.">Ключи</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="overlay" data-portrait data-title="Подтверждение подписи" data-text="Окно, которое появляется вместо NCALayer: какой сайт просит, что подписать и каким ключом. Подтверждение через Windows Hello.">Подтверждение</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="add-key" data-title="Новый ключ" data-text="Выберите файл .p12 от НУЦ, введите пароль и назовите ключ. Пароль можно сохранить в защищённом хранилище, тогда вводить его больше не придётся.">Новый ключ</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="avatar-crop" data-title="Фото ключа" data-text="По фото или логотипу компании ключ легко найти в списке и в окне подписи. Кадрируется прямо в программе.">Фото ключа</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="settings" data-title="Параметры" data-text="Windows Hello при каждой подписи, запоминание подтверждения, метки времени НУЦ, защита хранилища, обновления и автозапуск. Изменения применяются сразу, как в Windows 11.">Параметры</button>
+      <button role="tab" type="button" aria-selected="true" data-shot="main" data-title="Мои ключи" data-text="Все ваши ключи в одном списке: название, фото, до какого числа действует ключ и для чего он. Рядом ФИО, ИИН и другие данные из сертификата.">Ключи</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="overlay" data-portrait data-title="Подтверждение подписи" data-text="Это окно появляется вместо NCALayer: какой сайт просит подпись, что подписать и каким ключом. Подтверждаете отпечатком, лицом или PIN-кодом.">Подтверждение</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="add-key" data-title="Новый ключ" data-text="Выберите файл ключа, который вы получили в ЦОНе или на eGov, введите пароль и придумайте название. Пароль программа запомнит, больше вводить его не придётся.">Новый ключ</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="avatar-crop" data-title="Фото ключа" data-text="По фото или логотипу компании нужный ключ сразу видно и в списке, и в окне подписи.">Фото ключа</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="settings" data-title="Параметры" data-text="Как часто спрашивать подтверждение, дополнительная защита ключей, запуск вместе с Windows и обновления. Изменения применяются сразу.">Параметры</button>
     </div>
 
     <div class="gallery reveal">
@@ -458,7 +442,7 @@
       </div>
       <div class="card gallery-caption">
         <h3 id="shot-title">Мои ключи</h3>
-        <p id="shot-text">Все ключи в одном списке: названия, фото, срок действия и назначение. Рядом сведения о сертификате, ИИН и издатель.</p>
+        <p id="shot-text">Все ваши ключи в одном списке: название, фото, до какого числа действует ключ и для чего он. Рядом ФИО, ИИН и другие данные из сертификата.</p>
         <div class="pips" id="shot-pips" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span><span></span></div>
       </div>
     </div>
@@ -473,19 +457,18 @@
       <h2 class="title-lg">Как начать</h2>
     </div>
     <div class="start-grid">
-      <div class="card start-step reveal"><span class="num">ШАГ 1</span><h3>Скачайте архив</h3><p>Кнопка ниже скачает версию для вашего процессора. Распакуйте архив в любую папку.</p></div>
+      <div class="card start-step reveal"><span class="num">ШАГ 1</span><h3>Скачайте</h3><p>Нажмите кнопку «Скачать» ниже и распакуйте архив. Внутри один файл <code>NativeNCA.exe</code>.</p></div>
       <div class="card start-step reveal"><span class="num">ШАГ 2</span><h3>Установите</h3><p>Запустите <code>NativeNCA.exe</code> и нажмите «Установить». Права администратора не нужны, программа появится в меню «Пуск».</p></div>
-      <div class="card start-step reveal"><span class="num">ШАГ 3</span><h3>Добавьте ключ</h3><p>Windows один раз спросит про сертификат для браузеров, ответьте «Да». Затем выберите файл <code>.p12</code> от НУЦ и введите пароль.</p></div>
-      <div class="card start-step reveal"><span class="num">ШАГ 4</span><h3>Войдите на eGov</h3><p>Как обычно. Вместо NCALayer появится окно NativeNCA. Если NCALayer запущен, программа предложит его закрыть.</p></div>
+      <div class="card start-step reveal"><span class="num">ШАГ 3</span><h3>Добавьте ключ</h3><p>Windows один раз спросит, можно ли установить сертификат, ответьте «Да». Затем выберите файл своего ключа ЭЦП и введите пароль от него.</p></div>
+      <div class="card start-step reveal"><span class="num">ШАГ 4</span><h3>Входите на eGov</h3><p>Как обычно. Только вместо NCALayer появится окно NativeNCA. Если NCALayer запущен, программа предложит его закрыть.</p></div>
     </div>
     <div class="card start-cta reveal">
       <div>
         <div class="reqs">
-          <span><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg>Windows 10 версии 2004+ или Windows 11</span>
-          <span><svg class="icon" aria-hidden="true"><use href="#i-flash"/></svg>x64 или ARM64</span>
-          <span><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Windows Hello желателен</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg>Windows 10 или 11</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Удобнее с отпечатком или камерой, но хватит и PIN-кода</span>
         </div>
-        <p class="start-note">Можно и без установки: «Запустить без установки» откроет программу прямо из папки с архивом, но такая копия не обновляется сама.</p>
+        <p class="start-note">Не хотите устанавливать? Нажмите «Запустить без установки», и программа будет работать прямо из папки. Такая копия не обновляется сама.</p>
         <div class="dl-alt" data-dl-alt hidden></div>
       </div>
       <a class="btn btn-accent btn-download" href="__DOWNLOAD_URL__" data-download>
@@ -509,59 +492,59 @@
     <div class="faq reveal" id="faq-list">
       <details class="expander">
         <summary>Это официальная программа?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Нет. NativeNCA — независимый проект с открытым кодом. Он не связан с НУЦ РК и АО «Национальные информационные технологии» и не является сертифицированным СКЗИ. Для сайтов разницы нет: они общаются с NativeNCA по тому же протоколу, что и с NCALayer.</p></div>
-      </details>
-      <details class="expander">
-        <summary>Нужно ли удалять NCALayer?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Нет. Но одновременно они работать не могут: сайты ждут обе программы на одном порту 13579. Если NCALayer запущен, NativeNCA предложит закрыть его и отключить его автозапуск. Включить автозапуск обратно можно в любой момент.</p></div>
-      </details>
-      <details class="expander">
-        <summary>NCALayer не запускается или сайт не может к нему подключиться. Поможет ли NativeNCA?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Может помочь, если дело в самом NCALayer. NativeNCA не нужна Java, у неё свой сертификат для <code>127.0.0.1</code>, а если порт 13579 занят, она покажет, какая программа его держит, и предложит закрыть NCALayer.</p><p>Блокировщики рекламы, которые запрещают сайтам обращаться к <code>127.0.0.1</code> (например, некоторые фильтры uBlock Origin), мешают и NativeNCA. Добавьте eGov или сайт банка в исключения.</p></div>
+        <div class="exp-body"><p>Нет. NativeNCA сделал независимый разработчик, не НУЦ РК и не АО «Национальные информационные технологии», и их сертификацию программа не проходила. Сайты разницы не замечают: они общаются с NativeNCA так же, как с NCALayer, а подпись получается вашим собственным ключом ЭЦП.</p></div>
       </details>
       <details class="expander">
         <summary>Работает ли NativeNCA с eGov и банками?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Да. NativeNCA реализует модули NCALayer <code>commonUtils</code> и <code>basics</code>: вход, подписи CMS/CAdES и XML, несколько документов за раз. Если какой-то сервис не принял подпись, напишите в <a href="https://github.com/northbound-oss/NativeNCA/issues">Issues</a>, а пока воспользуйтесь NCALayer.</p></div>
+        <div class="exp-body"><p>Да. Вход по ЭЦП и подпись документов работают так же, как с NCALayer. Если какой-то сайт всё же не принял подпись, напишите нам на <a href="https://github.com/northbound-oss/NativeNCA/issues">GitHub</a> и пока воспользуйтесь NCALayer.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Нужно ли удалять NCALayer?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Нет, пусть остаётся. Но работать одновременно они не могут, поэтому NativeNCA предложит закрыть NCALayer и не запускать его вместе с Windows. Вернуть NCALayer можно в любой момент.</p></div>
+      </details>
+      <details class="expander">
+        <summary>У меня не работает NCALayer. Поможет ли NativeNCA?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Скорее всего, да, если дело в самом NCALayer: в Java, сертификате или в том, что он завис. NativeNCA обходится без Java и сама подсказывает, что мешает ей работать.</p><p>Но если сайт не может достучаться до программы из-за блокировщика рекламы (например, uBlock Origin), то он мешает и NativeNCA. Добавьте eGov или сайт банка в исключения блокировщика.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Какие ключи подходят?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Обычные ключи ЭЦП НУЦ РК в виде файлов, те, что вы получаете на eGov или в ЦОНе (файлы с расширением <code>.p12</code>). Подходят ключи физических лиц, ИП и сотрудников организаций.</p><p>Пока не поддерживаются ключи на флешках-токенах (Kaztoken, eToken, JaCarta) и на удостоверении личности.</p></div>
       </details>
       <details class="expander">
         <summary>Нужна ли Java?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Нет. NativeNCA написана на .NET, и всё нужное уже внутри одного файла. Ни Java, ни Kalkan SDK не требуются.</p></div>
+        <div class="exp-body"><p>Нет. Всё нужное уже внутри одного файла программы, больше ничего ставить не надо.</p></div>
       </details>
       <details class="expander">
-        <summary>Какие ключи поддерживаются?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Файловые ключи <code>.p12</code> от НУЦ РК: СТ РК ГОСТ Р 34.10-2015 (512 бит) и RSA.</p><p>Пока не поддерживаются аппаратные носители и удостоверение личности (Kaztoken, eToken, JaCarta, ID-карта). Старые ключи ГОСТ 34.310-2004 тоже не поддерживаются: НУЦ перестал их выпускать, и срок всех таких ключей уже истёк.</p></div>
+        <summary>Безопасно ли хранить ключи в программе?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Ключи и пароли хранятся только на вашем компьютере, в зашифрованном виде, и открываются только под вашей учётной записью Windows. В параметрах можно включить дополнительную защиту: тогда ключи открываются только вашим отпечатком, лицом или PIN-кодом. В интернет ключи не попадают.</p><p>Как устроено шифрование, подробно описано в <a href="https://github.com/northbound-oss/NativeNCA/blob/main/README.ru.md#как-это-работает">README</a>.</p></div>
       </details>
       <details class="expander">
-        <summary>Где хранятся мои ключи и пароли?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>В папке <code>%APPDATA%\NativeNCA\Vault</code>, в зашифрованном виде: Windows DPAPI для вашей учётной записи. Если включить защиту Windows Hello, они дополнительно шифруются AES-256-GCM, а ключ к ним хранится в TPM и открывается только вашим лицом, отпечатком или PIN-кодом.</p></div>
-      </details>
-      <details class="expander">
-        <summary>Как обновляется NativeNCA?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Установленная программа проверяет GitHub при запуске и раз в шесть часов. Когда выходит новая версия, в окне появляется баннер, а Windows один раз показывает уведомление. Обновление начнётся, только когда вы нажмёте «Обновить»: NativeNCA скачает архив, проверит подпись разработчика и перезапустится за несколько секунд. Ключи и параметры сохраняются.</p><p>Если с новой версией что-то не так, в параметрах есть кнопка «Вернуть предыдущую версию». Проверку обновлений можно выключить там же.</p></div>
+        <summary>Windows пишет «Система Windows защитила ваш компьютер». Что делать?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Так Windows встречает программы, которые пока скачало мало людей. Нажмите «Подробнее», а затем «Выполнить в любом случае». Скачивайте NativeNCA только с этого сайта или со страницы проекта на GitHub.</p></div>
       </details>
       <details class="expander">
         <summary>Зачем программа устанавливает сертификат?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Сайты подключаются к <code>wss://127.0.0.1:13579</code> по TLS, поэтому браузер должен доверять локальному сертификату. NativeNCA создаёт удостоверяющий центр только для вашего компьютера, выпускает им один сертификат для <code>127.0.0.1</code> и <code>localhost</code> и сразу уничтожает закрытый ключ центра. Подтвердить им что-то ещё невозможно.</p><p>Chrome, Edge и Firefox берут сертификат из хранилища Windows. Firefox, открытый во время установки, нужно перезапустить. Удалить сертификат можно в параметрах программы.</p></div>
+        <div class="exp-body"><p>Без него браузер не разрешит сайту обратиться к программе. Сертификат создаётся только для вашего компьютера и годится только для связи браузера с NativeNCA, ни для чего другого его использовать нельзя.</p><p>Chrome, Edge и Firefox подхватывают его сами. Если Firefox был открыт во время установки, перезапустите его. Удалить сертификат можно в параметрах программы.</p></div>
       </details>
       <details class="expander">
-        <summary>Windows SmartScreen предупреждает при запуске. Это нормально?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>SmartScreen так реагирует на программы, которые скачало пока мало людей. Нажмите «Подробнее», затем «Выполнить в любом случае». Чтобы убедиться, что архив не подменили, сверьте его SHA-256 с файлом <code>.sha256</code> со страницы релиза: в PowerShell это <code>Get-FileHash NativeNCA-*.zip</code>.</p></div>
+        <summary>Как обновляется программа?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Когда выйдет новая версия, NativeNCA сообщит об этом. Обновление начнётся, только когда вы нажмёте «Обновить», и займёт несколько секунд. Ключи и настройки сохраняются.</p><p>Если новая версия чем-то не понравилась, в параметрах есть кнопка «Вернуть предыдущую версию». Там же можно выключить проверку обновлений.</p></div>
       </details>
       <details class="expander">
         <summary>Что будет, если сбросить PIN-код Windows?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Если включена защита хранилища Windows Hello, ключ Windows Hello пропадёт вместе с PIN-кодом, и защищённые данные восстановить не получится. Без этой защиты сброс PIN-кода ни на что не влияет. В любом случае храните исходные файлы <code>.p12</code> и пароли к ним.</p></div>
+        <div class="exp-body"><p>Обычно ничего. Но если вы включили дополнительную защиту ключей отпечатком или PIN-кодом, после сброса PIN-кода сохранённые в программе ключи открыть не получится. Тогда добавьте их заново из файлов. Поэтому храните файлы ключей и пароли к ним, как и раньше.</p></div>
       </details>
       <details class="expander">
         <summary>Как удалить NativeNCA?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Кнопкой «Удалить NativeNCA» в параметрах программы или в «Параметры Windows → Приложения → Установленные приложения». Ключи и параметры по умолчанию остаются в <code>%APPDATA%\NativeNCA</code> на случай повторной установки. Чтобы удалить их вместе с сертификатом для браузеров, отметьте флажок. Исходные файлы <code>.p12</code> программа не трогает.</p></div>
+        <div class="exp-body"><p>Как любую программу: «Параметры Windows → Приложения → Установленные приложения» или кнопкой «Удалить NativeNCA» в параметрах самой программы. Добавленные ключи по умолчанию остаются на случай, если вы поставите программу снова. Чтобы удалить и их, отметьте флажок. Исходные файлы ключей программа не трогает.</p></div>
       </details>
       <details class="expander">
-        <summary>Есть версия для macOS или Linux?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Нет. NativeNCA опирается на Windows Hello, DPAPI и хранилище сертификатов Windows, поэтому работает только в Windows 10 и 11.</p></div>
+        <summary>Есть версия для Mac или Linux?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Нет, NativeNCA работает только в Windows 10 и 11.</p></div>
       </details>
       <details class="expander">
         <summary>Сколько стоит?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Нисколько. Программа бесплатная, без рекламы, код открыт под лицензией GPL-3.0. Если хотите, можно <a href="#donate">поддержать разработку</a>.</p></div>
+        <div class="exp-body"><p>Нисколько. Программа бесплатная и без рекламы. Если хотите, можно <a href="#donate">поддержать разработку</a>.</p></div>
       </details>
     </div>
   </div>
@@ -574,7 +557,7 @@
       <span class="heart"><svg class="icon" aria-hidden="true"><use href="#i-heart-fill"/></svg></span>
       <div>
         <h2 class="title">Поддержать разработку</h2>
-        <p>NativeNCA бесплатная, без рекламы и телеметрии. Донаты идут на совместимость с новыми сайтами, поддержку аппаратных носителей и сертификат для подписи программы, после которого SmartScreen перестанет предупреждать при запуске.</p>
+        <p>NativeNCA бесплатная, без рекламы и слежки. Донаты помогут поддержать ключи на флешках-токенах, проверить программу на новых сайтах и купить сертификат разработчика, после которого Windows перестанет предупреждать при запуске.</p>
       </div>
       <button class="btn btn-accent btn-lg" type="button" id="donate-open">
         <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Поддержать
@@ -624,7 +607,7 @@
   <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
   <div>
     <b>Загрузка началась</b>
-    <p>Распакуйте архив, запустите <code>NativeNCA.exe</code> и нажмите «Установить». Если SmartScreen спросит, нажмите «Подробнее» и «Выполнить в любом случае».</p>
+    <p>Распакуйте архив, запустите <code>NativeNCA.exe</code> и нажмите «Установить». Если Windows предупредит, нажмите «Подробнее» и «Выполнить в любом случае».</p>
   </div>
   <button class="btn btn-subtle btn-icon" type="button" id="toast-close" aria-label="Закрыть"><svg class="icon" aria-hidden="true"><use href="#i-dismiss"/></svg></button>
 </div>

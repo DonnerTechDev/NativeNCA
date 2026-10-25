@@ -10,7 +10,7 @@
   var o = location.hostname === 'localhost' ? 'http://localhost:4330' : 'https://oss.northbound.sh';
   var r = document.referrer, d = document.documentElement;
   try { if ((r !== o + '/' && r !== o + '/ru/') || matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
-  window.ossIntro = { product: 'NativeNCA', by: 'DonnerTechDev', line: 'Windows үшін NCALayer баламасы' };
+  window.ossIntro = { product: 'NativeNCA', by: 'DonnerTechDev', line: 'NCALayer сияқты, тек ыңғайлырақ' };
   d.classList.add('oss-in');
   var s = document.createElement('script');
   s.src = o + '/intro.js'; s.async = true;
@@ -151,10 +151,10 @@
   <div class="wrap hero-grid">
     <div>
       <h1 class="hero-title">
-        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>Windows үшін NCALayer-дің нативті баламасы</span>
-        <span class="display">ЭЦҚ Java-сыз және&nbsp;<em>әр қолтаңбаға құпиясөзсіз</em></span>
+        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>NCALayer орнына</span>
+        <span class="display">NCALayer істейтіннің бәрі, <em>тек ыңғайлырақ</em></span>
       </h1>
-      <p class="lead">NativeNCA ҰКО ЭЦҚ кілтімен eGov-қа, интернет-банктерге және басқа қазақстандық сервистерге кіріп, құжаттарға қол қояды. Сайттар онымен NCALayer-мен қалай жұмыс істесе, дәл солай жұмыс істейді, ал қолтаңбаны бет-әлпетіңізбен, саусақ ізіңізбен немесе Windows Hello PIN-кодымен растайсыз.</p>
+      <p class="lead">NativeNCA дәл сол жұмысты атқарады: eGov-қа, банктерге және басқа қызметтерге ЭЦҚ арқылы кіру және құжаттарға қол қою. Тек Java-сыз, бірден ашылады, әр қолтаңба үшін құпиясөз сұрамайды, неге қол қойып жатқаныңызды көрсетеді, ал бірдеңе дұрыс болмаса, өзі айтады.</p>
 
       <div class="hero-actions">
         <a class="btn btn-accent btn-download" href="__DOWNLOAD_URL__" data-download data-download-main>
@@ -175,9 +175,9 @@
       </div>
 
       <div class="hero-facts">
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Тегін</span>
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Ашық код, GPL-3.0</span>
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Windows 10 және 11, x64 және ARM64</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Тегін және жарнамасыз</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Java керек емес</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Windows 10 және 11</span>
       </div>
     </div>
 
@@ -196,7 +196,7 @@
     <div class="section-head center reveal">
       <p class="eyebrow">Неге NCALayer емес</p>
       <h2 class="title-lg">NCALayer зейнетке шығуға лайық</h2>
-      <p class="lead">Ол көп жыл бойы бүкіл Қазақстанға құжаттарға қол қойып келді, оған рақмет. Бір қолтаңбаның онда және NativeNCA-да қалай өтетінін салыстырыңыз: кез келген терезедегі батырманы басыңыз.</p>
+      <p class="lead">Ол көп жыл бойы бүкіл Қазақстанның құжаттарына қол қойды, оған рахмет. Бірақ қол қою әлдеқайда оңай болуы мүмкін. Кез келген терезедегі батырманы басып, салыстырып көріңіз.</p>
     </div>
 
     <div class="versus reveal">
@@ -253,24 +253,24 @@
         <caption class="visually-hidden">NCALayer мен NativeNCA салыстыруы</caption>
         <thead><tr><th scope="col">Қысқаша</th><th scope="col">NCALayer</th><th scope="col">NativeNCA</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Java</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Өзімен бірге тұтас Java машинасын әкеліп, оны жадта ұстайды</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Қажет емес. .NET-тегі бір файл, науада тұрады</span></td></tr>
-          <tr><th scope="row">Кілт құпиясөзі</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>.p12 файлын тауып, құпиясөзді енгізу. Әр қолтаңба сайын</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Кілтті қосқанда бір рет, одан кейін Windows Hello</span></td></tr>
-          <tr><th scope="row">Кілт таңдау</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Қай <code>GOST512_…p12</code> керек екенін табу</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Түсінікті атаулар мен суреттер: «Жеке eGov», «Шаңырақ ЖШС»</span></td></tr>
-          <tr><th scope="row">127.0.0.1 сертификаты</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Барлық компьютерде бір ғана жабық кілт</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Әр компьютерде өзінікі, куәландырушы орталықтың кілті жойылған</span></td></tr>
-          <tr><th scope="row">Бастапқы код</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Жабық, тексеру мүмкін емес</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>GitHub-та GPL-3.0 бойынша ашық, өзіңіз құрастыра аласыз</span></td></tr>
+          <tr><th scope="row">Кілттің құпиясөзі</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Әр қол қойған сайын кілт файлын іздеп, құпиясөзді енгізу</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Кілтті қосқанда бір рет. Одан кейін саусақ ізі, бет‑әлпет немесе PIN-код</span></td></tr>
+          <tr><th scope="row">Бірнеше кілт</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg><code>GOST512_…p12</code> сияқты ұқсас атаулы файлдар, керегін тауып көріңіз</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Түсінікті атаулар мен суреттер: «Жеке», «Шаңырақ ЖШС»</span></td></tr>
+          <tr><th scope="row">Не орнату керек</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Java және NCALayer-дің өзі. Баяу іске қосылады, жадты көп алады</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Бір шағын бағдарлама, бірден ашылады</span></td></tr>
+          <tr><th scope="row">Бірдеңе істемей қалса</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Сайт «Қосылу қатесі» дейді, ал себебі түсініксіз</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Бағдарлама не кедергі екенін өзі айтып, түзетуді ұсынады</span></td></tr>
+          <tr><th scope="row">Тексеруге бола ма</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Жоқ, коды жабық</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Иә, коды ашық, кез келген маман бағдарламаның не істейтінін көре алады</span></td></tr>
           <tr><th scope="row">Сыртқы түрі</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Java апплеттері дәуірінен сәлем</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Fluent Design, Mica, ашық және күңгірт тақырыптар</span></td></tr>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>2000-жылдардың басындағы бағдарлама сияқты</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Заманауи Windows 11 қолданбасы сияқты, күңгірт тақырыбы бар</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -283,53 +283,38 @@
     <div class="section-head reveal">
       <p class="eyebrow">Мүмкіндіктер</p>
       <h2 class="title-lg">NativeNCA не істей алады</h2>
-      <p class="lead"><code>.p12</code> кілттері бір рет қосылады. Одан кейін сайттың әр сұрауында терезе шығып, қолтаңбаны кім сұрап тұрғаны, нақты неге қол қойылатыны және қай кілтпен екені көрсетіледі.</p>
+      <p class="lead">ЭЦҚ кілттеріңізді бір рет қосасыз. Сайт қолтаңба сұрағанда NativeNCA терезе көрсетеді: кім сұрап тұр, неге қол қою керек және қай кілтпен.</p>
     </div>
     <div class="grid grid-3 features">
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-plug"/></svg></span>
-        <h3>NCALayer-мен үйлесімді</h3>
-        <p>Сол <code>wss://127.0.0.1:13579</code> мекенжайын тыңдап, сол хаттаманы түсінеді, сондықтан сайттарда ештеңе өзгертудің керегі жоқ.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg></span>
-        <h3>ГОСТ және RSA кілттері</h3>
-        <p>ҰКО берген ҚР СТ ГОСТ Р 34.10-2015 (512 бит) және RSA кілттері. CMS/CAdES және XML қолтаңбалары Kalkan жасаған эталондық қолтаңбалармен салыстырылып тексерілген.</p>
+        <h3>NCALayer істейтін жерде жұмыс істейді</h3>
+        <p>eGov, интернет-банкинг және NCALayer сұрайтын басқа сайттар NativeNCA-мен де дәл солай жұмыс істейді. Ештеңе баптаудың қажеті жоқ.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg></span>
-        <h3>Windows Hello</h3>
-        <p>Қолтаңба бет-әлпетпен, саусақ ізімен немесе PIN-кодпен расталады. Кілт құпиясөзін тек кілтті қосқанда бір рет енгізесіз.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-keys"/></svg></span>
-        <h3>Шифрланған қойма</h3>
-        <p>Кілттер мен құпиясөздер Windows DPAPI арқылы шифрланады. Қаласаңыз, TPM-дегі Windows Hello кілті тағы бір қорғау қабатын қосады.</p>
+        <h3>Құпиясөз тек бір рет</h3>
+        <p>Кілттің құпиясөзін кілтті қосқанда енгізесіз. Одан кейін саусақ ізімен, бет‑әлпетпен немесе Windows PIN-кодымен растайсыз.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg></span>
-        <h3>Неге қол қоятыныңыз көрінеді</h3>
-        <p>Растау терезесінде сайттың домені, деректердің өзі және сұрауға сай келетін кілттер көрсетіледі.</p>
+        <h3>Неге қол қойып жатқаныңыз көрінеді</h3>
+        <p>Қол қоюдан бұрын оны сұраған сайттың мекенжайы мен құжаттың өзін көресіз. Бірдеңе дұрыс болмаса, «Болдырмау» батырмасын басыңыз.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-image"/></svg></span>
-        <h3>Кілт суреттері</h3>
-        <p>Кілтке фото немесе компания логотипін қойып, оны бағдарламаның ішінде кесуге болады. Сонда кілттер шатаспайды.</p>
+        <h3>Кілттер шатаспайды</h3>
+        <p>Әр кілтке атау мен сурет беріңіз: «Жеке», «ЖК», компания логотипі. Кілтіңіз бірнешеу болса немесе бухгалтер болсаңыз, ыңғайлы.</p>
       </article>
       <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-clock-lock"/></svg></span>
-        <h3>ҰКО уақыт белгілері</h3>
-        <p>CAdES-T уақыт белгісі бар қолтаңбаны сертификат мерзімі біткеннен кейін де тексеруге болады.</p>
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-keys"/></svg></span>
+        <h3>Кілттер құлыпта</h3>
+        <p>Кілттер мен құпиясөздер тек сіздің компьютеріңізде шифрланған түрде сақталады. Ешқайда, тіпті әзірлеушіге де жіберілмейді.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-sync"/></svg></span>
-        <h3>Орнату және жаңарту</h3>
-        <p>Әкімші құқығынсыз орнатылады. Жаңа нұсқа шыққанын бағдарламаның өзі хабарлайды және «Жаңарту» батырмасын басқанда жаңарады. Алдыңғы нұсқаны қайтаруға болады.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg></span>
-        <h3>Windows 11 үшін жасалған</h3>
-        <p>Fluent Design, Mica, күңгірт тақырып, науадағы белгіше және Windows-пен бірге іске қосылу. Бірден ашылады, кіріспе экрансыз.</p>
+        <h3>Оңай орнату және жаңарту</h3>
+        <p>Әкімші құқығы керек емес. Жаңа нұсқа шыққанын бағдарлама өзі хабарлайды, бір батырмамен жаңарады, ал ұнамаса, алдыңғы нұсқаны қайтаруға болады.</p>
       </article>
     </div>
   </div>
@@ -340,12 +325,12 @@
   <div class="wrap how">
     <div class="reveal">
       <p class="eyebrow">Қол қою қалай өтеді</p>
-      <h2 class="title-lg">Сайт қолтаңба сұрағанда не болады</h2>
+      <h2 class="title-lg">Сайтта бұл қалай көрінеді</h2>
       <ol class="steps" style="margin-top: 28px">
-        <li><div><h3>Сайт сұрау жібереді</h3><p>eGov немесе банк бұрын NCALayer-ге қалай қосылса, дәл солай <code>127.0.0.1:13579</code> мекенжайына қосылады.</p></div></li>
-        <li><div><h3>Кім және не сұрап тұрғанын көресіз</h3><p>Домен, сұраудың мазмұны және сай келетін кілттер. Басқа кілтті таңдауға немесе бас тартуға болады.</p></div></li>
-        <li><div><h3>Windows Hello арқылы растайсыз</h3><p>Кілт жадта ашылады, деректерге сіздің компьютеріңізде қол қойылады.</p></div></li>
-        <li><div><h3>Сайт тек қолтаңбаны алады</h3><p>Оған қолтаңба мен ашық сертификат жіберіледі. Жабық кілт компьютерде қалады.</p></div></li>
+        <li><div><h3>«ЭЦҚ арқылы кіру» немесе «Қол қою» батырмасын басасыз</h3><p>eGov-та, банкте немесе бұрын NCALayer ашылатын кез келген басқа қызметте.</p></div></li>
+        <li><div><h3>NativeNCA терезесі пайда болады</h3><p>Онда қай сайт қолтаңба сұрап тұрғаны және неге қол қою керек екені көрінеді. Кілтті де осы жерде таңдайсыз.</p></div></li>
+        <li><div><h3>Саусағыңызды тигізесіз немесе PIN-кодты енгізесіз</h3><p>Windows-қа кіргендей. Кілттің құпиясөзі керек емес.</p></div></li>
+        <li><div><h3>Дайын</h3><p>Сайт қолтаңбаны алады, ал кілттің өзі сіздің компьютеріңізде қалады.</p></div></li>
       </ol>
     </div>
     <div class="how-shot reveal">
@@ -362,70 +347,69 @@
   <div class="wrap">
     <div class="section-head reveal">
       <p class="eyebrow">Қауіпсіздік</p>
-      <h2 class="title-lg">NativeNCA кілттерді қалай қорғайды</h2>
-      <p class="lead">Код GPL-3.0 лицензиясы бойынша ашық, ал қорғаудың құрылымы README-де толық сипатталған. Мұнда ең негізгісі жинақталған.</p>
+      <h2 class="title-lg">Кілтіңіз өзіңізде қалады</h2>
+      <p class="lead">ЭЦҚ – бұл сіздің қолтаңбаңыз, ал оны сақтайтын бағдарлама оны қорғауы керек. NativeNCA мұны қалай істейтінін қарапайым тілмен түсіндіреміз. Мамандарға арналған толық мәліметтер GitHub-та бар.</p>
     </div>
 
     <div class="grid grid-3">
       <article class="card sec-card reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg></span>
-        <h3>Ашық бастапқы код</h3>
-        <p>Криптография, қойма, хаттама және жаңартулар GitHub-та жатыр. Релиздерді GitHub Actions осы кодтан құрастырады, әр мұрағатқа SHA-256 бақылау сомасы қоса беріледі.</p>
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-server"/></svg></span>
+        <h3>Қол қою сіздің компьютеріңізде жасалады</h3>
+        <p>Сайт тек дайын қолтаңбаны алады. Кілттің өзі ешқайда кетпейді: сайтқа да, интернетке де, әзірлеушіге де.</p>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-shield-keyhole"/></svg></span>
+        <h3>Кілттер шифрланған</h3>
+        <p>Кілттер мен құпиясөздер Windows құралдарымен шифрланған және тек сіздің тіркелгіңізде ашылады. Қосымша құлыпты қосуға болады: сонда оларды тек саусақ ізіңіз, бет‑әлпетіңіз немесе PIN-кодыңыз ашады.</p>
         <div class="vs">
-          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: код жабық</div>
-          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: код ашық, GPL-3.0 лицензиясы</div>
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Бұл құлыппен сіз растамайынша кілттерді осы компьютердегі басқа бағдарлама да ашып оқи алмайды</div>
+        </div>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg></span>
+        <h3>Ештеңе жасырылмаған</h3>
+        <p>Бағдарламаның бүкіл коды жарияланған. Кез келген маман оның не істейтінін және не істемейтінін тексере алады.</p>
+        <div class="vs">
+          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: коды жабық</div>
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: коды ашық</div>
         </div>
       </article>
       <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg></span>
-        <h3>Әр компьютерде өз сертификаты</h3>
-        <p>Браузерге <code>127.0.0.1</code> үшін сертификат керек. NativeNCA оны өз куәландырушы орталығымен шығарады да, сол орталықтың кілтін бірден жояды. Атау шектеулері тек жергілікті мекенжайларға рұқсат береді.</p>
+        <h3>Браузермен қорғалған байланыс</h3>
+        <p>Сайт бағдарламаға қауіпсіз жүгінуі үшін арнайы сертификат керек. NativeNCA әр компьютерде өз сертификатын жасайды, ол басқа ештеңеге жарамайды.</p>
         <div class="vs">
-          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: жабық кілт барлық орнатуда бірдей</div>
+          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: барлық компьютерде бір сертификат</div>
           <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: әр компьютерде өзінікі</div>
         </div>
       </article>
       <article class="card sec-card reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-shield-keyhole"/></svg></span>
-        <h3>Windows қорғайтын қойма</h3>
-        <p>Кілттер мен құпиясөздер тіркелгіңізге арналған DPAPI арқылы шифрланған. Қорғалған режимде олар қосымша AES-256-GCM арқылы TPM-дегі кілтпен шифрланады, оны тек Windows Hello аша алады.</p>
-        <div class="vs">
-          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Сізсіз кілттерді сіздің атыңыздан іске қосылған бағдарлама да аша алмайды</div>
-        </div>
-      </article>
-      <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-sync"/></svg></span>
-        <h3>Қол қойылған жаңартулар</h3>
-        <p>Әр релиз мұрағатына жоба кілтімен қол қойылған. NativeNCA жаңартуды қолтаңба дәл осы нұсқа мен архитектура үшін жарамды болса және нұсқа орнатылғаннан жаңа болса ғана орнатады. Файлдар тек github.com-нан HTTPS арқылы жүктеледі, ал алдыңғы нұсқа қайтару үшін сақталады.</p>
-      </article>
-      <article class="card sec-card reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-server"/></svg></span>
-        <h3>Тек осы компьютерге арналған сервер</h3>
-        <p>NativeNCA тек <code>127.0.0.1</code> мекенжайын тыңдайды: оған жергілікті желіден де, интернеттен де қосылу мүмкін емес. Қолтаңба компьютерде жасалады, жабық кілт ешқайда жіберілмейді.</p>
+        <h3>Жаңартуды қолдан жасау мүмкін емес</h3>
+        <p>Әр жаңартуға әзірлеуші қол қойған. Бағдарлама қолтаңбаны тексереді және біреу ауыстырған файлды орнатпайды.</p>
       </article>
       <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-cloud-off"/></svg></span>
-        <h3>Телеметриясыз</h3>
-        <p>Бағдарлама әзірлеушіге ештеңе жібермейді. Интернетке ол екі жағдайда ғана шығады: жаңартуларды тексеру үшін GitHub-қа (мұны өшіруге болады) және уақыт белгілері қосулы болса, ҰКО уақыт белгілері қызметіне.</p>
+        <h3>Аңдусыз</h3>
+        <p>Бағдарлама статистика жинамайды және әзірлеушіге ештеңе жібермейді. Интернетке тек жаңартуларды тексеру үшін (мұны өшіруге болады) және уақыт белгілерін қоссаңыз, қолтаңбаға уақыт белгісін алу үшін шығады.</p>
       </article>
     </div>
 
     <div class="infobar reveal" role="note">
       <svg class="icon" aria-hidden="true"><use href="#i-warning"/></svg>
       <div>
-        <b>Білу маңызды</b>
+        <b>Не білу маңызды</b>
         <ul>
-          <li>NativeNCA — тәуелсіз жоба. Ол ҚР ҰКО-мен және «ҰАТ» АҚ-мен байланысты емес, олар мақұлдамаған, және ол ақпаратты криптографиялық қорғаудың сертификатталған құралы болып табылмайды.</li>
-          <li>Windows Hello қорғауы қосулы кезде Windows PIN-кодын қалпына келтірсеңіз, қойманы ашу мүмкін болмайды. Бастапқы <code>.p12</code> файлдары мен олардың құпиясөздерін сақтап қойыңыз.</li>
-          <li>Қандай да бір сервис қолтаңбаны қабылдамаса, NCALayer-ді қолыңызда ұстаңыз және бізге хабарлаңыз.</li>
+          <li>NativeNCA – тәуелсіз бағдарлама. Оны ҚР ҰКО да, «ҰАТ» АҚ да жасаған жоқ, және ол олардың сертификаттауынан өтпеген.</li>
+          <li>Кілт файлдары мен олардың құпиясөздерін бұрынғыдай сенімді жерде сақтаңыз. Компьютерді ауыстырсаңыз немесе Windows PIN-кодын қалпына келтірсеңіз, олар керек болады.</li>
+          <li>NCALayer-ді жоюға асықпаңыз. Қандай да бір сайт қолтаңбаны қабылдамаса, сонда NCALayer-ді пайдаланып, бізге жазыңыз.</li>
         </ul>
       </div>
     </div>
 
     <div class="verify reveal">
       <a class="btn" href="https://github.com/northbound-oss/NativeNCA"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>Бастапқы код</a>
-      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/blob/main/README.kk.md#қалай-жұмыс-істейді"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Қорғау қалай жасалған</a>
-      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/actions"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>GitHub Actions-тағы құрастырулар</a>
+      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/blob/main/README.kk.md#қалай-жұмыс-істейді"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Техникалық мәліметтер</a>
     </div>
   </div>
 </section>
@@ -436,15 +420,15 @@
     <div class="section-head reveal">
       <p class="eyebrow">Скриншоттар</p>
       <h2 class="title-lg">Windows 11 қосымшасы сияқты көрінеді</h2>
-      <p class="lead">Интерфейс Fluent Design негізінде жасалған. Скриншоттардың тақырыбы сайт тақырыбымен бірге ауысады.</p>
+      <p class="lead">Windows-тың өзіндегідей ашық және күңгірт тақырып. Скриншоттар сайттың тақырыбымен бірге ауысады.</p>
     </div>
 
     <div class="selector reveal" role="tablist" aria-label="Скриншоттар" id="shots-tabs">
-      <button role="tab" type="button" aria-selected="true" data-shot="main" data-title="Менің кілттерім" data-text="Барлық кілттер бір тізімде: атаулары, суреттері, жарамдылық мерзімі және мақсаты. Қасында сертификат мәліметтері, ЖСН және беруші.">Кілттер</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="overlay" data-portrait data-title="Қол қоюды растау" data-text="NCALayer орнына шығатын терезе: қай сайт сұрайды, неге және қай кілтпен қол қою керек. Windows Hello арқылы расталады.">Растау</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="add-key" data-title="Жаңа кілт" data-text="ҰКО берген .p12 файлын таңдап, құпиясөзді енгізіңіз де, кілтке атау беріңіз. Құпиясөзді қорғалған қоймада сақтасаңыз, оны қайта енгізудің қажеті болмайды.">Жаңа кілт</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="avatar-crop" data-title="Кілт суреті" data-text="Фото немесе компания логотипі арқылы кілтті тізімнен де, қол қою терезесінен де оңай табасыз. Сурет бағдарламаның ішінде кесіледі.">Кілт суреті</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="settings" data-title="Параметрлер" data-text="Әр қолтаңбада Windows Hello, растауды есте сақтау, ҰКО уақыт белгілері, қойманы қорғау, жаңартулар және автоматты іске қосу. Өзгерістер Windows 11-дегідей бірден қолданылады.">Параметрлер</button>
+      <button role="tab" type="button" aria-selected="true" data-shot="main" data-title="Менің кілттерім" data-text="Барлық кілттеріңіз бір тізімде: атауы, суреті, кілт қашанға дейін жарамды және не үшін керек. Қасында аты‑жөніңіз, ЖСН және сертификаттағы басқа деректер.">Кілттер</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="overlay" data-portrait data-title="Қол қоюды растау" data-text="Бұл терезе NCALayer орнына пайда болады: қай сайт қолтаңба сұрайды, неге және қай кілтпен қол қою керек. Саусақ ізімен, бет‑әлпетпен немесе PIN-кодпен растайсыз.">Растау</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="add-key" data-title="Жаңа кілт" data-text="ХҚКО-дан немесе eGov-тан алған кілт файлын таңдап, құпиясөзін енгізіп, кілтке атау беріңіз. Бағдарлама құпиясөзді есте сақтайды, енді оны енгізудің қажеті жоқ.">Жаңа кілт</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="avatar-crop" data-title="Кілт суреті" data-text="Сурет немесе компания логотипі бар кілтті тізімнен де, қол қою терезесінен де бірден табасыз.">Кілт суреті</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="settings" data-title="Параметрлер" data-text="Растауды қаншалықты жиі сұрау, кілттердің қосымша қорғауы, Windows-пен бірге іске қосу және жаңартулар. Өзгерістер бірден қолданылады.">Параметрлер</button>
     </div>
 
     <div class="gallery reveal">
@@ -458,7 +442,7 @@
       </div>
       <div class="card gallery-caption">
         <h3 id="shot-title">Менің кілттерім</h3>
-        <p id="shot-text">Барлық кілттер бір тізімде: атаулары, суреттері, жарамдылық мерзімі және мақсаты. Қасында сертификат мәліметтері, ЖСН және беруші.</p>
+        <p id="shot-text">Барлық кілттеріңіз бір тізімде: атауы, суреті, кілт қашанға дейін жарамды және не үшін керек. Қасында аты‑жөніңіз, ЖСН және сертификаттағы басқа деректер.</p>
         <div class="pips" id="shot-pips" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span><span></span></div>
       </div>
     </div>
@@ -473,19 +457,18 @@
       <h2 class="title-lg">Қалай бастау керек</h2>
     </div>
     <div class="start-grid">
-      <div class="card start-step reveal"><span class="num">1-ҚАДАМ</span><h3>Мұрағатты жүктеңіз</h3><p>Төмендегі батырма процессорыңызға арналған нұсқаны жүктейді. Мұрағатты кез келген қалтаға шығарыңыз.</p></div>
-      <div class="card start-step reveal"><span class="num">2-ҚАДАМ</span><h3>Орнатыңыз</h3><p><code>NativeNCA.exe</code> іске қосып, «Орнату» батырмасын басыңыз. Әкімші құқығы керек емес, бағдарлама «Бастау» мәзірінде пайда болады.</p></div>
-      <div class="card start-step reveal"><span class="num">3-ҚАДАМ</span><h3>Кілт қосыңыз</h3><p>Windows браузерлерге арналған сертификат туралы бір рет сұрайды, «Иә» деп жауап беріңіз. Содан кейін ҰКО берген <code>.p12</code> файлын таңдап, құпиясөзді енгізіңіз.</p></div>
-      <div class="card start-step reveal"><span class="num">4-ҚАДАМ</span><h3>eGov-қа кіріңіз</h3><p>Әдеттегідей. NCALayer орнына NativeNCA терезесі шығады. NCALayer іске қосулы болса, бағдарлама оны жабуды ұсынады.</p></div>
+      <div class="card start-step reveal"><span class="num">ҚАДАМ 1</span><h3>Жүктеп алыңыз</h3><p>Төмендегі жүктеу батырмасын басып, мұрағатты ашыңыз. Ішінде бір ғана <code>NativeNCA.exe</code> файлы бар.</p></div>
+      <div class="card start-step reveal"><span class="num">ҚАДАМ 2</span><h3>Орнатыңыз</h3><p><code>NativeNCA.exe</code> файлын іске қосып, «Орнату» батырмасын басыңыз. Әкімші құқығы керек емес, бағдарлама «Бастау» мәзірінде пайда болады.</p></div>
+      <div class="card start-step reveal"><span class="num">ҚАДАМ 3</span><h3>Кілтті қосыңыз</h3><p>Windows сертификат орнатуға бола ма деп бір рет сұрайды, «Иә» деп жауап беріңіз. Содан кейін ЭЦҚ кілтінің файлын таңдап, оның құпиясөзін енгізіңіз.</p></div>
+      <div class="card start-step reveal"><span class="num">ҚАДАМ 4</span><h3>eGov-қа кіріңіз</h3><p>Әдеттегідей. Тек NCALayer орнына NativeNCA терезесі шығады. NCALayer іске қосулы болса, бағдарлама оны жабуды ұсынады.</p></div>
     </div>
     <div class="card start-cta reveal">
       <div>
         <div class="reqs">
-          <span><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg>Windows 10 2004 нұсқасы немесе жаңарағы, не Windows 11</span>
-          <span><svg class="icon" aria-hidden="true"><use href="#i-flash"/></svg>x64 немесе ARM64</span>
-          <span><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Windows Hello ұсынылады</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg>Windows 10 немесе 11</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Саусақ ізі сканері немесе камерамен ыңғайлырақ, бірақ PIN-код та жеткілікті</span>
         </div>
-        <p class="start-note">Орнатпай да болады: «Орнатпай іске қосу» бағдарламаны мұрағат шығарылған қалтадан ашады, бірақ мұндай көшірме өздігінен жаңармайды.</p>
+        <p class="start-note">Орнатқыңыз келмей ме? «Орнатпай іске қосу» батырмасын басыңыз, сонда бағдарлама қалтаның ішінен жұмыс істейді. Мұндай көшірме өздігінен жаңармайды.</p>
         <div class="dl-alt" data-dl-alt hidden></div>
       </div>
       <a class="btn btn-accent btn-download" href="__DOWNLOAD_URL__" data-download>
@@ -509,59 +492,59 @@
     <div class="faq reveal" id="faq-list">
       <details class="expander">
         <summary>Бұл ресми бағдарлама ма?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Жоқ. NativeNCA — ашық кодты тәуелсіз жоба. Ол ҚР ҰКО-мен және «Ұлттық ақпараттық технологиялар» АҚ-мен байланысты емес және ақпаратты криптографиялық қорғаудың сертификатталған құралы емес. Сайттар үшін айырмашылық жоқ: олар NativeNCA-мен NCALayer-мен бірдей хаттама арқылы байланысады.</p></div>
-      </details>
-      <details class="expander">
-        <summary>NCALayer-ді жою керек пе?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Жоқ. Бірақ екеуі бір мезгілде жұмыс істей алмайды: сайттар екі бағдарламаны да бір портта, 13579-да күтеді. NCALayer іске қосулы болса, NativeNCA оны жабуды және автоматты іске қосылуын өшіруді ұсынады. Автоматты іске қосуды кез келген уақытта қайта қосуға болады.</p></div>
-      </details>
-      <details class="expander">
-        <summary>NCALayer іске қосылмайды немесе сайт оған қосыла алмайды. NativeNCA көмектесе ме?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Мәселе NCALayer-дің өзінде болса, көмектесуі мүмкін. NativeNCA-ға Java қажет емес, оның <code>127.0.0.1</code> үшін өз сертификаты бар, ал 13579 порты бос болмаса, оны қай бағдарлама ұстап тұрғанын көрсетеді және NCALayer-ді жабуды ұсынады.</p><p>Сайттардың <code>127.0.0.1</code> мекенжайына жүгінуіне тыйым салатын жарнама бұғаттағыштар (мысалы, uBlock Origin-нің кейбір сүзгілері) NativeNCA-ға да кедергі келтіреді. eGov-ты немесе банк сайтын ерекшеліктерге қосыңыз.</p></div>
+        <div class="exp-body"><p>Жоқ. NativeNCA-ны ҚР ҰКО да, «Ұлттық ақпараттық технологиялар» АҚ да емес, тәуелсіз әзірлеуші жасады, және ол олардың сертификаттауынан өтпеген. Сайттар айырмашылықты байқамайды: олар NativeNCA-мен NCALayer-мен қалай сөйлессе, солай сөйлеседі, ал қолтаңба өзіңіздің ЭЦҚ кілтіңізбен жасалады.</p></div>
       </details>
       <details class="expander">
         <summary>NativeNCA eGov-пен және банктермен жұмыс істей ме?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Иә. NativeNCA NCALayer-дің <code>commonUtils</code> және <code>basics</code> модульдерін іске асырады: кіру, CMS/CAdES және XML қолтаңбалары, бірнеше құжатқа бірден қол қою. Қандай да бір сервис қолтаңбаны қабылдамаса, <a href="https://github.com/northbound-oss/NativeNCA/issues">GitHub</a>-та жазыңыз, ал әзірге NCALayer-ді пайдаланыңыз.</p></div>
+        <div class="exp-body"><p>Иә. ЭЦҚ арқылы кіру және құжаттарға қол қою NCALayer-дегідей жұмыс істейді. Егер қандай да бір сайт қолтаңбаны қабылдамаса, <a href="https://github.com/northbound-oss/NativeNCA/issues">GitHub-та</a> жазыңыз, ал әзірге NCALayer-ді пайдаланыңыз.</p></div>
+      </details>
+      <details class="expander">
+        <summary>NCALayer-ді жою керек пе?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Жоқ, қала берсін. Бірақ екеуі бір уақытта жұмыс істей алмайды, сондықтан NativeNCA NCALayer-ді жабуды және оны Windows-пен бірге іске қоспауды ұсынады. NCALayer-ді кез келген уақытта қайтаруға болады.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Менде NCALayer жұмыс істемейді. NativeNCA көмектесе ме?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Мәселе NCALayer-дің өзінде болса (Java, сертификат немесе жай қатып қалса), көмектесуі әбден мүмкін. NativeNCA-ға Java керек емес, ал жұмысына не кедергі екенін өзі айтады.</p><p>Бірақ сайттың бағдарламаға жетуіне жарнама бұғаттағыш (мысалы, uBlock Origin) кедергі болса, ол NativeNCA-ға да кедергі. eGov-ты немесе банк сайтын бұғаттағыштың ерекшеліктеріне қосыңыз.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Қандай кілттер жарайды?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>ҚР ҰКО-ның файл түріндегі әдеттегі ЭЦҚ кілттері, яғни eGov-тан немесе ХҚКО-дан алатын кілттер (<code>.p12</code> кеңейтімді файлдар). Жеке тұлғалардың, ЖК-нің және ұйым қызметкерлерінің кілттері жарайды.</p><p>Әзірге токен-флешкалардағы (Kaztoken, eToken, JaCarta) және жеке куәліктегі кілттерге қолдау жоқ.</p></div>
       </details>
       <details class="expander">
         <summary>Java керек пе?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Жоқ. NativeNCA .NET-те жазылған, қажеттінің бәрі бір файлдың ішінде. Java да, Kalkan SDK да қажет емес.</p></div>
+        <div class="exp-body"><p>Жоқ. Керектінің бәрі бағдарламаның бір файлының ішінде. Басқа ештеңе орнатудың қажеті жоқ.</p></div>
       </details>
       <details class="expander">
-        <summary>Қандай кілттер қолдау табады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>ҰКО берген <code>.p12</code> файл кілттері: ҚР СТ ГОСТ Р 34.10-2015 (512 бит) және RSA.</p><p>Аппараттық тасымалдағыштар мен жеке куәлік (Kaztoken, eToken, JaCarta, ID-карта) әзірге қолдау таппайды. Ескі ГОСТ 34.310-2004 кілттері де қолдау таппайды: ҰКО оларды шығаруды тоқтатты, және мұндай кілттердің бәрінің мерзімі өтіп кетті.</p></div>
+        <summary>Кілттерді бағдарламада сақтау қауіпсіз бе?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Кілттер мен құпиясөздер тек сіздің компьютеріңізде шифрланған түрде сақталады және тек сіздің Windows тіркелгіңізде ашылады. Параметрлерде қосымша қорғауды қосуға болады: сонда оларды тек саусақ ізіңіз, бет‑әлпетіңіз немесе PIN-кодыңыз ашады. Кілттер интернетке шықпайды.</p><p>Шифрлау қалай жасалғаны <a href="https://github.com/northbound-oss/NativeNCA/blob/main/README.kk.md#қалай-жұмыс-істейді">README-де</a> толық сипатталған.</p></div>
       </details>
       <details class="expander">
-        <summary>Кілттерім мен құпиясөздерім қайда сақталады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p><code>%APPDATA%\NativeNCA\Vault</code> қалтасында, тіркелгіңізге арналған Windows DPAPI арқылы шифрланған күйде. Windows Hello қорғауын қоссаңыз, олар қосымша AES-256-GCM арқылы шифрланады, ал оның кілті TPM-де сақталып, тек бет-әлпетіңізбен, саусақ ізіңізбен немесе PIN-кодыңызбен ашылады.</p></div>
+        <summary>Іске қосқанда Windows ескерту көрсетеді. Не істеу керек?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Windows әзірге аз адам жүктеген бағдарламаларды осылай қарсы алады. «Толығырақ», содан кейін «Бәрібір іске қосу» батырмасын басыңыз. NativeNCA-ны тек осы сайттан немесе жобаның GitHub бетінен жүктеп алыңыз.</p></div>
       </details>
       <details class="expander">
-        <summary>NativeNCA қалай жаңарады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Орнатылған бағдарлама іске қосылғанда және әр алты сағат сайын GitHub-ты тексереді. Жаңа нұсқа шыққанда терезеде баннер пайда болады, ал Windows бір рет хабарлама көрсетеді. Жаңарту тек «Жаңарту» батырмасын басқанда басталады: NativeNCA мұрағатты жүктеп, әзірлеушінің қолтаңбасын тексереді де, бірнеше секундта қайта іске қосылады. Кілттер мен параметрлер сақталады.</p><p>Жаңа нұсқада бірдеңе дұрыс болмаса, параметрлерде «Алдыңғы нұсқаны қайтару» батырмасы бар. Жаңартуларды тексеруді де сол жерде өшіруге болады.</p></div>
+        <summary>Бағдарлама неге сертификат орнатады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Онсыз браузер сайтқа бағдарламаға жүгінуге рұқсат бермейді. Сертификат тек сіздің компьютеріңіз үшін жасалады және тек браузер мен NativeNCA арасындағы байланысқа жарайды, оны басқа ештеңеге пайдалану мүмкін емес.</p><p>Chrome, Edge және Firefox оны өздері алады. Орнату кезінде Firefox ашық болса, оны қайта іске қосыңыз. Сертификатты бағдарлама параметрлерінде жоюға болады.</p></div>
       </details>
       <details class="expander">
-        <summary>Бағдарлама сертификатты не үшін орнатады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Сайттар <code>wss://127.0.0.1:13579</code> мекенжайына TLS арқылы қосылады, сондықтан браузер жергілікті сертификатқа сенуі керек. NativeNCA тек сіздің компьютеріңізге арналған куәландырушы орталық жасап, ол арқылы <code>127.0.0.1</code> және <code>localhost</code> үшін бір сертификат шығарады да, орталықтың жабық кілтін бірден жояды. Онымен басқа ештеңені растау мүмкін емес.</p><p>Chrome, Edge және Firefox сертификатты Windows қоймасынан алады. Орнату кезінде Firefox ашық болса, оны қайта іске қосыңыз. Сертификатты бағдарлама параметрлерінде жоюға болады.</p></div>
-      </details>
-      <details class="expander">
-        <summary>Іске қосқанда Windows SmartScreen ескертеді. Бұл қалыпты ма?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>SmartScreen әзірге аз адам жүктеген бағдарламаларға осылай әрекет етеді. «Толығырақ» (More info), содан кейін «Бәрібір іске қосу» (Run anyway) батырмасын басыңыз. Мұрағаттың ауыстырылмағанына көз жеткізу үшін оның SHA-256 мәнін релиз бетіндегі <code>.sha256</code> файлымен салыстырыңыз: PowerShell-де бұл <code>Get-FileHash NativeNCA-*.zip</code>.</p></div>
+        <summary>Бағдарлама қалай жаңарады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Жаңа нұсқа шыққанда NativeNCA бұл туралы хабарлайды. Жаңарту тек «Жаңарту» батырмасын басқанда басталады және бірнеше секунд алады. Кілттер мен баптаулар сақталады.</p><p>Жаңа нұсқа бір нәрсесімен ұнамаса, параметрлерде «Алдыңғы нұсқаны қайтару» батырмасы бар. Жаңартуларды тексеруді де сол жерде өшіруге болады.</p></div>
       </details>
       <details class="expander">
         <summary>Windows PIN-кодын қалпына келтірсем не болады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Қойманы Windows Hello қорғауы қосулы болса, Windows Hello кілті PIN-кодпен бірге жойылады да, қорғалған деректерді қалпына келтіру мүмкін болмайды. Бұл қорғау қосылмаса, PIN-кодты қалпына келтіру ештеңеге әсер етпейді. Қалай болғанда да, бастапқы <code>.p12</code> файлдары мен олардың құпиясөздерін сақтап қойыңыз.</p></div>
+        <div class="exp-body"><p>Әдетте ештеңе болмайды. Бірақ кілттердің саусақ ізімен немесе PIN-кодпен қосымша қорғауын қосқан болсаңыз, PIN-кодты қалпына келтіргеннен кейін бағдарламада сақталған кілттерді ашу мүмкін болмайды. Сонда оларды файлдардан қайта қосыңыз. Сондықтан кілт файлдары мен құпиясөздерін бұрынғыдай сақтаңыз.</p></div>
       </details>
       <details class="expander">
         <summary>NativeNCA-ны қалай жоюға болады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Бағдарлама параметрлеріндегі «NativeNCA-ны жою» батырмасымен немесе «Windows параметрлері → Қолданбалар → Орнатылған қолданбалар» арқылы. Әдепкіде кілттер мен параметрлер қайта орнатқан жағдайға арнап <code>%APPDATA%\NativeNCA</code> қалтасында қалады. Оларды браузерлерге арналған сертификатпен бірге жою үшін құсбелгі қойыңыз. Бастапқы <code>.p12</code> файлдарына бағдарлама тиіспейді.</p></div>
+        <div class="exp-body"><p>Кез келген бағдарлама сияқты: «Windows параметрлері → Қолданбалар → Орнатылған қолданбалар» арқылы немесе бағдарлама параметрлеріндегі «NativeNCA-ны жою» батырмасымен. Қосылған кілттер бағдарламаны қайта орнатсаңыз деп әдепкі бойынша қалады. Оларды да жою үшін құсбелгіні қойыңыз. Бастапқы кілт файлдарына бағдарлама тиіспейді.</p></div>
       </details>
       <details class="expander">
-        <summary>macOS немесе Linux нұсқасы бар ма?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Жоқ. NativeNCA Windows Hello, DPAPI және Windows сертификаттар қоймасына сүйенеді, сондықтан тек Windows 10 және 11-де жұмыс істейді.</p></div>
+        <summary>Mac немесе Linux нұсқасы бар ма?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Жоқ, NativeNCA тек Windows 10 және 11-де жұмыс істейді.</p></div>
       </details>
       <details class="expander">
         <summary>Қанша тұрады?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Тегін. Бағдарламада жарнама жоқ, коды GPL-3.0 лицензиясы бойынша ашық. Қаласаңыз, <a href="#donate">әзірлеуді қолдай аласыз</a>.</p></div>
+        <div class="exp-body"><p>Тегін. Бағдарлама ақысыз және жарнамасыз. Қаласаңыз, <a href="#donate">әзірлеуді қолдай</a> аласыз.</p></div>
       </details>
     </div>
   </div>
@@ -574,7 +557,7 @@
       <span class="heart"><svg class="icon" aria-hidden="true"><use href="#i-heart-fill"/></svg></span>
       <div>
         <h2 class="title">Әзірлеуді қолдау</h2>
-        <p>NativeNCA тегін, жарнамасыз және телеметриясыз. Демеушілік қаражат жаңа сайттармен үйлесімділікке, аппараттық тасымалдағыштарды қолдауға және бағдарламаға қол қоятын сертификатқа жұмсалады. Сол сертификаттан кейін SmartScreen іске қосқанда ескертпейтін болады.</p>
+        <p>NativeNCA тегін, жарнамасыз және аңдусыз. Демеу қаржысы токен-флешкалардағы кілттерге қолдау қосуға, бағдарламаны жаңа сайттарда тексеруге және әзірлеуші сертификатын сатып алуға жұмсалады, сол сертификаттан кейін Windows іске қосқанда ескертпейтін болады.</p>
       </div>
       <button class="btn btn-accent btn-lg" type="button" id="donate-open">
         <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Қолдау
@@ -624,7 +607,7 @@
   <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
   <div>
     <b>Жүктеу басталды</b>
-    <p>Мұрағатты шығарып, <code>NativeNCA.exe</code> іске қосыңыз да, «Орнату» батырмасын басыңыз. SmartScreen сұраса, «Толығырақ» және «Бәрібір іске қосу» батырмаларын басыңыз.</p>
+    <p>Мұрағатты ашып, <code>NativeNCA.exe</code> файлын іске қосыңыз да, «Орнату» батырмасын басыңыз. Windows ескерту көрсетсе, «Толығырақ» және «Бәрібір іске қосу» батырмаларын басыңыз.</p>
   </div>
   <button class="btn btn-subtle btn-icon" type="button" id="toast-close" aria-label="Жабу"><svg class="icon" aria-hidden="true"><use href="#i-dismiss"/></svg></button>
 </div>

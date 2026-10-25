@@ -10,7 +10,7 @@
   var o = location.hostname === 'localhost' ? 'http://localhost:4330' : 'https://oss.northbound.sh';
   var r = document.referrer, d = document.documentElement;
   try { if ((r !== o + '/' && r !== o + '/ru/') || matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
-  window.ossIntro = { product: 'NativeNCA', by: 'DonnerTechDev', line: 'An NCALayer replacement for Windows' };
+  window.ossIntro = { product: 'NativeNCA', by: 'DonnerTechDev', line: 'Like NCALayer, just easier' };
   d.classList.add('oss-in');
   var s = document.createElement('script');
   s.src = o + '/intro.js'; s.async = true;
@@ -151,10 +151,10 @@
   <div class="wrap hero-grid">
     <div>
       <h1 class="hero-title">
-        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>A native NCALayer replacement for Windows</span>
-        <span class="display">Digital signatures without Java <em>or a password every&nbsp;time</em></span>
+        <span class="eyebrow"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-shield-keyhole"/></svg>Use it instead of NCALayer</span>
+        <span class="display">Everything NCALayer does, <em>just easier</em></span>
       </h1>
-      <p class="lead">NativeNCA signs you in and signs documents on eGov, in online banking and other Kazakh services with your NCA (НУЦ РК) key. Websites talk to it the same way they talk to NCALayer, and you approve each signature with your face, fingerprint or Windows Hello PIN.</p>
+      <p class="lead">NativeNCA does the same job: it signs you in to eGov, online banking and other services with your digital signature and signs documents. Only it needs no Java, opens right away, doesn't ask for a password for every signature, shows exactly what you're signing and tells you itself when something is wrong.</p>
 
       <div class="hero-actions">
         <a class="btn btn-accent btn-download" href="__DOWNLOAD_URL__" data-download data-download-main>
@@ -175,9 +175,9 @@
       </div>
 
       <div class="hero-facts">
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Free</span>
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Open source, GPL-3.0</span>
-        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Windows 10 and 11, x64 and ARM64</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Free, no ads</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>No Java needed</span>
+        <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-check-fill"/></svg>Windows 10 and 11</span>
       </div>
     </div>
 
@@ -196,7 +196,7 @@
     <div class="section-head center reveal">
       <p class="eyebrow">Why not NCALayer</p>
       <h2 class="title-lg">NCALayer has earned its retirement</h2>
-      <p class="lead">For years it signed documents for the whole of Kazakhstan, and we thank it for that. Compare one signature in NCALayer and in NativeNCA: press the button in either window.</p>
+      <p class="lead">It signed documents for all of Kazakhstan for years, and we're grateful. But signing can be simpler. Press the button in either window and compare.</p>
     </div>
 
     <div class="versus reveal">
@@ -253,24 +253,24 @@
         <caption class="visually-hidden">NCALayer compared with NativeNCA</caption>
         <thead><tr><th scope="col">In short</th><th scope="col">NCALayer</th><th scope="col">NativeNCA</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Java</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Brings a whole Java runtime and keeps it in memory</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Not needed. A single .NET file that sits in the tray</span></td></tr>
           <tr><th scope="row">Key password</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Find the .p12 file and type the password. For every signature</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Once, when you add the key. After that, Windows Hello</span></td></tr>
-          <tr><th scope="row">Choosing a key</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Guess which <code>GOST512_…p12</code> is the right one</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Readable names and photos: "Personal eGov", "LLP Shanyrak"</span></td></tr>
-          <tr><th scope="row">Certificate for 127.0.0.1</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>The same private key on every computer</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>A separate one per computer, the issuing key destroyed</span></td></tr>
-          <tr><th scope="row">Source code</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Closed, nothing to check</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Open on GitHub under GPL-3.0, you can build it yourself</span></td></tr>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Find the key file and type the password for every signature</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Once, when you add the key. After that, a fingerprint, your face or a PIN</span></td></tr>
+          <tr><th scope="row">Several keys</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Files with look-alike names such as <code>GOST512_…p12</code>. Guess which one</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Clear names and photos: "Personal", "LLP Shanyrak"</span></td></tr>
+          <tr><th scope="row">What to install</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Java and NCALayer itself. Slow to start, uses a lot of memory</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>One small app that opens right away</span></td></tr>
+          <tr><th scope="row">When something breaks</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>The site says "Connection error" and you have no idea why</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>The app tells you what's in the way and offers to fix it</span></td></tr>
+          <tr><th scope="row">Can anyone check it</th>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>No, the code is closed</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Yes, the code is open, so any expert can see what the app does</span></td></tr>
           <tr><th scope="row">Looks</th>
-            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Straight from the age of Java applets</span></td>
-            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Fluent Design, Mica, light and dark themes</span></td></tr>
+            <td class="bad" data-label="NCALayer"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>Like an app from the early 2000s</span></td>
+            <td class="good" data-label="NativeNCA"><span class="cell"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Like a modern Windows 11 app, with a dark theme</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -283,53 +283,38 @@
     <div class="section-head reveal">
       <p class="eyebrow">Features</p>
       <h2 class="title-lg">What NativeNCA does</h2>
-      <p class="lead">You add your <code>.p12</code> keys once. After that, every request from a website opens a window that shows who is asking, what exactly will be signed and with which key.</p>
+      <p class="lead">You add your signature keys once. When a site asks for a signature, NativeNCA shows a window: who's asking, what to sign and with which key.</p>
     </div>
     <div class="grid grid-3 features">
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-plug"/></svg></span>
-        <h3>Works like NCALayer</h3>
-        <p>Listens on the same <code>wss://127.0.0.1:13579</code> and speaks the same protocol, so websites need no changes.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg></span>
-        <h3>GOST and RSA keys</h3>
-        <p>СТ РК ГОСТ Р 34.10-2015 (512 bit) and RSA keys from NCA. CMS/CAdES and XML signatures are checked against reference signatures made by Kalkan.</p>
+        <h3>Works wherever NCALayer works</h3>
+        <p>eGov, online banking and other sites that ask for NCALayer work with NativeNCA the same way. Nothing to set up.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg></span>
-        <h3>Windows Hello</h3>
-        <p>Approve a signature with your face, fingerprint or PIN. You type the key password once, when you add the key.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-keys"/></svg></span>
-        <h3>Encrypted vault</h3>
-        <p>Keys and passwords are encrypted with Windows DPAPI. If you like, a Windows Hello key from the TPM adds a second layer.</p>
+        <h3>Password only once</h3>
+        <p>You type the key password when you add the key. After that you confirm with a fingerprint, your face or your Windows PIN.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg></span>
-        <h3>You see what you sign</h3>
-        <p>The confirmation window shows the site's domain, the data itself and the keys that fit the request.</p>
+        <h3>See what you sign</h3>
+        <p>Before signing you see the address of the site that asks and the document itself. If something looks wrong, just select Cancel.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-image"/></svg></span>
-        <h3>Key photos</h3>
-        <p>Give a key a photo or a company logo and crop it right in the app, so keys are hard to mix up.</p>
+        <h3>Never mix up keys</h3>
+        <p>Give each key a name and a photo: "Personal", "Sole proprietor", a company logo. Handy if you have several keys or work as an accountant.</p>
       </article>
       <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-clock-lock"/></svg></span>
-        <h3>NCA timestamps</h3>
-        <p>With a CAdES-T timestamp, a signature can still be verified after the certificate expires.</p>
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-keys"/></svg></span>
+        <h3>Keys under lock</h3>
+        <p>Keys and passwords stay on your PC only, encrypted. They aren't sent anywhere, not even to the developer.</p>
       </article>
       <article class="card feature reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-sync"/></svg></span>
-        <h3>Install and updates</h3>
-        <p>Installs without administrator rights. The app tells you about a new version and updates when you press "Update". You can roll back to the previous version.</p>
-      </article>
-      <article class="card feature reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg></span>
-        <h3>Made for Windows 11</h3>
-        <p>Fluent Design, Mica, dark theme, a tray icon and start with Windows. Opens right away, with no splash screen.</p>
+        <h3>Easy to install and update</h3>
+        <p>No administrator rights needed. The app tells you when a new version is out, updates with one button, and you can go back to the previous version.</p>
       </article>
     </div>
   </div>
@@ -340,12 +325,12 @@
   <div class="wrap how">
     <div class="reveal">
       <p class="eyebrow">How signing works</p>
-      <h2 class="title-lg">What happens when a site asks for a signature</h2>
+      <h2 class="title-lg">What it looks like on a site</h2>
       <ol class="steps" style="margin-top: 28px">
-        <li><div><h3>The site sends a request</h3><p>eGov or your bank connects to <code>127.0.0.1:13579</code>, as it did with NCALayer.</p></div></li>
-        <li><div><h3>You see who is asking and for what</h3><p>The domain, the request content and the matching keys. You can pick another key or cancel.</p></div></li>
-        <li><div><h3>You confirm with Windows Hello</h3><p>The key is decrypted in memory and the data is signed on your computer.</p></div></li>
-        <li><div><h3>The site gets only the signature</h3><p>It receives the signature and your public certificate. The private key stays on the computer.</p></div></li>
+        <li><div><h3>You select Sign in with EDS or Sign</h3><p>On eGov, in online banking or any other service where NCALayer used to open.</p></div></li>
+        <li><div><h3>The NativeNCA window appears</h3><p>It shows which site asks for a signature and what exactly you're signing. You choose the key right there.</p></div></li>
+        <li><div><h3>Touch the sensor or enter your PIN</h3><p>Just like signing in to Windows. No key password needed.</p></div></li>
+        <li><div><h3>Done</h3><p>The site gets the signature, and the key itself stays on your PC.</p></div></li>
       </ol>
     </div>
     <div class="how-shot reveal">
@@ -362,51 +347,51 @@
   <div class="wrap">
     <div class="section-head reveal">
       <p class="eyebrow">Security</p>
-      <h2 class="title-lg">How NativeNCA protects your keys</h2>
-      <p class="lead">The code is open under GPL-3.0, and the README describes the protection in detail. Here are the main points.</p>
+      <h2 class="title-lg">Your key stays with you</h2>
+      <p class="lead">Your digital signature is your signature, and the app that keeps it must look after it. Here's how NativeNCA does that, in plain words. Technical details for experts are on GitHub.</p>
     </div>
 
     <div class="grid grid-3">
       <article class="card sec-card reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg></span>
-        <h3>Open source</h3>
-        <p>Cryptography, the vault, the protocol and the updater are on GitHub. GitHub Actions builds releases from that same code, and every zip comes with a SHA-256 checksum.</p>
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-server"/></svg></span>
+        <h3>Signing happens on your PC</h3>
+        <p>The site only gets the finished signature. The key itself goes nowhere: not to the site, not to the internet, not to the developer.</p>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-shield-keyhole"/></svg></span>
+        <h3>Keys are encrypted</h3>
+        <p>Keys and passwords are encrypted by Windows and open only under your Windows account. You can turn on an extra lock: then only your fingerprint, face or PIN opens them.</p>
         <div class="vs">
-          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: closed source</div>
-          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: open source, GPL-3.0</div>
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>With this lock, even another program on this PC can't decrypt the keys without your confirmation</div>
+        </div>
+      </article>
+      <article class="card sec-card reveal">
+        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg></span>
+        <h3>Nothing hidden</h3>
+        <p>All the app's code is published. Any expert can check what it does and what it doesn't.</p>
+        <div class="vs">
+          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: closed code</div>
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: open code</div>
         </div>
       </article>
       <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-certificate"/></svg></span>
-        <h3>A certificate of its own on every computer</h3>
-        <p>The browser needs a certificate for <code>127.0.0.1</code>. NativeNCA issues it from its own certificate authority and destroys that authority's key right away. Name constraints allow local addresses only.</p>
+        <h3>Secure link to the browser</h3>
+        <p>For a site to reach the app safely, a special certificate is needed. NativeNCA creates its own on each PC, and it's no good for anything else.</p>
         <div class="vs">
-          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: the same private key in every installation</div>
-          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: each computer has its own</div>
-        </div>
-      </article>
-      <article class="card sec-card reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-shield-keyhole"/></svg></span>
-        <h3>A vault protected by Windows</h3>
-        <p>Keys and passwords are encrypted with DPAPI for your Windows account. In protected mode they are also encrypted with AES-256-GCM under a TPM key that only Windows Hello can unlock.</p>
-        <div class="vs">
-          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Without you, even a program running under your account cannot decrypt the keys</div>
+          <div class="bad"><svg class="icon" aria-hidden="true"><use href="#i-dismiss-circle"/></svg>NCALayer: the same certificate on every PC</div>
+          <div class="good"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>NativeNCA: every PC has its own</div>
         </div>
       </article>
       <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-sync"/></svg></span>
-        <h3>Signed updates</h3>
-        <p>Every release zip is signed with the project key. NativeNCA installs an update only if the signature is valid for that exact version and architecture and the version is newer than the installed one. Files come only from github.com over HTTPS, and the previous version is kept for rollback.</p>
-      </article>
-      <article class="card sec-card reveal">
-        <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-server"/></svg></span>
-        <h3>A server for this computer only</h3>
-        <p>NativeNCA listens on <code>127.0.0.1</code> only, so nothing on your network or the internet can connect to it. Signatures are made on the computer, and the private key is never sent anywhere.</p>
+        <h3>Updates can't be forged</h3>
+        <p>Every update is signed by the developer. The app checks the signature and won't install a file someone has swapped.</p>
       </article>
       <article class="card sec-card reveal">
         <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-cloud-off"/></svg></span>
-        <h3>No telemetry</h3>
-        <p>The app sends nothing to the developer. It goes online in two cases: to GitHub to check for updates (you can turn this off), and to the NCA timestamping service if timestamps are on.</p>
+        <h3>No tracking</h3>
+        <p>The app collects no statistics and sends nothing to the developer. It goes online only to check for updates (you can turn that off) and to get a timestamp for a signature, if you turned timestamps on.</p>
       </article>
     </div>
 
@@ -415,17 +400,16 @@
       <div>
         <b>Good to know</b>
         <ul>
-          <li>NativeNCA is an independent project. It is not affiliated with or endorsed by NCA (НУЦ РК) or JSC "National Information Technologies", and it is not a certified cryptographic tool.</li>
-          <li>If you reset your Windows PIN while Windows Hello protection is on, the vault cannot be decrypted. Keep your original <code>.p12</code> files and their passwords.</li>
-          <li>Keep NCALayer around in case a service rejects a signature, and let us know when that happens.</li>
+          <li>NativeNCA is an independent app. It isn't made by НУЦ РК (the National Certification Authority) or JSC NIT and hasn't been certified by them.</li>
+          <li>Keep your key files and their passwords somewhere safe, as before. You'll need them if you move to a new PC or reset your Windows PIN.</li>
+          <li>Don't rush to uninstall NCALayer. If some site doesn't accept the signature, use NCALayer there and let us know.</li>
         </ul>
       </div>
     </div>
 
     <div class="verify reveal">
       <a class="btn" href="https://github.com/northbound-oss/NativeNCA"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>Source code</a>
-      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/blob/main/README.md#how-it-works"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>How the protection works</a>
-      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/actions"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Builds on GitHub Actions</a>
+      <a class="btn" href="https://github.com/northbound-oss/NativeNCA/blob/main/README.md#how-it-works"><svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>Technical details</a>
     </div>
   </div>
 </section>
@@ -436,15 +420,15 @@
     <div class="section-head reveal">
       <p class="eyebrow">Screenshots</p>
       <h2 class="title-lg">Looks like a Windows 11 app</h2>
-      <p class="lead">The interface is built with Fluent Design. Screenshots follow the site's theme.</p>
+      <p class="lead">Light and dark theme, just like Windows itself. The screenshots switch along with the site theme.</p>
     </div>
 
     <div class="selector reveal" role="tablist" aria-label="Screenshots" id="shots-tabs">
-      <button role="tab" type="button" aria-selected="true" data-shot="main" data-title="My keys" data-text="All keys in one list with names, photos, expiry and purpose. Certificate details, IIN and issuer are right next to it.">Keys</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="overlay" data-portrait data-title="Signature confirmation" data-text="The window that appears instead of NCALayer: which site asks, what it wants to sign and with which key. Confirmed with Windows Hello.">Confirmation</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="add-key" data-title="New key" data-text="Pick a .p12 file from NCA, enter its password and name the key. Save the password in the protected vault and you will not need to type it again.">New key</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="avatar-crop" data-title="Key photo" data-text="A photo or company logo makes a key easy to find in the list and in the signing window. Cropped right in the app.">Key photo</button>
-      <button role="tab" type="button" aria-selected="false" data-shot="settings" data-title="Settings" data-text="Windows Hello for every signature, remembered confirmations, NCA timestamps, vault protection, updates and autostart. Changes apply right away, as in Windows 11.">Settings</button>
+      <button role="tab" type="button" aria-selected="true" data-shot="main" data-title="My keys" data-text="All your keys in one list: name, photo, the date a key is valid until and what it's for. Next to it, your name, IIN and other details from the certificate.">Keys</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="overlay" data-portrait data-title="Confirm signing" data-text="This window appears instead of NCALayer: which site asks for a signature, what to sign and with which key. Confirm with a fingerprint, your face or a PIN.">Confirm</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="add-key" data-title="New key" data-text="Select the key file you got from eGov or a public service center, enter its password and give the key a name. The app remembers the password, so you won't type it again.">New key</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="avatar-crop" data-title="Key photo" data-text="With a photo or company logo, the right key is easy to spot in the list and in the signing window.">Key photo</button>
+      <button role="tab" type="button" aria-selected="false" data-shot="settings" data-title="Settings" data-text="How often to ask for confirmation, extra protection for keys, starting with Windows and updates. Changes apply right away.">Settings</button>
     </div>
 
     <div class="gallery reveal">
@@ -458,7 +442,7 @@
       </div>
       <div class="card gallery-caption">
         <h3 id="shot-title">My keys</h3>
-        <p id="shot-text">All keys in one list with names, photos, expiry and purpose. Certificate details, IIN and issuer are right next to it.</p>
+        <p id="shot-text">All your keys in one list: name, photo, the date a key is valid until and what it's for. Next to it, your name, IIN and other details from the certificate.</p>
         <div class="pips" id="shot-pips" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span><span></span></div>
       </div>
     </div>
@@ -473,19 +457,18 @@
       <h2 class="title-lg">Getting started</h2>
     </div>
     <div class="start-grid">
-      <div class="card start-step reveal"><span class="num">STEP 1</span><h3>Download the zip</h3><p>The button below picks the build for your processor. Extract the zip to any folder.</p></div>
-      <div class="card start-step reveal"><span class="num">STEP 2</span><h3>Install</h3><p>Run <code>NativeNCA.exe</code> and press "Install". No administrator rights needed, and the app appears in the Start menu.</p></div>
-      <div class="card start-step reveal"><span class="num">STEP 3</span><h3>Add a key</h3><p>Windows asks once about the browser certificate: answer "Yes". Then pick your <code>.p12</code> file from NCA and enter its password.</p></div>
-      <div class="card start-step reveal"><span class="num">STEP 4</span><h3>Sign in to eGov</h3><p>As usual. The NativeNCA window appears instead of NCALayer. If NCALayer is running, the app offers to close it.</p></div>
+      <div class="card start-step reveal"><span class="num">STEP 1</span><h3>Download</h3><p>Select Download below and extract the zip. Inside is a single file, <code>NativeNCA.exe</code>.</p></div>
+      <div class="card start-step reveal"><span class="num">STEP 2</span><h3>Install</h3><p>Run <code>NativeNCA.exe</code> and select Install. No administrator rights needed. The app appears in the Start menu.</p></div>
+      <div class="card start-step reveal"><span class="num">STEP 3</span><h3>Add your key</h3><p>Windows asks once whether to install a certificate. Answer Yes. Then select your signature key file and enter its password.</p></div>
+      <div class="card start-step reveal"><span class="num">STEP 4</span><h3>Sign in to eGov</h3><p>As usual, except the NativeNCA window appears instead of NCALayer. If NCALayer is running, the app offers to close it.</p></div>
     </div>
     <div class="card start-cta reveal">
       <div>
         <div class="reqs">
-          <span><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg>Windows 10 version 2004+ or Windows 11</span>
-          <span><svg class="icon" aria-hidden="true"><use href="#i-flash"/></svg>x64 or ARM64</span>
-          <span><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Windows Hello recommended</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-laptop"/></svg>Windows 10 or 11</span>
+          <span><svg class="icon" aria-hidden="true"><use href="#i-fingerprint"/></svg>Easier with a fingerprint reader or camera, but a PIN is enough</span>
         </div>
-        <p class="start-note">You can also skip installation: "Run without installing" starts the app from the extracted folder, but that copy does not update itself.</p>
+        <p class="start-note">Rather not install? Select Run without installing and the app works right from the folder. That copy doesn't update itself.</p>
         <div class="dl-alt" data-dl-alt hidden></div>
       </div>
       <a class="btn btn-accent btn-download" href="__DOWNLOAD_URL__" data-download>
@@ -509,59 +492,59 @@
     <div class="faq reveal" id="faq-list">
       <details class="expander">
         <summary>Is this an official app?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>No. NativeNCA is an independent open-source project. It is not affiliated with NCA (НУЦ РК) or JSC "National Information Technologies", and it is not a certified cryptographic tool. For websites it makes no difference: they talk to NativeNCA over the same protocol as to NCALayer.</p></div>
+        <div class="exp-body"><p>No. NativeNCA is made by an independent developer, not by НУЦ РК or JSC National Information Technologies, and it hasn't been certified by them. Sites can't tell the difference: they talk to NativeNCA just as they talk to NCALayer, and the signature is made with your own key.</p></div>
+      </details>
+      <details class="expander">
+        <summary>Does it work with eGov and banks?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Yes. Signing in with a digital signature and signing documents work the same as with NCALayer. If some site still doesn't accept the signature, let us know on <a href="https://github.com/northbound-oss/NativeNCA/issues">GitHub</a> and use NCALayer there for now.</p></div>
       </details>
       <details class="expander">
         <summary>Do I need to uninstall NCALayer?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>No. But the two cannot run at the same time, because websites expect both on the same port, 13579. If NCALayer is running, NativeNCA offers to close it and turn off its autostart. You can turn autostart back on at any time.</p></div>
+        <div class="exp-body"><p>No, keep it. But the two can't run at the same time, so NativeNCA offers to close NCALayer and stop it from starting with Windows. You can bring NCALayer back any time.</p></div>
       </details>
       <details class="expander">
-        <summary>NCALayer won't start, or the site can't connect to it. Will NativeNCA help?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>It may, if the problem is NCALayer itself. NativeNCA doesn't need Java, has its own certificate for <code>127.0.0.1</code>, and if port 13579 is taken, it shows which program holds it and offers to close NCALayer.</p><p>Ad blockers that stop websites from reaching <code>127.0.0.1</code> (such as some uBlock Origin filter lists) block NativeNCA too. Add eGov or your bank's site to their exceptions.</p></div>
+        <summary>NCALayer doesn't work for me. Will NativeNCA help?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Most likely, if the problem is NCALayer itself: Java, its certificate, or it simply hangs. NativeNCA doesn't need Java and tells you itself what's stopping it from working.</p><p>But if an ad blocker (uBlock Origin, for example) stops the site from reaching the app, it gets in the way of NativeNCA too. Add eGov or your bank's site to the blocker's exceptions.</p></div>
       </details>
       <details class="expander">
-        <summary>Does NativeNCA work with eGov and banks?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Yes. NativeNCA implements the NCALayer modules <code>commonUtils</code> and <code>basics</code>: sign-in, CMS/CAdES and XML signatures, several documents at once. If a service rejects a signature, please open an issue on <a href="https://github.com/northbound-oss/NativeNCA/issues">GitHub</a> and use NCALayer for now.</p></div>
+        <summary>Which keys work?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>The usual НУЦ РК signature keys stored as files, the ones you get from eGov or a public service center (files ending in <code>.p12</code>). Keys of individuals, sole proprietors and company employees all work.</p><p>Keys on USB tokens (Kaztoken, eToken, JaCarta) and on ID cards aren't supported yet.</p></div>
       </details>
       <details class="expander">
         <summary>Do I need Java?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>No. NativeNCA is written in .NET and ships as a single file with everything it needs. Neither Java nor the Kalkan SDK is required.</p></div>
+        <div class="exp-body"><p>No. Everything the app needs is inside its single file. There's nothing else to install.</p></div>
       </details>
       <details class="expander">
-        <summary>Which keys are supported?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>File keys (<code>.p12</code>) from NCA: СТ РК ГОСТ Р 34.10-2015 (512 bit) and RSA.</p><p>Hardware tokens and ID cards (Kaztoken, eToken, JaCarta, ID card) are not supported yet. Legacy GOST 34.310-2004 keys are not supported either: NCA stopped issuing them, and all of them have expired.</p></div>
+        <summary>Is it safe to keep keys in the app?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Keys and passwords stay on your PC only, encrypted, and open only under your Windows account. In settings you can turn on extra protection: then only your fingerprint, face or PIN opens them. Keys never go online.</p><p>The <a href="https://github.com/northbound-oss/NativeNCA/blob/main/README.md#how-it-works">README</a> describes the encryption in detail.</p></div>
       </details>
       <details class="expander">
-        <summary>Where are my keys and passwords stored?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>In <code>%APPDATA%\NativeNCA\Vault</code>, encrypted with Windows DPAPI for your account. With Windows Hello protection on, they are also encrypted with AES-256-GCM, and the key for that lives in the TPM and opens only with your face, fingerprint or PIN.</p></div>
-      </details>
-      <details class="expander">
-        <summary>How does NativeNCA update?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>The installed app checks GitHub at start and every six hours. When a new version is out, a banner appears in the window and Windows shows a notification once. The update starts only when you press "Update": NativeNCA downloads the zip, checks the developer's signature and restarts within a few seconds. Keys and settings are kept.</p><p>If something is wrong with the new version, Settings has a "Roll back to the previous version" button. You can also turn off update checks there.</p></div>
+        <summary>Windows says "Windows protected your PC". What should I do?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>That's how Windows treats apps that few people have downloaded so far. Select More info, then Run anyway. Download NativeNCA only from this site or the project's GitHub page.</p></div>
       </details>
       <details class="expander">
         <summary>Why does the app install a certificate?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Websites connect to <code>wss://127.0.0.1:13579</code> over TLS, so the browser has to trust a local certificate. NativeNCA creates a certificate authority for your computer only, issues one certificate for <code>127.0.0.1</code> and <code>localhost</code> and destroys the authority's private key right away. Nothing else can be certified with it.</p><p>Chrome, Edge and Firefox take the certificate from the Windows store. If Firefox was open during setup, restart it. You can remove the certificate in the app's settings.</p></div>
+        <div class="exp-body"><p>Without it the browser won't let a site reach the app. The certificate is created for your PC only and is good only for the link between the browser and NativeNCA. It can't be used for anything else.</p><p>Chrome, Edge and Firefox pick it up automatically. If Firefox was open during setup, restart it. You can remove the certificate in the app's settings.</p></div>
       </details>
       <details class="expander">
-        <summary>Windows SmartScreen warns me when I run it. Is that normal?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>SmartScreen does this for apps that few people have downloaded so far. Click "More info", then "Run anyway". To make sure the zip has not been tampered with, compare its SHA-256 with the <code>.sha256</code> file on the release page: in PowerShell, run <code>Get-FileHash NativeNCA-*.zip</code>.</p></div>
+        <summary>How does the app update?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>When a new version is out, NativeNCA lets you know. The update starts only when you select Update and takes a few seconds. Your keys and settings stay.</p><p>If you don't like the new version, settings have a Go back to the previous version button. You can turn off update checks there too.</p></div>
       </details>
       <details class="expander">
         <summary>What happens if I reset my Windows PIN?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>If Windows Hello vault protection is on, the Windows Hello key disappears together with the PIN, and the protected data cannot be recovered. Without that protection, resetting the PIN changes nothing. Either way, keep your original <code>.p12</code> files and their passwords.</p></div>
+        <div class="exp-body"><p>Usually nothing. But if you turned on extra protection for keys with a fingerprint or PIN, the keys saved in the app can't be opened after a PIN reset. Add them again from the files. That's why you should keep your key files and passwords, as before.</p></div>
       </details>
       <details class="expander">
         <summary>How do I uninstall NativeNCA?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>With "Uninstall NativeNCA" in the app's settings, or in Windows Settings → Apps → Installed apps. By default, keys and settings stay in <code>%APPDATA%\NativeNCA</code> in case you reinstall. Tick the checkbox to remove them along with the browser certificate. Your original <code>.p12</code> files are never touched.</p></div>
+        <div class="exp-body"><p>Like any app: Settings &gt; Apps &gt; Installed apps, or the Uninstall NativeNCA button in the app's own settings. The keys you added stay by default, in case you install it again. To delete them too, select the check box. The app never touches your original key files.</p></div>
       </details>
       <details class="expander">
-        <summary>Is there a version for macOS or Linux?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>No. NativeNCA relies on Windows Hello, DPAPI and the Windows certificate store, so it runs on Windows 10 and 11 only.</p></div>
+        <summary>Is there a version for Mac or Linux?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>No, NativeNCA works only on Windows 10 and 11.</p></div>
       </details>
       <details class="expander">
         <summary>How much does it cost?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Nothing. The app is free, has no ads, and the code is open under GPL-3.0. If you want, you can <a href="#donate">support development</a>.</p></div>
+        <div class="exp-body"><p>Nothing. The app is free and has no ads. If you'd like, you can <a href="#donate">support development</a>.</p></div>
       </details>
     </div>
   </div>
@@ -574,7 +557,7 @@
       <span class="heart"><svg class="icon" aria-hidden="true"><use href="#i-heart-fill"/></svg></span>
       <div>
         <h2 class="title">Support development</h2>
-        <p>NativeNCA is free, with no ads and no telemetry. Donations go towards compatibility with new sites, hardware token support and a code signing certificate, after which SmartScreen will stop warning on launch.</p>
+        <p>NativeNCA is free, with no ads and no tracking. Donations help add support for keys on USB tokens, test the app with new sites and buy a developer certificate, so Windows stops warning at startup.</p>
       </div>
       <button class="btn btn-accent btn-lg" type="button" id="donate-open">
         <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Support
@@ -624,7 +607,7 @@
   <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
   <div>
     <b>Download started</b>
-    <p>Extract the zip, run <code>NativeNCA.exe</code> and press "Install". If SmartScreen asks, click "More info" and "Run anyway".</p>
+    <p>Extract the zip, run <code>NativeNCA.exe</code> and select Install. If Windows shows a warning, select More info and Run anyway.</p>
   </div>
   <button class="btn btn-subtle btn-icon" type="button" id="toast-close" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-dismiss"/></svg></button>
 </div>

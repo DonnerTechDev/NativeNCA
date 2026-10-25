@@ -610,8 +610,8 @@ section { position: relative; }
 .compare tbody tr + tr td, .compare tbody tr + tr th { border-top: 1px solid var(--divider); }
 .compare tbody th { font-weight: 600; width: 22%; }
 .compare td { color: var(--text-2); width: 39%; }
-.compare td .cell { display: flex; gap: 10px; }
-.compare td .icon { width: 18px; height: 18px; margin-top: 3px; }
+.compare td .cell { display: block; position: relative; padding-left: 28px; }
+.compare td .icon { position: absolute; left: 0; top: 3px; width: 18px; height: 18px; }
 .compare td.bad .icon { color: var(--critical); }
 .compare td.good { color: var(--text); }
 .compare td.good .icon { color: var(--success); }
