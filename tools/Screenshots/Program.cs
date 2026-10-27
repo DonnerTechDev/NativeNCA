@@ -301,6 +301,30 @@ class Program
         return new SignOverlayWindow(new SignOverlayViewModel(MakeVault(keys), new ConsentCache(), request));
     }
 
+    static CsrOverlayWindow MakeCsrOverlay(CsrPromptRequest request = null, bool saveBackup = false, string folder = null, string password = null)
+    {
+        request ??= new CsrPromptRequest
+        {
+            Origin = "https://egov.kz",
+            Description = new LocText(() => Strings.Overlay_CsrTitle),
+            SubjectCommonName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ",
+            SubjectIin = "880412300517",
+            KeyAlgorithm = Strings.Crypto_AlgorithmGost2015_512
+        };
+        var vm = new CsrOverlayViewModel(request)
+        {
+            SaveBackupCopy = saveBackup,
+            BackupFolder = folder ?? @"C:\Users\Dan\Documents",
+            Password = password ?? string.Empty
+        };
+        var window = new CsrOverlayWindow(vm);
+        if (!string.IsNullOrEmpty(password) && window.FindName("PasswordInput") is Wpf.Ui.Controls.PasswordBox pb)
+        {
+            pb.Password = password;
+        }
+        return window;
+    }
+
     static async Task RunUpdates(ApplicationTheme theme, string t, bool dark)
     {
         // Update available, stacked under a server problem.
@@ -492,6 +516,31 @@ class Program
         typeof(SignOverlayViewModel).GetMethod("RequireManualPassword", BindingFlags.Instance | BindingFlags.NonPublic)!
             .Invoke(sign, new object[] { new LocText(() => Strings.Overlay_SavedPasswordWrong) });
         await Idle(); Snap(signWindow, $"d-overlay-error-{t}", dark); signWindow.Close();
+
+        // CSR overlay states: backup enabled with organization details, and insecure origin.
+        var csrBackup = MakeCsrOverlay(new CsrPromptRequest
+        {
+            Origin = "https://cabinet.salyk.kz",
+            Description = new LocText(() => Strings.Overlay_CsrTitle),
+            SubjectCommonName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ",
+            SubjectIin = "880412300517",
+            SubjectBin = "190540012388",
+            SubjectOrganization = "ТОО «ШАНЫРАК ЛОГИСТИК»",
+            KeyAlgorithm = Strings.Crypto_AlgorithmGost2015_512
+        }, saveBackup: true, folder: @"C:\Users\Dan\Documents\Keys", password: "••••••••");
+        Place(csrBackup); csrBackup.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        Snap(csrBackup, $"d-csr-overlay-backup-{t}", dark); csrBackup.Close();
+
+        var csrInsecure = MakeCsrOverlay(new CsrPromptRequest
+        {
+            Origin = "http://localhost:8080",
+            Description = new LocText(() => Strings.Overlay_CsrTitle),
+            SubjectCommonName = "АХМЕТОВ ДАНИЯР СЕРИКОВИЧ",
+            SubjectIin = "880412300517",
+            KeyAlgorithm = Strings.Crypto_AlgorithmRsa2048
+        });
+        Place(csrInsecure); csrInsecure.Show(); await Idle(); ApplyTheme(theme); await Idle();
+        Snap(csrInsecure, $"d-csr-overlay-insecure-{t}", dark); csrInsecure.Close();
     }
 
     static Wpf.Ui.Controls.ContentDialog FindDialog(DependencyObject root)
@@ -610,6 +659,11 @@ class Program
             Place(ov); ov.Show(); await Idle(); ApplyTheme(theme); await Idle();
             Snap(ov, $"overlay-{t}", dark);
             ov.Close();
+
+            var csr = MakeCsrOverlay();
+            Place(csr); csr.Show(); await Idle(); ApplyTheme(theme); await Idle();
+            Snap(csr, $"csr-overlay-{t}", dark);
+            csr.Close();
         }
     }
 }

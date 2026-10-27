@@ -249,11 +249,18 @@ public class SecureVaultService
     /// <exception cref="WrongPasswordException"/>
     public VaultKeyItem AddKey(string p12FilePath, string password, string? customName = null, bool savePassword = false)
     {
-        EnsureWritable();
         if (!File.Exists(p12FilePath))
             throw new FileNotFoundException(Strings.Vault_KeyFileNotFound, p12FilePath);
 
         byte[] rawBytes = File.ReadAllBytes(p12FilePath);
+        return AddKey(rawBytes, password, customName, savePassword, Path.GetFileName(p12FilePath));
+    }
+
+    /// <summary>Validates the password, reads the certificate and stores the container bytes encrypted.</summary>
+    /// <exception cref="WrongPasswordException"/>
+    public VaultKeyItem AddKey(byte[] rawBytes, string password, string? customName = null, bool savePassword = false, string? originalFileName = null)
+    {
+        EnsureWritable();
 
         // Full load: checks the password, the key/certificate match and that the algorithm is supported.
         var signingKey = SigningKey.Load(rawBytes, password);
@@ -272,13 +279,13 @@ public class SecureVaultService
         string defaultName = !string.IsNullOrWhiteSpace(customName)
             ? customName.Trim()
             : !string.IsNullOrWhiteSpace(info.Organization) ? info.Organization!
-            : info.FullName ?? Path.GetFileNameWithoutExtension(p12FilePath);
+            : info.FullName ?? (!string.IsNullOrEmpty(originalFileName) ? Path.GetFileNameWithoutExtension(originalFileName) : (info.CommonName ?? info.Subject));
 
         var item = new VaultKeyItem
         {
             Id = keyId,
             Name = defaultName,
-            OriginalFileName = Path.GetFileName(p12FilePath),
+            OriginalFileName = originalFileName ?? $"{info.Algorithm}_{keyId:N}.p12",
             EncryptedFileName = encFileName,
             Subject = info.Subject,
             Issuer = info.Issuer,
@@ -303,6 +310,7 @@ public class SecureVaultService
             PersistDatabase();
         }
 
+        Changed?.Invoke(this, EventArgs.Empty);
         return item;
     }
 

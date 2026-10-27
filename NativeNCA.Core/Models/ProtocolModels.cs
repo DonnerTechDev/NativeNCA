@@ -41,3 +41,25 @@ public class SigningPromptResult
 
     public static SigningPromptResult Cancelled => new() { Approved = false };
 }
+
+public class CsrPromptRequest
+{
+    public string Origin { get; set; } = string.Empty;
+    public LocText Description { get; set; } = LocText.Raw(string.Empty);
+    public Dictionary<string, string> DistinguishedName { get; set; } = new();
+    public string? SubjectCommonName { get; set; }
+    public string? SubjectIin { get; set; }
+    public string? SubjectBin { get; set; }
+    public string? SubjectOrganization { get; set; }
+    public string? Email { get; set; }
+    public string KeyAlgorithm { get; set; } = string.Empty;
+}
+
+public class CsrPromptResult
+{
+    public bool Approved { get; set; }
+    public string? Password { get; set; }
+    public string? BackupFolder { get; set; }
+
+    public static CsrPromptResult Cancelled => new() { Approved = false };
+}

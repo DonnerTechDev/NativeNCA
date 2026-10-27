@@ -27,13 +27,15 @@ public class NcaProtocolHandler
     private readonly SecureVaultService _vault;
     private readonly IUserPromptService _prompt;
     private readonly ITimestampProvider _tsa;
+    private readonly PendingCsrStore _pendingCsrStore;
     private readonly SemaphoreSlim _promptGate = new(1, 1);
 
-    public NcaProtocolHandler(SecureVaultService vault, IUserPromptService prompt, ITimestampProvider? tsa = null)
+    public NcaProtocolHandler(SecureVaultService vault, IUserPromptService prompt, ITimestampProvider? tsa = null, PendingCsrStore? pendingCsrStore = null)
     {
         _vault = vault;
         _prompt = prompt;
         _tsa = tsa ?? new NcaTimestampService();
+        _pendingCsrStore = pendingCsrStore ?? new PendingCsrStore();
     }
 
     /// <summary>CAdES-BES → CAdES-T when requested.</summary>
@@ -42,6 +44,8 @@ public class NcaProtocolHandler
 
     public async Task<string> HandleAsync(string requestJson, string origin, CancellationToken ct)
     {
+        LogProtocol($"[REQ from {origin}] {requestJson}");
+
         JsonObject request;
         try
         {
@@ -52,26 +56,34 @@ public class NcaProtocolHandler
             return CommonError("Malformed request");
         }
 
-        string module = request["module"]?.GetValue<string>() ?? CommonUtilsModule;
-        string method = request["method"]?.GetValue<string>() ?? string.Empty;
+        string module = GetString(request["module"]) ?? CommonUtilsModule;
+        string method = GetString(request["method"]) ?? string.Empty;
         JsonNode? args = request["args"];
 
         try
         {
-            return module switch
+            string response = module switch
             {
                 CommonUtilsModule => await HandleCommonUtilsAsync(method, args as JsonArray ?? new JsonArray(), origin, ct),
                 BasicsModule when method == "sign" => await HandleBasicsSignAsync(args as JsonObject ?? new JsonObject(), origin, ct),
+                BasicsModule when method == "generateCsr" => await HandleBasicsGenerateCsrAsync(args as JsonObject ?? new JsonObject(), origin, ct),
+                BasicsModule when method == "importCertificate" => await HandleBasicsImportCertificateAsync(args as JsonObject ?? new JsonObject(), origin, ct),
+                BasicsModule when method == "obtainAllStorages" => HandleBasicsObtainAllStorages(),
                 BasicsModule => BasicsError("unsupported.method", $"Метод {method} не поддерживается"), // NoLoc: protocol message
                 _ => CommonError($"Модуль {module} не поддерживается NativeNCA") // NoLoc: protocol message
             };
+
+            LogProtocol($"[RESP {module}.{method}] {response}");
+            return response;
         }
         catch (OperationCanceledException)
         {
+            LogProtocol($"[CANCELED {module}.{method}]");
             return module == BasicsModule ? BasicsCancelled() : CommonCancelled();
         }
         catch (Exception ex)
         {
+            LogProtocol($"[EX in {module}.{method}] {ex}");
             return module == BasicsModule ? BasicsError("internal.error", ex.Message) : CommonError(ex.Message);
         }
     }
@@ -200,13 +212,16 @@ public class NcaProtocolHandler
 
     private async Task<string> HandleBasicsSignAsync(JsonObject args, string origin, CancellationToken ct)
     {
-        if (args["allowedStorages"] is JsonArray storages && storages.Count > 0 &&
-            !storages.Any(s => string.Equals(s?.GetValue<string>(), "PKCS12", StringComparison.OrdinalIgnoreCase)))
+        if (args["allowedStorages"] is JsonArray storages)
         {
-            return BasicsError("storage.unsupported", "Сайт требует аппаратный носитель (токен или ID-карту), он не поддерживается NativeNCA"); // NoLoc: protocol message
+            var valid = storages.Select(GetString).Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            if (valid.Count > 0 && !valid.Any(s => string.Equals(s, "PKCS12", StringComparison.OrdinalIgnoreCase)))
+            {
+                return BasicsError("storage.unsupported", "Сайт требует аппаратный носитель (токен или ID-карту), он не поддерживается NativeNCA"); // NoLoc: protocol message
+            }
         }
 
-        string format = args["format"]?.GetValue<string>()?.ToLowerInvariant() ?? "cms";
+        string format = GetString(args["format"])?.ToLowerInvariant() ?? "cms";
         var signingParams = args["signingParams"] as JsonObject;
         var signerParams = args["signerParams"] as JsonObject;
 
@@ -218,15 +233,15 @@ public class NcaProtocolHandler
 
         List<string> items = args["data"] switch
         {
-            JsonArray arr => arr.Select(n => n?.GetValue<string>() ?? string.Empty).ToList(),
-            JsonValue v => new List<string> { v.GetValue<string>() },
+            JsonArray arr => arr.Select(GetString).Where(s => s != null).Select(s => s!).ToList(),
+            JsonNode n when GetString(n) is string s => new List<string> { s },
             _ => throw new ArgumentException("Нет данных для подписи") // NoLoc: protocol message
         };
 
         var usage = KeyUsageFilter.Any;
         if (signerParams?["extKeyUsageOids"] is JsonArray ekus)
         {
-            var oids = ekus.Select(e => e?.GetValue<string>()).ToHashSet();
+            var oids = ekus.Select(GetString).Where(s => s != null).ToHashSet();
             if (oids.Contains(KzOids.EkuClientAuth) && !oids.Contains(KzOids.EkuEmailProtection)) usage = KeyUsageFilter.Auth;
             else if (oids.Contains(KzOids.EkuEmailProtection) && !oids.Contains(KzOids.EkuClientAuth)) usage = KeyUsageFilter.Sign;
         }
@@ -245,8 +260,8 @@ public class NcaProtocolHandler
                 : format == "xml" ? Strings.Request_SignXml : Strings.Request_SignDocument),
             DataToSignPreview = preview,
             RequiredUsage = usage,
-            RequiredIin = signerParams?["iin"]?.GetValue<string>(),
-            RequiredBin = signerParams?["bin"]?.GetValue<string>()
+            RequiredIin = GetString(signerParams?["iin"]),
+            RequiredBin = GetString(signerParams?["bin"])
         }, ct);
 
         if (!result.Approved || result.Key == null || result.SelectedKey == null)
@@ -272,6 +287,331 @@ public class NcaProtocolHandler
         var payload = new JsonArray(signed.Select(s => (JsonNode)s).ToArray());
         return new JsonObject { ["status"] = true, ["body"] = new JsonObject { ["result"] = payload } }.ToJsonString();
     }
+
+    private async Task<string> HandleBasicsGenerateCsrAsync(JsonObject args, string origin, CancellationToken ct)
+    {
+        bool hasPkcs12 = false;
+        bool hasStorageRestriction = false;
+
+        if (args["allowedStorages"] is JsonArray storages)
+        {
+            var valid = storages.Select(GetString).Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            if (valid.Count > 0)
+            {
+                hasStorageRestriction = true;
+                hasPkcs12 = valid.Any(s => string.Equals(s, "PKCS12", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+        else if (args["allowedStorage"] != null)
+        {
+            string? asStr = GetString(args["allowedStorage"]);
+            if (!string.IsNullOrWhiteSpace(asStr))
+            {
+                hasStorageRestriction = true;
+                hasPkcs12 = string.Equals(asStr, "PKCS12", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        else if (args["storageType"] != null)
+        {
+            string? stStr = GetString(args["storageType"]);
+            if (!string.IsNullOrWhiteSpace(stStr))
+            {
+                hasStorageRestriction = true;
+                hasPkcs12 = string.Equals(stStr, "PKCS12", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        if (hasStorageRestriction && !hasPkcs12)
+        {
+            return BasicsError("CSR_GENERATING_FAILURE", "NativeNCA поддерживает только файловое хранилище (PKCS#12)"); // NoLoc: protocol message
+        }
+
+        var dnNode = args["dn"] as JsonObject;
+        var dn = new Dictionary<string, string>();
+        if (dnNode != null)
+        {
+            foreach (var (k, v) in dnNode)
+            {
+                string? strVal = GetString(v);
+                if (!string.IsNullOrEmpty(strVal)) dn[k] = strVal;
+            }
+        }
+
+        if (dn.Count == 0)
+        {
+            return BasicsError("CSR_GENERATING_FAILURE", "Не указаны данные субъекта (DN)"); // NoLoc: protocol message
+        }
+
+        string? email = GetString(args["email"]);
+        string? defaultPassword = GetString(args["defaultPassword"]);
+
+        var sans = new List<string>();
+        if (args["subjectAltNames"] is JsonArray sanArray)
+        {
+            foreach (var item in sanArray)
+            {
+                string? s = GetString(item);
+                if (!string.IsNullOrWhiteSpace(s)) sans.Add(s);
+            }
+        }
+
+        var paramsArray = args["params"] as JsonArray;
+        var keyParams = new List<(string alg, int length)>();
+        if (paramsArray != null && paramsArray.Count > 0)
+        {
+            foreach (var p in paramsArray)
+            {
+                if (p is JsonObject po)
+                {
+                    string alg = GetString(po["algorithm"]) ?? "GOST512";
+                    int len = GetInt(po["length"]) ?? (alg.Contains("RSA", StringComparison.OrdinalIgnoreCase) ? 2048 : 512);
+                    keyParams.Add((alg, len));
+                }
+            }
+        }
+        else if (args["algorithm"] != null)
+        {
+            string alg = GetString(args["algorithm"]) ?? "GOST512";
+            int len = GetInt(args["keyLength"]) ?? (alg.Contains("RSA", StringComparison.OrdinalIgnoreCase) ? 2048 : 512);
+            keyParams.Add((alg, len));
+        }
+        else
+        {
+            keyParams.Add(("GOST512", 512));
+        }
+
+        string? cn = dn.GetValueOrDefault("2.5.4.3");
+        string? iin = dn.GetValueOrDefault("2.5.4.5");
+        string? bin = dn.GetValueOrDefault("2.5.4.11");
+        string? org = dn.GetValueOrDefault("2.5.4.10");
+
+        string algDisplayName = keyParams[0].alg.Contains("RSA", StringComparison.OrdinalIgnoreCase)
+            ? Strings.Crypto_AlgorithmRsa2048
+            : Strings.Crypto_AlgorithmGost2015_512;
+
+        var promptReq = new CsrPromptRequest
+        {
+            Origin = origin,
+            Description = new LocText(() => Strings.Overlay_CsrTitle),
+            DistinguishedName = dn,
+            SubjectCommonName = cn,
+            SubjectIin = iin,
+            SubjectBin = bin,
+            SubjectOrganization = org,
+            Email = email,
+            KeyAlgorithm = algDisplayName
+        };
+
+        CsrPromptResult promptResult;
+        await _promptGate.WaitAsync(ct);
+        try
+        {
+            promptResult = await _prompt.PromptForCsrAsync(promptReq, ct);
+        }
+        finally
+        {
+            _promptGate.Release();
+        }
+
+        if (!promptResult.Approved)
+            return BasicsCancelled();
+
+        string chosenPassword = !string.IsNullOrEmpty(promptResult.Password)
+            ? promptResult.Password
+            : (!string.IsNullOrEmpty(defaultPassword) ? defaultPassword : Guid.NewGuid().ToString("N"));
+
+        var pems = new JsonArray();
+        foreach (var (alg, len) in keyParams)
+        {
+            var generated = CsrGenerator.Generate(dn, email, sans, alg, len);
+            _pendingCsrStore.Add(new PendingCsrItem
+            {
+                KeyId = generated.KeyId,
+                Prefix = generated.Prefix,
+                Kind = generated.Kind,
+                PrivateKeyInfo = generated.PrivateKeyInfo,
+                PublicKeyInfo = generated.PublicKeyInfo,
+                Password = chosenPassword,
+                BackupFolder = promptResult.BackupFolder,
+                CustomName = cn
+            });
+            pems.Add(generated.CsrPem);
+        }
+
+        return new JsonObject
+        {
+            ["status"] = true,
+            ["body"] = new JsonObject
+            {
+                ["pems"] = pems
+            }
+        }.ToJsonString();
+    }
+
+    private async Task<string> HandleBasicsImportCertificateAsync(JsonObject args, string origin, CancellationToken ct)
+    {
+        bool hasPkcs12 = false;
+        bool hasStorageRestriction = false;
+
+        if (args["allowedStorages"] is JsonArray storages)
+        {
+            var valid = storages.Select(GetString).Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            if (valid.Count > 0)
+            {
+                hasStorageRestriction = true;
+                hasPkcs12 = valid.Any(s => string.Equals(s, "PKCS12", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+        else if (args["allowedStorage"] != null)
+        {
+            string? asStr = GetString(args["allowedStorage"]);
+            if (!string.IsNullOrWhiteSpace(asStr))
+            {
+                hasStorageRestriction = true;
+                hasPkcs12 = string.Equals(asStr, "PKCS12", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        else if (args["storageType"] != null)
+        {
+            string? stStr = GetString(args["storageType"]);
+            if (!string.IsNullOrWhiteSpace(stStr))
+            {
+                hasStorageRestriction = true;
+                hasPkcs12 = string.Equals(stStr, "PKCS12", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        if (hasStorageRestriction && !hasPkcs12)
+        {
+            return BasicsError("CERTIFICATE_IMPORTING_FAILURE", "NativeNCA поддерживает только файловое хранилище (PKCS#12)"); // NoLoc: protocol message
+        }
+
+        var certNodes = args["certificates"] as JsonArray;
+        if (certNodes == null || certNodes.Count == 0)
+        {
+            return BasicsError("CERTIFICATE_IMPORTING_FAILURE", "Пустой список сертификатов"); // NoLoc: protocol message
+        }
+
+        string? defaultPassword = GetString(args["defaultPassword"]);
+        string? keystorePath = GetString(args["keystorePath"]);
+
+        var parser = new Org.BouncyCastle.X509.X509CertificateParser();
+        var allCerts = new List<Org.BouncyCastle.X509.X509Certificate>();
+        foreach (var node in certNodes)
+        {
+            string text = GetString(node)?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(text)) continue;
+
+            try
+            {
+                if (text.Contains("-----BEGIN", StringComparison.OrdinalIgnoreCase))
+                {
+                    allCerts.Add(parser.ReadCertificate(Encoding.UTF8.GetBytes(text)));
+                }
+                else
+                {
+                    allCerts.Add(parser.ReadCertificate(Convert.FromBase64String(text)));
+                }
+            }
+            catch
+            {
+                // Ignore unparseable certificates
+            }
+        }
+
+        if (allCerts.Count == 0)
+        {
+            return BasicsError("CERTIFICATE_IMPORTING_FAILURE", "Не удалось разобрать сертификаты"); // NoLoc: protocol message
+        }
+
+        int importedCount = 0;
+        string? lastImportedName = null;
+
+        foreach (var cert in allCerts)
+        {
+            byte[] pubBytes = cert.CertificateStructure.SubjectPublicKeyInfo.PublicKey.GetBytes();
+            byte[] keyIdBytes = System.Security.Cryptography.SHA1.HashData(pubBytes);
+            string keyIdHex = Convert.ToHexString(keyIdBytes).ToLowerInvariant();
+
+            var pending = _pendingCsrStore.Find(keyIdHex);
+            if (pending == null) continue;
+
+            string finalPassword = !string.IsNullOrEmpty(defaultPassword)
+                ? defaultPassword
+                : (!string.IsNullOrEmpty(pending.Password) ? pending.Password : "NativeNCA123");
+
+            var contents = new Pkcs12Contents
+            {
+                PrivateKey = pending.PrivateKeyInfo,
+                Certificate = cert,
+                AllCertificates = allCerts
+            };
+
+            byte[] p12Bytes = Pkcs12Writer.Write(contents, finalPassword);
+
+            try
+            {
+                _vault.AddKey(p12Bytes, finalPassword, customName: pending.CustomName, savePassword: true);
+            }
+            catch (InvalidOperationException)
+            {
+                // Already present in vault
+            }
+
+            string? targetFolder = !string.IsNullOrEmpty(pending.BackupFolder)
+                ? pending.BackupFolder
+                : (!string.IsNullOrEmpty(keystorePath) ? keystorePath : null);
+
+            if (!string.IsNullOrEmpty(targetFolder))
+            {
+                try
+                {
+                    Directory.CreateDirectory(targetFolder);
+                    string fileName = $"{pending.Prefix}_{pending.KeyId}.p12";
+                    File.WriteAllBytes(Path.Combine(targetFolder, fileName), p12Bytes);
+                }
+                catch
+                {
+                    // Non-fatal if backup folder write fails
+                }
+            }
+
+            _pendingCsrStore.Remove(pending.KeyId);
+            lastImportedName = CertificateInfo.From(cert).CommonName;
+            importedCount++;
+        }
+
+        if (importedCount == 0)
+        {
+            return BasicsError("CERTIFICATE_IMPORTING_FAILURE",
+                "Хранилище ключей не содержит открытый ключ, который соответствует сертификату для установки"); // NoLoc: protocol message
+        }
+
+        if (lastImportedName != null)
+        {
+            await _prompt.ShowNotificationAsync(Strings.Status_CertificateImportedTitle,
+                Loc.Format(Strings.Status_CertificateImported, lastImportedName));
+        }
+
+        return new JsonObject
+        {
+            ["status"] = true,
+            ["body"] = new JsonObject
+            {
+                ["result"] = true
+            }
+        }.ToJsonString();
+    }
+
+    private static string HandleBasicsObtainAllStorages() =>
+        new JsonObject
+        {
+            ["status"] = true,
+            ["body"] = new JsonArray
+            {
+                new JsonObject { ["storage"] = "PKCS12" }
+            }
+        }.ToJsonString();
 
     // ===================== helpers =====================
 
@@ -357,6 +697,33 @@ public class NcaProtocolHandler
 
         string sha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(data))[..16];
         return Loc.Plural(data.Length, Strings.Request_BinaryPreview_Plural, sha);
+    }
+
+    private static string? GetString(JsonNode? node) => node switch
+    {
+        null => null,
+        JsonValue val when val.TryGetValue<string>(out var s) => s,
+        JsonValue val => val.ToString(),
+        _ => node.ToString()
+    };
+
+    private static int? GetInt(JsonNode? node) => node switch
+    {
+        null => null,
+        JsonValue val when val.TryGetValue<int>(out int i) => i,
+        JsonValue val when int.TryParse(val.ToString(), out int i) => i,
+        _ => null
+    };
+
+    private static void LogProtocol(string line)
+    {
+        try
+        {
+            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NativeNCA");
+            Directory.CreateDirectory(dir);
+            File.AppendAllText(Path.Combine(dir, "protocol.log"), $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {line}\n");
+        }
+        catch { }
     }
 
     // commonUtils responses

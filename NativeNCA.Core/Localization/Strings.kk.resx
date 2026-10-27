@@ -1151,4 +1151,37 @@
   <data name="Xml_NoId" xml:space="preserve">
     <value>Қол қойылатын элементте Id төлсипаты болуы керек</value>
   </data>
+  <data name="Status_CertificateImportedTitle" xml:space="preserve">
+    <value>ЭЦҚ шығарылды</value>
+  </data>
+  <data name="Status_CertificateImported" xml:space="preserve">
+    <value>«{0}» сертификаты сәтті шығарылып, қоймаға қосылды</value>
+  </data>
+  <data name="Overlay_CsrTitle" xml:space="preserve">
+    <value>Жаңа ЭЦҚ шығару</value>
+  </data>
+  <data name="Overlay_CsrSubtitle" xml:space="preserve">
+    <value>Сайт сертификатты шығару үшін жаңа кілттер жұбын жасауды сұрауда</value>
+  </data>
+  <data name="Overlay_CsrSubject" xml:space="preserve">
+    <value>Иесі</value>
+  </data>
+  <data name="Overlay_CsrAlgorithm" xml:space="preserve">
+    <value>Алгоритм</value>
+  </data>
+  <data name="Overlay_CsrSaveBackup" xml:space="preserve">
+    <value>Резервтік көшірмесін сақтау (.p12)</value>
+  </data>
+  <data name="Overlay_CsrBackupFolder" xml:space="preserve">
+    <value>Сақтау қапшығы</value>
+  </data>
+  <data name="Overlay_CsrGenerateButton" xml:space="preserve">
+    <value>Кілттерді шығару</value>
+  </data>
+  <data name="Crypto_AlgorithmGost2015_512" xml:space="preserve">
+    <value>ҚР СТ ГОСТ Р 34.10-2015 (512 бит)</value>
+  </data>
+  <data name="Crypto_AlgorithmRsa2048" xml:space="preserve">
+    <value>RSA (2048 бит)</value>
+  </data>
 </root>

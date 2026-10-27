@@ -71,6 +71,32 @@ internal static class TestKeys
         return BuildPfx(PrivateKeyInfoFactory.CreatePrivateKeyInfo(kp.Private), cert, password);
     }
 
+    public static X509Certificate CreateCertFromSpki(SubjectPublicKeyInfo spki, bool isGost = true)
+    {
+        var sigAlg = isGost ? Gost2015.SignatureAlgorithm : new AlgorithmIdentifier(new DerObjectIdentifier(KzOids.Sha256WithRsa), DerNull.Instance);
+        var tbs = BuildTbs(spki, sigAlg, authAndSign: true);
+        byte[] sig;
+        if (isGost)
+        {
+            var domain = Gost2015.Domain;
+            BigInteger d;
+            do { d = new BigInteger(domain.N.BitLength, Random); } while (d.SignValue == 0 || d.CompareTo(domain.N) >= 0);
+            sig = Gost2015.SignDigest(new ECPrivateKeyParameters(d, domain), Gost2015.Hash(tbs.GetEncoded()));
+        }
+        else
+        {
+            var gen = new RsaKeyPairGenerator();
+            gen.Init(new KeyGenerationParameters(Random, 2048));
+            var kp = gen.GenerateKeyPair();
+            var signer = SignerUtilities.GetSigner("SHA256WITHRSA");
+            signer.Init(true, kp.Private);
+            byte[] tbsBytes = tbs.GetEncoded();
+            signer.BlockUpdate(tbsBytes, 0, tbsBytes.Length);
+            sig = signer.GenerateSignature();
+        }
+        return new X509Certificate(new X509CertificateStructure(tbs, sigAlg, new DerBitString(sig)));
+    }
+
     private static TbsCertificateStructure BuildTbs(SubjectPublicKeyInfo spki, AlgorithmIdentifier sigAlg, bool authAndSign)
     {
         var gen = new V3TbsCertificateGenerator();

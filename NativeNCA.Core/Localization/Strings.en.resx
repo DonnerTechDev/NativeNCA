@@ -1122,4 +1122,37 @@ Without it, browsers can connect to NativeNCA only if NCALayer is installed on t
   <data name="Xml_NoId" xml:space="preserve">
     <value>The element to sign must have an Id attribute</value>
   </data>
+  <data name="Status_CertificateImportedTitle" xml:space="preserve">
+    <value>Certificate issued</value>
+  </data>
+  <data name="Status_CertificateImported" xml:space="preserve">
+    <value>Certificate "{0}" has been issued and added to the vault</value>
+  </data>
+  <data name="Overlay_CsrTitle" xml:space="preserve">
+    <value>Issue new digital signature</value>
+  </data>
+  <data name="Overlay_CsrSubtitle" xml:space="preserve">
+    <value>The site is requesting key generation to issue a certificate</value>
+  </data>
+  <data name="Overlay_CsrSubject" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="Overlay_CsrAlgorithm" xml:space="preserve">
+    <value>Algorithm</value>
+  </data>
+  <data name="Overlay_CsrSaveBackup" xml:space="preserve">
+    <value>Save a backup copy (.p12)</value>
+  </data>
+  <data name="Overlay_CsrBackupFolder" xml:space="preserve">
+    <value>Destination folder</value>
+  </data>
+  <data name="Overlay_CsrGenerateButton" xml:space="preserve">
+    <value>Generate keys</value>
+  </data>
+  <data name="Crypto_AlgorithmGost2015_512" xml:space="preserve">
+    <value>ST RK GOST R 34.10-2015 (512-bit)</value>
+  </data>
+  <data name="Crypto_AlgorithmRsa2048" xml:space="preserve">
+    <value>RSA (2048-bit)</value>
+  </data>
 </root>

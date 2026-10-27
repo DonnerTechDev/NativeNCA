@@ -49,6 +49,19 @@ internal sealed class FakePrompt(SecureVaultService vault, bool approve = true) 
         }
     }
 
+    public List<CsrPromptRequest> CsrRequests { get; } = new();
+
+    public Task<CsrPromptResult> PromptForCsrAsync(CsrPromptRequest request, CancellationToken ct = default)
+    {
+        lock (CsrRequests) CsrRequests.Add(request);
+        if (!approve) return Task.FromResult(CsrPromptResult.Cancelled);
+        return Task.FromResult(new CsrPromptResult
+        {
+            Approved = true,
+            Password = TestKeys.Password
+        });
+    }
+
     public Task ShowNotificationAsync(string title, string message) => Task.CompletedTask;
 }
 

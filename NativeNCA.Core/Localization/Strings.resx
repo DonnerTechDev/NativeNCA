@@ -1122,4 +1122,37 @@
   <data name="Xml_NoId" xml:space="preserve">
     <value>Подписываемый элемент должен иметь атрибут Id</value>
   </data>
+  <data name="Status_CertificateImportedTitle" xml:space="preserve">
+    <value>ЭЦП выпущена</value>
+  </data>
+  <data name="Status_CertificateImported" xml:space="preserve">
+    <value>Сертификат «{0}» успешно выпущен и добавлен в хранилище</value>
+  </data>
+  <data name="Overlay_CsrTitle" xml:space="preserve">
+    <value>Выпуск новой ЭЦП</value>
+  </data>
+  <data name="Overlay_CsrSubtitle" xml:space="preserve">
+    <value>Сайт запрашивает генерацию новой пары ключей для выпуска сертификата</value>
+  </data>
+  <data name="Overlay_CsrSubject" xml:space="preserve">
+    <value>Владелец</value>
+  </data>
+  <data name="Overlay_CsrAlgorithm" xml:space="preserve">
+    <value>Алгоритм</value>
+  </data>
+  <data name="Overlay_CsrSaveBackup" xml:space="preserve">
+    <value>Сохранить резервную копию (.p12)</value>
+  </data>
+  <data name="Overlay_CsrBackupFolder" xml:space="preserve">
+    <value>Папка для сохранения</value>
+  </data>
+  <data name="Overlay_CsrGenerateButton" xml:space="preserve">
+    <value>Выпустить ключи</value>
+  </data>
+  <data name="Crypto_AlgorithmGost2015_512" xml:space="preserve">
+    <value>СТ РК ГОСТ Р 34.10-2015 (512 бит)</value>
+  </data>
+  <data name="Crypto_AlgorithmRsa2048" xml:space="preserve">
+    <value>RSA (2048 бит)</value>
+  </data>
 </root>

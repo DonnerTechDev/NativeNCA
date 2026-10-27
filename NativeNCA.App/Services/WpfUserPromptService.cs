@@ -42,6 +42,26 @@ public class WpfUserPromptService : IUserPromptService
         }).Task.Unwrap();
     }
 
+    public Task<CsrPromptResult> PromptForCsrAsync(CsrPromptRequest request, CancellationToken cancellationToken = default)
+    {
+        if (Application.Current == null)
+            return Task.FromResult(CsrPromptResult.Cancelled);
+
+        return Application.Current.Dispatcher.InvokeAsync(async () =>
+        {
+            var vm = new CsrOverlayViewModel(request);
+            var window = new CsrOverlayWindow(vm);
+
+            await using var registration = cancellationToken.Register(() =>
+                Application.Current.Dispatcher.BeginInvoke(vm.Cancel));
+
+            window.Show();
+            var result = await vm.Task;
+            window.Close();
+            return result;
+        }).Task.Unwrap();
+    }
+
     public Task ShowNotificationAsync(string title, string message)
     {
         Application.Current?.Dispatcher.BeginInvoke(() =>
