@@ -2,7 +2,7 @@
 
 # NativeNCA
 
-**English** | [Русский](README.ru.md) | [Қазақша](README.kk.md)
+**English** | [Русский](README.ru.md) | [Қазақша](README.kk.md) · [oss.northbound.sh/NativeNCA](https://oss.northbound.sh/NativeNCA/en/)
 
 NativeNCA is a native Windows replacement for NCALayer. It lets you log in and sign documents on eGov, in online banking and in other Kazakh services with your NCA (НУЦ РК) digital signature, without Java and without typing your key password every time.
 
@@ -43,7 +43,7 @@ NCALayer does its job, but it is a Java application: it takes a while to start, 
 
 ## Getting started
 
-1. Download the latest archive for your processor from [Releases](../../releases) (`win-x64` fits most computers, `win-arm64` is for ARM) and extract it.
+1. Download the latest archive for your processor from the [website](https://oss.northbound.sh/NativeNCA/en/) or [Releases](../../releases) (`win-x64` fits most computers, `win-arm64` is for ARM) and extract it.
 2. Run `NativeNCA.exe` and click **Install**. NativeNCA is installed for your Windows account only, without administrator rights, into `%LOCALAPPDATA%\Programs\NativeNCA`, and appears in the Start menu and in Installed apps. **Run without installing** starts it from the current folder instead, but such a copy does not update itself.
 3. On the first start NativeNCA explains and sets up its certificate for browsers. Windows then shows a security warning about installing a certificate once; answer **Yes**. NativeNCA appears in the tray and starts listening for websites.
 4. Click **Add key**, choose your `.p12` file from NCA, enter its password and give the key a name. Leave **Save the password in the secure Vault** on if you want to sign with Windows Hello alone.
