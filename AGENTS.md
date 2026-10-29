@@ -148,4 +148,4 @@ Everything lives in the one `NativeNCA.exe`; there is no separate installer or u
 
 - Verify UI changes by rendering with `tools/Screenshots` (or a similar off-screen harness) and looking at the result. Mica is approximated there.
 - Keep commits focused and split unrelated changes. Write messages in English, imperative mood.
-- The README exists in three languages (`README.md`, `README.ru.md`, `README.kk.md`). Keep them in sync, write natural text and do not use emoji.
+- The README exists in three languages (`README.md`, `README.en.md`, `README.kk.md`). Keep them in sync, write natural text and do not use emoji.

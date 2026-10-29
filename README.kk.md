@@ -2,7 +2,7 @@
 
 # NativeNCA
 
-[English](README.md) | [Русский](README.ru.md) | **Қазақша** · [oss.northbound.sh/NativeNCA](https://oss.northbound.sh/NativeNCA/kk/)
+[English](README.en.md) | [Русский](README.md) | **Қазақша** · [oss.northbound.sh/NativeNCA](https://oss.northbound.sh/NativeNCA/kk/)
 
 NativeNCA — Windows жүйесіне арналған NCALayer-дің нативті баламасы. Ол арқылы ҰКО (НУЦ РК) берген ЭЦҚ кілтімен eGov-қа, интернет-банктерге және басқа да қазақстандық сервистерге кіріп, құжаттарға қол қоюға болады. Java қажет емес, кілттің құпиясөзін әр жолы енгізудің де қажеті жоқ.
 

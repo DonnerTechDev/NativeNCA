@@ -2,85 +2,85 @@
 
 # NativeNCA
 
-**English** | [Русский](README.ru.md) | [Қазақша](README.kk.md) · [oss.northbound.sh/NativeNCA](https://oss.northbound.sh/NativeNCA/en/)
+[English](README.en.md) | **Русский** | [Қазақша](README.kk.md) · [oss.northbound.sh/NativeNCA](https://oss.northbound.sh/NativeNCA/)
 
-NativeNCA is a native Windows replacement for NCALayer. It lets you log in and sign documents on eGov, in online banking and in other Kazakh services with your NCA (НУЦ РК) digital signature, without Java and without typing your key password every time.
+NativeNCA — нативная замена NCALayer для Windows. С ней можно входить и подписывать документы на eGov, в интернет-банках и других казахстанских сервисах ключом ЭЦП НУЦ РК. Java не нужна, вводить пароль от ключа каждый раз тоже не нужно.
 
-Websites talk to it exactly as they talk to NCALayer, so nothing has to change on their side. You add your `.p12` keys once, and from then on every request shows a clear confirmation window: which site is asking, what it wants to sign, and which key will be used. You approve with Windows Hello.
+Сайты общаются с NativeNCA так же, как с NCALayer, поэтому на их стороне ничего менять не надо. Вы один раз добавляете свои ключи `.p12`, а дальше на каждый запрос появляется понятное окно подтверждения: какой сайт спрашивает, что он хочет подписать и каким ключом. Подтверждаете через Windows Hello.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/en/main-dark.png">
-  <img alt="NativeNCA key vault" src="docs/screenshots/en/main-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/ru/main-dark.png">
+  <img alt="Хранилище ключей NativeNCA" src="docs/screenshots/ru/main-light.png">
 </picture>
 
-## Why another NCALayer
+## Зачем ещё один NCALayer
 
-NCALayer does its job, but it is a Java application: it takes a while to start, keeps a JVM in memory, asks for the key file and password on every operation and looks out of place on a modern Windows desktop. NativeNCA is a small .NET application that sits in the tray, starts instantly and keeps your keys in an encrypted vault, so signing becomes one click and a fingerprint.
+NCALayer со своей задачей справляется, но это Java-приложение: оно долго запускается, держит в памяти JVM, на каждую операцию просит выбрать файл ключа и ввести пароль и выглядит чужеродно в современной Windows. NativeNCA — небольшое .NET-приложение. Оно живёт в трее, запускается мгновенно и хранит ключи в зашифрованном хранилище, так что подпись превращается в один клик и прикосновение пальца.
 
-## Features
+## Возможности
 
-- **Compatible with NCALayer.** Listens on `wss://127.0.0.1:13579` and implements the `kz.gov.pki.knca.commonUtils` and `kz.gov.pki.knca.basics` modules: CMS/CAdES and XML signatures, multiple documents at once, certificate info.
-- **GOST and RSA keys from NCA.** СТ РК ГОСТ Р 34.10-2015 (512 bit) and RSA keys issued by НУЦ РК. The cryptography is implemented in managed code on top of BouncyCastle and checked against signatures produced by NCA's own Kalkan library. No Kalkan SDK, no Java.
-- **Key vault.** Keys and, if you choose, their passwords are stored encrypted with Windows DPAPI. You can give each key a readable name ("Personal eGov", "LLP Shanyrak") and change its password.
-- **Key pictures.** Give each key a photo or a company logo, cropped right in the app, so the right key is easy to spot in the list and in the signing prompt.
-- **Windows Hello.** Every signature can require face, fingerprint or PIN. In the optional protected mode, the vault itself is encrypted with a Windows Hello key kept in the TPM, so the keys cannot be decrypted without you, even by a program running under your account.
-- **Timestamps.** CMS signatures can carry a trusted timestamp from the NCA time-stamping service (CAdES-T), so they remain verifiable after the certificate expires.
-- **Built for Windows 11.** Fluent design, Mica, light and dark themes, tray icon, start with Windows.
-- **Kazakh, Russian and English.** The language follows Windows (Kazakh and Russian Windows get their own, everything else English) or can be chosen in Settings. It switches at once, without a restart.
+- **Совместимость с NCALayer.** Слушает `wss://127.0.0.1:13579` и реализует модули `kz.gov.pki.knca.commonUtils` и `kz.gov.pki.knca.basics`: подписи CMS/CAdES и XML, несколько документов за раз, сведения о сертификате.
+- **Ключи ГОСТ и RSA от НУЦ.** Поддерживаются ключи СТ РК ГОСТ Р 34.10-2015 (512 бит) и RSA, выданные НУЦ РК. Криптография реализована на управляемом коде поверх BouncyCastle и сверена с подписями, созданными библиотекой Kalkan самого НУЦ. Kalkan SDK и Java не требуются.
+- **Хранилище ключей.** Ключи и, по желанию, пароли от них хранятся зашифрованными через Windows DPAPI. Ключам можно давать понятные имена («Личный eGov», «ТОО Шанырак») и менять пароль.
+- **Фото ключей.** Каждому ключу можно назначить фото или логотип компании и кадрировать его прямо в приложении. Так нужный ключ сразу видно в списке и в окне подписи.
+- **Windows Hello.** Каждая подпись может требовать лицо, отпечаток пальца или PIN-код. В дополнительном защищённом режиме само хранилище шифруется ключом Windows Hello из TPM: без вас ключи не расшифрует даже программа, запущенная от вашего имени.
+- **Метки времени.** К CMS-подписям можно добавлять доверенную метку времени от службы НУЦ (CAdES-T), чтобы подпись оставалась проверяемой и после окончания срока сертификата.
+- **Сделано для Windows 11.** Fluent Design, Mica, светлая и тёмная темы, значок в трее, запуск вместе с Windows.
+- **Казахский, русский и английский.** Язык берётся из Windows (на казахской и русской Windows — свой, в остальных случаях английский) или выбирается в параметрах. Он меняется сразу, без перезапуска.
 
 <table>
   <tr>
-    <td width="40%"><img alt="Signing confirmation" src="docs/screenshots/en/overlay-light.png"></td>
-    <td width="60%"><img alt="Settings" src="docs/screenshots/en/settings-dark.png"><br><img alt="Adding a key" src="docs/screenshots/en/add-key-light.png"></td>
+    <td width="40%"><img alt="Подтверждение подписи" src="docs/screenshots/ru/overlay-light.png"></td>
+    <td width="60%"><img alt="Параметры" src="docs/screenshots/ru/settings-dark.png"><br><img alt="Добавление ключа" src="docs/screenshots/ru/add-key-light.png"></td>
   </tr>
 </table>
 
-## Requirements
+## Требования
 
-- Windows 10 version 2004 or later, or Windows 11 (x64 or ARM64).
-- NCALayer is not needed. If it is installed, it must not run at the same time as NativeNCA: websites expect both programs on the same port. When NCALayer is running, NativeNCA offers to close it and turn off its autostart.
-- Windows Hello (PIN, fingerprint or face) is recommended but not required.
+- Windows 10 версии 2004 или новее либо Windows 11 (x64 или ARM64).
+- NCALayer не нужен. Если он установлен, его нельзя запускать одновременно с NativeNCA: сайты ждут обе программы на одном и том же порту. Если NCALayer запущен, NativeNCA предложит закрыть его и отключить его автозапуск.
+- Windows Hello (PIN-код, отпечаток или лицо) желателен, но не обязателен.
 
-## Getting started
+## Как начать
 
-1. Download the latest archive for your processor from the [website](https://oss.northbound.sh/NativeNCA/en/) or [Releases](../../releases) (`win-x64` fits most computers, `win-arm64` is for ARM) and extract it.
-2. Run `NativeNCA.exe` and click **Install**. NativeNCA is installed for your Windows account only, without administrator rights, into `%LOCALAPPDATA%\Programs\NativeNCA`, and appears in the Start menu and in Installed apps. **Run without installing** starts it from the current folder instead, but such a copy does not update itself.
-3. On the first start NativeNCA explains and sets up its certificate for browsers. Windows then shows a security warning about installing a certificate once; answer **Yes**. NativeNCA appears in the tray and starts listening for websites.
-4. Click **Add key**, choose your `.p12` file from NCA, enter its password and give the key a name. Leave **Save the password in the secure Vault** on if you want to sign with Windows Hello alone.
-5. Open eGov or your bank and sign in as usual. NativeNCA shows a confirmation window instead of NCALayer.
+1. Скачайте с [сайта](https://oss.northbound.sh/NativeNCA/) или со страницы [Releases](../../releases) архив для своего процессора (`win-x64` подходит большинству компьютеров, `win-arm64` — для ARM) и распакуйте его.
+2. Запустите `NativeNCA.exe` и нажмите **Установить**. NativeNCA установится только для вашей учётной записи, без прав администратора, в папку `%LOCALAPPDATA%\Programs\NativeNCA` и появится в меню «Пуск» и в списке установленных приложений. **Запустить без установки** запускает программу прямо из текущей папки, но такая копия не обновляется сама.
+3. При первом запуске программа объяснит, зачем нужен сертификат для браузеров, и установит его. Windows один раз покажет предупреждение системы безопасности об установке сертификата — ответьте **Да**. NativeNCA появится в трее и начнёт принимать запросы сайтов.
+4. Нажмите **Добавить ключ**, выберите файл `.p12` от НУЦ, введите пароль и дайте ключу название. Оставьте включённым **Сохранить пароль в защищённом Vault**, если хотите подписывать только через Windows Hello.
+5. Откройте eGov или свой банк и войдите как обычно. Вместо NCALayer появится окно подтверждения NativeNCA.
 
-## Updates and uninstalling
+## Обновление и удаление
 
-- The installed NativeNCA checks GitHub for a new version at startup and every six hours. You can turn this off in Settings, under **Updates**. When a new version is out, a banner appears in the window and Windows shows a notification once per version. **Update** downloads the archive, checks it and restarts NativeNCA within a few seconds. Keys and settings are kept.
-- Every release archive is signed with the project's release key. NativeNCA installs an update only if the signature is valid for exactly that version and processor architecture and the version is newer than the installed one; anything else is refused. Files are downloaded only from github.com over HTTPS.
-- The previous version is kept. If something stops working after an update, click **Go back to the previous version** in Settings. The version you rolled back from is not offered automatically again, but **Check for updates** still finds it.
-- To uninstall, use **Uninstall NativeNCA** in Settings, or Windows Settings → Apps → Installed apps. By default your keys and settings stay in `%APPDATA%\NativeNCA` in case you install NativeNCA again; tick the box to delete them together with the browser certificate. Your original `.p12` files are never touched.
+- Установленная NativeNCA проверяет новые версии на GitHub при запуске и каждые шесть часов. Проверку можно выключить в параметрах, в разделе **Обновления**. Когда выходит новая версия, в окне появляется баннер, а Windows один раз показывает уведомление. Кнопка **Обновить** скачивает архив, проверяет его и за несколько секунд перезапускает NativeNCA. Ключи и параметры сохраняются.
+- Каждый архив релиза подписан ключом проекта. NativeNCA устанавливает обновление, только если подпись верна именно для этой версии и архитектуры процессора, а версия новее установленной. Всё остальное отклоняется. Файлы загружаются только с github.com по HTTPS.
+- Предыдущая версия сохраняется. Если после обновления что-то перестало работать, нажмите в параметрах **Вернуть предыдущую версию**. Версия, с которой вы вернулись, больше не предлагается автоматически, но её найдёт кнопка **Проверить обновления**.
+- Удалить программу можно в параметрах NativeNCA (**Удалить NativeNCA**) или в «Параметры Windows → Приложения → Установленные приложения». По умолчанию ключи и параметры остаются в `%APPDATA%\NativeNCA` на случай повторной установки; отметьте флажок, чтобы удалить их вместе с сертификатом для браузеров. Исходные файлы `.p12` не затрагиваются.
 
-## How it works
+## Как это работает
 
-When a website asks for a signature, NativeNCA shows the requesting domain, the data and the keys that fit the request. After you confirm, the key is decrypted in memory, the data is signed locally and only the signature and your public certificate are sent back to the website. The private key never leaves your computer.
+Когда сайт просит подпись, NativeNCA показывает домен, подписываемые данные и подходящие ключи. После подтверждения ключ расшифровывается в памяти, данные подписываются на вашем компьютере, а сайту уходят только подпись и ваш открытый сертификат. Закрытый ключ компьютер не покидает.
 
-Storage:
+Хранение:
 
-- Key files and saved passwords are encrypted with DPAPI for your Windows account and stored in `%APPDATA%\NativeNCA\Vault`.
-- With Windows Hello protection turned on, they are additionally encrypted with AES-256-GCM. The vault key is wrapped by an RSA key in the Microsoft Passport key storage provider, which only Windows Hello can unlock. One verification opens the vault for the time set in Settings.
-- If you reset your Windows PIN, the Windows Hello key is lost and protected data cannot be recovered. Keep your original `.p12` files and passwords.
+- Файлы ключей и сохранённые пароли шифруются DPAPI для вашей учётной записи Windows и лежат в `%APPDATA%\NativeNCA\Vault`.
+- При включённой защите Windows Hello они дополнительно шифруются AES-256-GCM. Ключ хранилища зашифрован RSA-ключом в хранилище Microsoft Passport, который открывается только через Windows Hello. Одна проверка открывает хранилище на время, заданное в параметрах.
+- Если сбросить PIN-код Windows, ключ Windows Hello пропадёт, и защищённые данные восстановить не получится. Сохраните исходные файлы `.p12` и пароли от них.
 
-Browser certificate:
+Сертификат для браузеров:
 
-- Websites connect to `wss://127.0.0.1:13579` over TLS, so the browser has to trust the local certificate. NativeNCA creates its own certificate authority for your computer, uses it once to issue a certificate for `127.0.0.1` and `localhost`, and destroys its private key right away. Only the public root certificate is added to your Windows trusted roots, so it can never vouch for anything else. On top of that, the root carries name constraints that limit it to local addresses.
-- The server certificate and its key are encrypted with DPAPI and stored in `%APPDATA%\NativeNCA\Tls`. Chrome, Edge and Firefox use the Windows certificate store, so no browser settings are needed. Firefox reads it only at startup: if it was open during setup, restart it.
-- You can remove the certificate in Settings, under **Browser certificate**. Until you set it up, NativeNCA falls back to NCALayer's certificate if NCALayer is installed. That certificate's private key is the same on every computer, which is why NativeNCA prefers its own.
+- Сайты подключаются к `wss://127.0.0.1:13579` по TLS, поэтому браузер должен доверять локальному сертификату. NativeNCA создаёт собственный удостоверяющий центр для вашего компьютера, один раз выпускает им сертификат для `127.0.0.1` и `localhost` и сразу уничтожает его закрытый ключ. В доверенные корневые сертификаты Windows попадает только открытая часть, поэтому ничего другого этот сертификат подтвердить не может. Вдобавок в нём записаны ограничения имён, которые разрешают только локальные адреса.
+- Сертификат сервера и его ключ зашифрованы DPAPI и лежат в `%APPDATA%\NativeNCA\Tls`. Chrome, Edge и Firefox берут сертификаты из хранилища Windows, так что настраивать браузеры не нужно. Firefox читает это хранилище только при запуске: если он был открыт во время установки, перезапустите его.
+- Удалить сертификат можно в параметрах, в строке **Сертификат для браузеров**. Пока он не установлен, NativeNCA использует сертификат NCALayer, если тот установлен. Закрытый ключ этого сертификата одинаков на всех компьютерах, поэтому NativeNCA предпочитает собственный.
 
-## Limitations
+## Ограничения
 
-- Hardware tokens and ID cards (Kaztoken, eToken, JaCarta, ID card) are not supported yet. Only file keys (`.p12`).
-- Legacy GOST 34.310-2004 keys are not supported. NCA stopped issuing them in 2024, and all of them have expired.
-- Signing local files through `createCMSSignatureFromFile` is not supported. Websites normally send data directly.
+- Аппаратные носители и удостоверения личности (Kaztoken, eToken, JaCarta, ID-карта) пока не поддерживаются. Только файловые ключи `.p12`.
+- Старые ключи ГОСТ 34.310-2004 не поддерживаются. НУЦ перестал их выпускать в 2024 году, и срок всех таких ключей уже истёк.
+- Подпись файлов с диска через `createCMSSignatureFromFile` не поддерживается. Обычно сайты передают данные напрямую.
 
-## Building from source
+## Сборка из исходников
 
-You need the [.NET 10 SDK](https://dotnet.microsoft.com/download).
+Нужен [.NET 10 SDK](https://dotnet.microsoft.com/download).
 
 ```
 dotnet build
@@ -88,18 +88,18 @@ dotnet test --filter "Category!=Network"
 dotnet publish NativeNCA.App -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
 ```
 
-The repository contains three projects:
+В репозитории три проекта:
 
-| Project | Purpose |
+| Проект | Назначение |
 | --- | --- |
-| `NativeNCA.Core` | Cryptography (PKCS#12, GOST 2015, CMS, XMLDSig, timestamps), key vault, NCALayer protocol and WebSocket server |
-| `NativeNCA.App` | WPF user interface built with WPF-UI |
-| `NativeNCA.Tests` | Unit tests, including verification against a real NCA signature |
+| `NativeNCA.Core` | Криптография (PKCS#12, ГОСТ 2015, CMS, XMLDSig, метки времени), хранилище ключей, протокол NCALayer и WebSocket-сервер |
+| `NativeNCA.App` | Интерфейс на WPF и WPF-UI |
+| `NativeNCA.Tests` | Тесты, в том числе проверка на настоящей подписи НУЦ |
 
-Releases are built by GitHub Actions. Pushing a tag such as `v1.2.0` runs the tests, builds self-contained x64 and ARM64 packages and publishes them as a GitHub release.
+Релизы собирает GitHub Actions. После пуша тега вида `v1.2.0` запускаются тесты, собираются самодостаточные пакеты для x64 и ARM64 и публикуются как релиз на GitHub.
 
-Release archives are signed with an ECDSA P-256 key. Its public half is built into `NativeNCA.Core` (`ReleaseSignature`), and the private half is kept in the `RELEASE_SIGNING_KEY` repository secret; a tag build fails without it. `tools/ReleaseSigning` generates a key pair and signs or verifies an archive locally.
+Архивы релизов подписываются ключом ECDSA P-256. Его открытая часть встроена в `NativeNCA.Core` (`ReleaseSignature`), а закрытая хранится в секрете репозитория `RELEASE_SIGNING_KEY`; без него сборка тега завершается ошибкой. Утилита `tools/ReleaseSigning` создаёт пару ключей, а также подписывает и проверяет архив локально.
 
-## Disclaimer
+## Отказ от ответственности
 
-NativeNCA is an independent project. It is not affiliated with, endorsed by or certified by the National Certification Authority of the Republic of Kazakhstan or JSC "National Information Technologies". It is not a certified cryptographic tool. Use it at your own risk and keep NCALayer around in case a service rejects a signature.
+NativeNCA — независимый проект. Он не связан с Национальным удостоверяющим центром Республики Казахстан и АО «Национальные информационные технологии», не одобрен и не сертифицирован ими. Программа не является сертифицированным средством криптографической защиты информации. Используйте её на свой риск и держите NCALayer под рукой на случай, если какой-то сервис не примет подпись.
