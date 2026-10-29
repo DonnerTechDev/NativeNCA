@@ -813,7 +813,14 @@ dialog {
   box-shadow: var(--shadow-dialog);
   width: min(100% - 32px, 480px);
 }
-dialog::backdrop { background: rgba(0, 0, 0, .3); }
+dialog:modal {
+  overscroll-behavior: contain;
+}
+dialog::backdrop {
+  background: rgba(0, 0, 0, .3);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
 :root[data-theme="dark"] dialog::backdrop { background: rgba(0, 0, 0, .5); }
 dialog[open] { animation: dialogIn .25s var(--ease); }
 @keyframes dialogIn { from { opacity: 0; transform: scale(1.05); } }
@@ -833,6 +840,145 @@ dialog[open] { animation: dialogIn .25s var(--ease); }
 .donate-item b { display: block; font-size: 15px; }
 .donate-item small { display: block; color: var(--text-2); font-size: 13px; }
 .donate-item .icon:last-child { margin-left: auto; color: var(--text-3); width: 16px; height: 16px; }
+
+/* ---------- Phone transfer card in donate dialog ---------- */
+.donate-phone-card {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-card);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+.donate-phone-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.donate-phone-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.donate-phone-label .icon {
+  width: 16px;
+  height: 16px;
+  color: #f14635;
+}
+.donate-banks {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.bank-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.bank-kaspi {
+  background: rgba(241, 70, 53, 0.12);
+  color: #f14635;
+}
+.bank-kaspi::before { background: #f14635; }
+
+.bank-freedom {
+  background: rgba(0, 163, 137, 0.12);
+  color: #00a389;
+}
+.bank-freedom::before { background: #00a389; }
+
+.bank-bcc {
+  background: rgba(0, 168, 89, 0.12);
+  color: #00a859;
+}
+.bank-bcc::before { background: #00a859; }
+
+.donate-phone-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg);
+  border: 1px solid var(--stroke-strong);
+  border-radius: var(--r-ctrl);
+  padding: 10px 14px;
+  transition: border-color .15s;
+}
+.donate-phone-display:hover {
+  border-color: #f14635;
+}
+.donate-phone-num {
+  font-family: var(--font-mono, "SF Mono", Consolas, "Cascadia Code", monospace);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+@media (max-width: 440px) {
+  .donate-phone-num { font-size: 16px; }
+  .donate-phone-display { padding: 8px 10px; }
+}
+.donate-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  --h: 36px;
+  min-height: 36px;
+  cursor: pointer;
+  border-radius: var(--r-ctrl);
+  border: 1px solid var(--stroke-strong);
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+.donate-copy-btn:hover {
+  background: var(--card-hover);
+}
+.donate-copy-btn .icon {
+  width: 15px;
+  height: 15px;
+}
+.donate-copy-btn.copied {
+  background: rgba(0, 168, 89, 0.15);
+  color: #00a859;
+  border-color: rgba(0, 168, 89, 0.35);
+}
+.donate-phone-hint {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+.donate-recipient {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.donate-recipient b {
+  color: var(--text-2);
+}
+.donate-other-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
 
 /* Lightbox */
 dialog.lightbox { width: min(100% - 32px, 1400px); background: transparent; border: 0; box-shadow: none; overflow: visible; }

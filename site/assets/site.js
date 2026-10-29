@@ -4,15 +4,19 @@
 
 const CONFIG = {
   repo: "northbound-oss/NativeNCA",
-  // Donation options shown in the donate dialog. Fill in real links; entries with an
-  // empty url are hidden. With a single entry the button opens it directly.
+  // Kazakhstan direct transfers:
+  phone: "+7 700 107 95 15", // Phone for Kaspi, Freedom, BCC
+  phoneRaw: "+77001079515",   // Digits for clipboard copy
+  recipientName: "Ярослав П.",
+  // Other donation options shown in the donate dialog:
   donate: [
-    { title: "Kaspi", url: "", icon: "heart",
-      note: { ru: "Перевод на карту или по номеру", en: "Card or phone transfer in Kazakhstan", kk: "Картаға немесе нөмір бойынша аударым" } },
+    { title: "DonationAlerts", url: "https://dalink.to/donnertech", icon: "heart",
+      note: { ru: "Банковские карты, крипта и кошельки", en: "Bank cards, crypto and e-wallets", kk: "Банк карталары, крипто және әмияндар" } },
+    { title: { ru: "Звезда на GitHub", en: "Star on GitHub", kk: "GitHub жұлдызшасы" },
+      url: "https://github.com/northbound-oss/NativeNCA", icon: "github",
+      note: { ru: "Бесплатный способ поддержать проект", en: "A free way to support the project", kk: "Жобаға тегін қолдау көрсету тәсілі" } },
     { title: "Boosty", url: "", icon: "heart",
       note: { ru: "Разово или по подписке", en: "One-off or monthly", kk: "Бір рет немесе жазылым арқылы" } },
-    { title: "GitHub Sponsors", url: "", icon: "github",
-      note: { ru: "Для тех, у кого есть зарубежная карта", en: "With any international card", kk: "Шетелдік картасы барларға" } },
   ],
 };
 
@@ -24,7 +28,10 @@ const I18N = {
     forArch: (a) => `Для ${a}`, whatsNew: "Что нового",
     again: "Ещё раз",
     shot: (t, dark) => `Скриншот NativeNCA: ${t}${dark ? ", тёмная тема" : ""}`,
-    star: "Поставить звезду на GitHub", starNote: "Ссылки для донатов скоро появятся",
+    star: "Поставить звезду на GitHub", starNote: "Бесплатный способ поддержать проект",
+    phoneTransfer: "Перевод по номеру телефона", phoneHint: "Подходят приложения Kaspi, Freedom, BCC и других банков",
+    copyPhone: "Копировать", copied: "Скопировано!",
+    otherMethods: "Другие способы",
     console: "Код сайта и программы:",
     race: [
       "> Запуск виртуальной машины Java…",
@@ -46,7 +53,10 @@ const I18N = {
     forArch: (a) => `For ${a}`, whatsNew: "What's new",
     again: "Again",
     shot: (t, dark) => `NativeNCA screenshot: ${t}${dark ? ", dark theme" : ""}`,
-    star: "Star it on GitHub", starNote: "Donation links are coming soon",
+    star: "Star it on GitHub", starNote: "A free way to support the project",
+    phoneTransfer: "Transfer by phone number", phoneHint: "Works in Kaspi, Freedom, BCC and other banking apps",
+    copyPhone: "Copy", copied: "Copied!",
+    otherMethods: "Other methods",
     console: "Source of the site and the app:",
     race: [
       "> Starting the Java virtual machine…",
@@ -68,7 +78,10 @@ const I18N = {
     forArch: (a) => `${a} үшін`, whatsNew: "Не өзгерді",
     again: "Тағы бір рет",
     shot: (t, dark) => `NativeNCA скриншоты: ${t}${dark ? ", күңгірт тақырып" : ""}`,
-    star: "GitHub-та жұлдызша қою", starNote: "Демеу сілтемелері жақында пайда болады",
+    star: "GitHub-та жұлдызша қою", starNote: "Жобаға тегін қолдау көрсету тәсілі",
+    phoneTransfer: "Телефон нөмірі бойынша аударым", phoneHint: "Kaspi, Freedom, BCC және басқа банк қосымшалары жарайды",
+    copyPhone: "Көшіру", copied: "Көшірілді!",
+    otherMethods: "Басқа тәсілдер",
     console: "Сайт пен бағдарламаның коды:",
     race: [
       "> Java виртуалды машинасы іске қосылуда…",
@@ -410,27 +423,125 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ---------- Donate dialog ---------- */
 (function donate() {
+  const dlg = $("#donate-dialog");
+  if (!dlg) return;
+
   const items = CONFIG.donate.filter((d) => d.url);
   const btn = $("#donate-open");
-  const dlg = $("#donate-dialog");
   const list = $("#donate-list");
   const ext = '<svg class="icon" aria-hidden="true"><use href="#i-open"/></svg>';
+  const title = (d) => (typeof d.title === "object" ? d.title[LANG] || d.title.ru : d.title) || "";
   const note = (d) => (typeof d.note === "object" ? d.note[LANG] || d.note.ru : d.note) || "";
 
-  if (items.length === 1) {
-    btn.addEventListener("click", () => window.open(items[0].url, "_blank", "noopener"));
-    return;
-  }
   if (items.length === 0) {
     // No donation links configured yet: offer a star instead of a dead end.
     items.push({ title: T.star, note: T.starNote, url: `https://github.com/${CONFIG.repo}`, icon: "github" });
   }
-  list.innerHTML = items.map((d) =>
-    `<a class="donate-item" href="${d.url}" target="_blank" rel="noopener">
-       <svg class="icon icon-24" aria-hidden="true"><use href="#i-${d.icon || "heart"}"/></svg>
-       <span><b>${d.title}</b><small>${note(d)}</small></span>${ext}</a>`).join("");
-  btn.addEventListener("click", () => dlg.showModal());
-  dlg.addEventListener("click", (e) => { if (e.target === dlg || e.target.closest("[data-close]")) dlg.close(); });
+  if (list) {
+    list.innerHTML = items.map((d) =>
+      `<a class="donate-item" href="${d.url}" target="_blank" rel="noopener">
+         <svg class="icon icon-24" aria-hidden="true"><use href="#i-${d.icon || "heart"}"/></svg>
+         <span><b>${title(d)}</b><small>${note(d)}</small></span>${ext}</a>`).join("");
+  }
+
+  // Phone transfer elements
+  const phoneNum = $("#donate-phone-num");
+  if (phoneNum && CONFIG.phone) {
+    phoneNum.textContent = CONFIG.phone;
+  }
+  const recipientEl = $("#donate-recipient");
+  const recipientNameEl = $("#donate-recipient-name");
+  if (recipientEl && recipientNameEl) {
+    if (CONFIG.recipientName) {
+      recipientNameEl.textContent = CONFIG.recipientName;
+      recipientEl.hidden = false;
+    } else {
+      recipientEl.hidden = true;
+    }
+  }
+  const copyBtn = $("#donate-copy-phone");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      const text = CONFIG.phoneRaw || CONFIG.phone;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.classList.add("copied");
+        const span = copyBtn.querySelector(".copy-text");
+        const use = copyBtn.querySelector("use");
+        if (span) span.textContent = T.copied;
+        if (use) use.setAttribute("href", "#i-checkmark");
+        setTimeout(() => {
+          copyBtn.classList.remove("copied");
+          if (span) span.textContent = T.copyPhone;
+          if (use) use.setAttribute("href", "#i-copy");
+        }, 2000);
+      });
+    });
+  }
+
+  const isDonateUrl = () => {
+    const hash = (location.hash || "").toLowerCase();
+    if (hash === "#donate" || hash === "#support") return true;
+    const search = new URLSearchParams(location.search);
+    return search.has("donate") || search.has("support");
+  };
+
+  const openDonate = (updateUrl = true) => {
+    if (!dlg.open) dlg.showModal();
+    if (updateUrl && (location.hash || "").toLowerCase() !== "#donate") {
+      try { history.pushState({ donateOpen: true }, "", "#donate"); } catch {}
+    }
+  };
+
+  const closeDonate = () => {
+    if (dlg.open) dlg.close();
+  };
+
+  if (btn) btn.addEventListener("click", () => openDonate(true));
+
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href="#donate"], a[href="#support"], [data-donate]');
+    if (!a) return;
+    e.preventDefault();
+    openDonate(true);
+  });
+
+  const outside = (e, dialog) => {
+    const r = dialog.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  };
+  dlg.addEventListener("click", (e) => {
+    if (e.target === dlg || outside(e, dlg) || e.target.closest("[data-close]")) {
+      closeDonate();
+    }
+  });
+
+  dlg.addEventListener("close", () => {
+    const hash = (location.hash || "").toLowerCase();
+    const search = new URLSearchParams(location.search);
+    if (hash === "#donate" || hash === "#support" || search.has("donate") || search.has("support")) {
+      const url = new URL(location.href);
+      if (hash === "#donate" || hash === "#support") url.hash = "";
+      url.searchParams.delete("donate");
+      url.searchParams.delete("support");
+      try { history.replaceState(null, "", url.pathname + (url.search || "")); } catch {}
+    }
+  });
+
+  const syncFromUrl = () => {
+    if (isDonateUrl()) {
+      if (!dlg.open) openDonate(false);
+    } else {
+      if (dlg.open) closeDonate();
+    }
+  };
+
+  window.addEventListener("popstate", syncFromUrl);
+  window.addEventListener("hashchange", syncFromUrl);
+
+  if (isDonateUrl()) {
+    openDonate(false);
+  }
 })();
 
 /* ---------- FAQ: one expander open at a time ---------- */

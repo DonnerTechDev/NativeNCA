@@ -172,7 +172,7 @@
       </div>
       <div class="hero-sub">
         <span data-dl-alt hidden></span>
-        <a href="#donate">Жобаны қолдау</a>
+        <a href="#donate" data-donate>Жобаны қолдау</a>
       </div>
 
       <div class="hero-facts">
@@ -552,7 +552,7 @@
 </section>
 
 <!-- ============ DONATE ============ -->
-<section class="section" id="donate" style="padding-top: 0">
+<section class="section" id="donate-section" style="padding-top: 0">
   <div class="wrap">
     <div class="card donate reveal">
       <span class="heart"><svg class="icon" aria-hidden="true"><use href="#i-heart-fill"/></svg></span>
@@ -588,10 +588,37 @@
   </div>
 </footer>
 
-<dialog id="donate-dialog" aria-labelledby="donate-title">
+<dialog id="donate-dialog" aria-labelledby="donate-title" closedby="any">
   <div class="dlg-body">
     <h2 id="donate-title">NativeNCA-ны қолдау</h2>
-    <p>Рақмет! Өзіңізге ыңғайлы тәсілді таңдаңыз.</p>
+    <p>Рақмет! Кез келген көмек жобаның дамуына үлес қосады.</p>
+
+    <div class="donate-phone-card">
+      <div class="donate-phone-head">
+        <span class="donate-phone-label" id="donate-phone-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>
+          Телефон нөмірі бойынша аударым
+        </span>
+        <div class="donate-banks" aria-label="Қолдау көрсетілетін банктер">
+          <span class="bank-chip bank-kaspi">Kaspi</span>
+          <span class="bank-chip bank-freedom">Freedom</span>
+          <span class="bank-chip bank-bcc">BCC</span>
+        </div>
+      </div>
+
+      <div class="donate-phone-display">
+        <span class="donate-phone-num" id="donate-phone-num">+7 700 107 95 15</span>
+        <button class="btn btn-subtle donate-copy-btn" type="button" id="donate-copy-phone" aria-label="Телефон нөмірін көшіру">
+          <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>
+          <span class="copy-text">Көшіру</span>
+        </button>
+      </div>
+
+      <p class="donate-phone-hint" id="donate-phone-hint">Kaspi, Freedom, BCC және басқа банк қосымшалары жарайды</p>
+      <div class="donate-recipient" id="donate-recipient">Алушы: <b id="donate-recipient-name">Ярослав П.</b></div>
+    </div>
+
+    <div class="donate-other-title" id="donate-other-title">Басқа тәсілдер</div>
     <div class="donate-list" id="donate-list"></div>
   </div>
   <div class="dlg-footer">
