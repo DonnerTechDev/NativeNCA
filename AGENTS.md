@@ -24,6 +24,8 @@ The UI is in Kazakh, Russian and English (see Localization below). Code, comment
 | `tools/Screenshots` | Renders `docs/screenshots/<en\|ru\|kk>` with fictional data (`--updates`: install/update UI, `--review`: every screen and dialog, `--lang kk`: one language) |
 | `tools/LocalizationReview` | Writes `docs/localization-review.md` (key, Russian, Kazakh, notes) for the native-speaker review. The sheet is local-only (gitignored) |
 | `tools/ReleaseSigning` | Generates the release signing key, signs and verifies release zips |
+| `tools/style_qr.py` | CLI tool to generate and style QR codes with custom dots, eyes and logos |
+| `tools/qr-styler.html` | Interactive browser tool with live preview to style and export QR codes |
 | `.github/workflows/build.yml` | CI, packaging and releases |
 | `site/` | Website for GitHub Pages (static HTML/CSS/JS in Russian, English and Kazakh). See the Website section |
 | `.github/workflows/pages.yml` | Builds `site/` and deploys it to GitHub Pages |
