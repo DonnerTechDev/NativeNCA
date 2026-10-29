@@ -496,12 +496,20 @@
         <div class="exp-body"><p>No. NativeNCA is made by an independent developer, not by НУЦ РК or JSC National Information Technologies, and it hasn't been certified by them. Sites can't tell the difference: they talk to NativeNCA just as they talk to NCALayer, and the signature is made with your own key.</p></div>
       </details>
       <details class="expander">
+        <summary>Are there security guarantees?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>The project's source code is completely open on GitHub, allowing anyone or any independent auditor to inspect every single line. There are no hidden background requests or telemetry, and keys are encrypted locally using Windows tools (DPAPI and Windows Hello).</p><p>Moreover, updates are never installed silently: NativeNCA updates strictly with your explicit confirmation, and every release is cryptographically signed. Quietly stealing keys or injecting malicious code is impossible.</p></div>
+      </details>
+      <details class="expander">
         <summary>Does it work with eGov and banks?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
         <div class="exp-body"><p>Yes. Signing in with a digital signature and signing documents work the same as with NCALayer. If some site still doesn't accept the signature, let us know on <a href="https://github.com/northbound-oss/NativeNCA/issues">GitHub</a> and use NCALayer there for now.</p></div>
       </details>
       <details class="expander">
+        <summary>How does it differ from Doodocs Sign?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>While Doodocs Sign also attempts to replace NCALayer, in practice it simply fails or throws errors on many websites and government portals. Furthermore, Doodocs is closed-source: it is impossible to audit how it handles your private keys, which poses inherent security risks. Its only real advantage is macOS support.</p><p>NativeNCA faithfully replicates the official NCALayer protocol, works reliably out of the box, and its completely open-source codebase guarantees your keys remain safe.</p></div>
+      </details>
+      <details class="expander">
         <summary>Do I need to uninstall NCALayer?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>No, keep it. But the two can't run at the same time, so NativeNCA offers to close NCALayer and stop it from starting with Windows. You can bring NCALayer back any time.</p></div>
+        <div class="exp-body"><p>Not necessarily. But the two can't run at the same time, so NativeNCA offers to close NCALayer and stop it from starting with Windows. You can bring NCALayer back any time.</p></div>
       </details>
       <details class="expander">
         <summary>NCALayer doesn't work for me. Will NativeNCA help?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
@@ -541,7 +549,7 @@
       </details>
       <details class="expander">
         <summary>Is there a version for Mac or Linux?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>No, NativeNCA works only on Windows 10 and 11.</p></div>
+        <div class="exp-body"><p>No, NativeNCA works only on Windows 10 and 11. A Linux version is planned for the near future.</p></div>
       </details>
       <details class="expander">
         <summary>How much does it cost?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>

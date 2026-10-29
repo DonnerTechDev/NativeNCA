@@ -496,12 +496,20 @@
         <div class="exp-body"><p>Нет. NativeNCA сделал независимый разработчик, не НУЦ РК и не АО «Национальные информационные технологии», и их сертификацию программа не проходила. Сайты разницы не замечают: они общаются с NativeNCA так же, как с NCALayer, а подпись получается вашим собственным ключом ЭЦП.</p></div>
       </details>
       <details class="expander">
+        <summary>Есть ли гарантии безопасности?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Исходный код проекта полностью открыт на GitHub, и любой желающий или независимый специалист может проверить его до единой строчки. В программе нет скрытых сетевых запросов и телеметрии, а ключи шифруются локально средствами Windows (DPAPI и Windows Hello).</p><p>Кроме того, обновления никогда не ставятся втихую: NativeNCA обновляется строго по вашему подтверждению, а каждый релиз имеет криптографическую подпись. Незаметно внедрить вредоносный код или утащить ключи невозможно.</p></div>
+      </details>
+      <details class="expander">
         <summary>Работает ли NativeNCA с eGov и банками?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
         <div class="exp-body"><p>Да. Вход по ЭЦП и подпись документов работают так же, как с NCALayer. Если какой-то сайт всё же не принял подпись, напишите нам на <a href="https://github.com/northbound-oss/NativeNCA/issues">GitHub</a> и пока воспользуйтесь NCALayer.</p></div>
       </details>
       <details class="expander">
+        <summary>В чём отличие от Doodocs Sign?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
+        <div class="exp-body"><p>Хотя Doodocs Sign также пытается заменять NCALayer, на практике на многих сайтах и государственных порталах он попросту не работает или выдаёт ошибки. Кроме того, у Doodocs закрытый исходный код: невозможно проверить, как именно приложение обрабатывает ваши ключи ЭЦП, а это заведомо несёт гораздо больше рисков для безопасности. Единственное его преимущество — поддержка macOS.</p><p>NativeNCA полностью воспроизводит официальный протокол NCALayer, стабильно работает на сайтах из коробки, а открытый исходный код гарантирует сохранность ваших ключей.</p></div>
+      </details>
+      <details class="expander">
         <summary>Нужно ли удалять NCALayer?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Нет, пусть остаётся. Но работать одновременно они не могут, поэтому NativeNCA предложит закрыть NCALayer и не запускать его вместе с Windows. Вернуть NCALayer можно в любой момент.</p></div>
+        <div class="exp-body"><p>Не обязательно. Но работать одновременно они не могут, поэтому NativeNCA предложит закрыть NCALayer и не запускать его вместе с Windows. Вернуть NCALayer можно в любой момент.</p></div>
       </details>
       <details class="expander">
         <summary>У меня не работает NCALayer. Поможет ли NativeNCA?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
@@ -541,7 +549,7 @@
       </details>
       <details class="expander">
         <summary>Есть версия для Mac или Linux?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
-        <div class="exp-body"><p>Нет, NativeNCA работает только в Windows 10 и 11.</p></div>
+        <div class="exp-body"><p>Нет, NativeNCA работает только в Windows 10 и 11. Планируется версия для Linux в ближайшем будущем.</p></div>
       </details>
       <details class="expander">
         <summary>Сколько стоит?<span class="chev"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span></summary>
