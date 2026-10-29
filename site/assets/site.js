@@ -11,7 +11,7 @@ const CONFIG = {
   // Other donation options shown in the donate dialog:
   donate: [
     { title: "DonationAlerts", url: "https://dalink.to/donnertech", icon: "heart",
-      note: { ru: "Банковские карты, крипта и кошельки", en: "Bank cards, crypto and e-wallets", kk: "Банк карталары, крипто және әмияндар" } },
+      note: { ru: "Банковские карты Visa, Mastercard и МИР", en: "Visa and Mastercard", kk: "Visa және Mastercard банк карталары" } },
     { title: { ru: "Звезда на GitHub", en: "Star on GitHub", kk: "GitHub жұлдызшасы" },
       url: "https://github.com/northbound-oss/NativeNCA", icon: "github",
       note: { ru: "Бесплатный способ поддержать проект", en: "A free way to support the project", kk: "Жобаға тегін қолдау көрсету тәсілі" } },
